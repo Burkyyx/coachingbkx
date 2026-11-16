@@ -426,15 +426,13 @@ async function main() {
   if (!coachId) {
     coachId = await createUser('coach@demo.fr');
     await must(
-      db
-        .from('profiles')
-        .insert({
-          id: coachId,
-          role: 'coach',
-          first_name: 'Enzo',
-          last_name: 'Coach',
-          onboarded_at: new Date().toISOString(),
-        }),
+      db.from('profiles').insert({
+        id: coachId,
+        role: 'coach',
+        first_name: 'Enzo',
+        last_name: 'Coach',
+        onboarded_at: new Date().toISOString(),
+      }),
       'profil coach',
     );
   }
@@ -520,7 +518,10 @@ async function main() {
           const isWarm = s.type === 'warmup';
           let reps = isWarm
             ? s.min
-            : Math.max(1, Math.round(st.reps + between(-0.5, 0.6) - (j > 1 && rand() < 0.35 ? 1 : 0)));
+            : Math.max(
+                1,
+                Math.round(st.reps + between(-0.5, 0.6) - (j > 1 && rand() < 0.35 ? 1 : 0)),
+              );
           if (stagnates) reps = Math.min(reps, min + 1);
           if (tired) reps = Math.max(1, reps - 2);
           const load =
