@@ -6,6 +6,8 @@
     "noImplicitOverride": true,
     "noFallthroughCasesInSwitch": true,
     "types": ["jest", "node"],
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
     "paths": {
       "@/*": ["./src/*"]
     }

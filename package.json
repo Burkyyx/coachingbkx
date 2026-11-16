@@ -21,7 +21,8 @@
     "db:reset": "supabase db reset",
     "db:types": "supabase gen types typescript --local --schema public > src/lib/database.types.ts && prettier --write src/lib/database.types.ts",
     "seed:demo": "node scripts/seed-demo.mjs",
-    "db:types:test": "KEEP_DB=1 bash scripts/test-rls.sh && supabase gen types typescript --db-url postgresql://postgres:postgres@127.0.0.1:54329/postgres --schema public > src/lib/database.types.ts && prettier --write src/lib/database.types.ts"
+    "db:types:test": "KEEP_DB=1 bash scripts/test-rls.sh && supabase gen types typescript --db-url postgresql://postgres:postgres@127.0.0.1:54329/postgres --schema public > src/lib/database.types.ts && prettier --write src/lib/database.types.ts",
+    "test:coverage": "jest --coverage"
   },
   "dependencies": {
     "@expo/metro-runtime": "~58.0.17",
@@ -99,6 +100,18 @@
     },
     "setupFiles": [
       "<rootDir>/jest/setup.ts"
-    ]
+    ],
+    "collectCoverageFrom": [
+      "src/core/**/*.ts",
+      "!src/core/testing/**",
+      "!src/core/index.ts"
+    ],
+    "coverageThreshold": {
+      "./src/core/": {
+        "lines": 95,
+        "functions": 95,
+        "branches": 85
+      }
+    }
   }
 }
