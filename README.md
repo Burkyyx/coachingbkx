@@ -109,8 +109,29 @@ select public.bootstrap_coach('ton-email@exemple.fr');
 > Il ne peut y avoir qu'**un seul** coach. Si tu as lancé la démo, supprime d'abord le compte `coach@demo.fr`
 > dans _Authentication_, puis relance la commande ci-dessus.
 
-**Sur ton téléphone (même Wi-Fi)** : `npm start`, puis ouvre l'adresse affichée dans le navigateur du
-téléphone (ex. `http://192.168.1.20:8081`). Pour l'app native, voir la [section 8](#8-installer-lapp-sur-ton-téléphone-eas).
+### Ouvrir l'app sur ton téléphone (même Wi-Fi que le Mac)
+
+1. Supabase doit tourner (`npm run db:start`). Arrête `npm run web` s'il tourne (Ctrl + C).
+2. Lance :
+   ```bash
+   npm run phone
+   ```
+3. Attends le cadre **« 📱 SUR TON TÉLÉPHONE »** avec un code QR (≈ 1 min la 1re fois).
+   **Scanne CE code** avec l'appareil photo du téléphone (ou tape l'adresse affichée,
+   ex. `http://192.168.1.20:8081`, dans Safari / Chrome).
+   _Ignore l'autre code QR affiché plus haut par Expo : il sert à une version de développement
+   de l'app, pas au navigateur._
+4. Si le Mac demande d'**autoriser les connexions entrantes** (pour « node » ou Docker) : _Autoriser_.
+
+Ça ne marche pas ?
+
+- Le téléphone doit être sur le **même Wi-Fi** que le Mac (pas en 4G/5G, pas sur un Wi-Fi « invités »).
+- La page ne s'ouvre pas : _Réglages Système → Réseau → Coupe-feu_ du Mac → désactive-le le temps
+  du test, ou autorise « node ».
+- Le mode avion (hors-ligne) ne se teste qu'avec la version en ligne (https, [section 7](#7-mettre-le-site-web-en-ligne)) :
+  sur une adresse `http://192.168…` le navigateur du téléphone ne met pas l'app en cache.
+
+Pour l'app native (App Store / Play Store), voir la [section 8](#8-installer-lapp-sur-ton-téléphone-eas).
 
 ---
 
@@ -317,7 +338,8 @@ Pour les notifications push et l'alerte du minuteur en arrière-plan, il faut un
 | Commande                       | À quoi ça sert                                                           |
 | ------------------------------ | ------------------------------------------------------------------------ |
 | `npm run web`                  | Lancer l'app dans le navigateur                                          |
-| `npm start`                    | Serveur de développement (téléphone, version de développement)           |
+| `npm run phone`                | Ouvrir l'app dans le navigateur du téléphone (même Wi-Fi, code QR)       |
+| `npm start`                    | Serveur pour la version de développement native (section 8)              |
 | `npm run check`                | Vérifier tout le code (types, style, tests)                              |
 | `npm run test:rls`             | Tests de sécurité de la base (Docker requis)                             |
 | `npm run test:coverage`        | Tests + couverture des algorithmes                                       |
