@@ -6,6 +6,7 @@ import { Button, Icon, Segmented, Sheet, Text, TextField, VStack } from '@/compo
 import { useTheme } from '@/theme/ThemeProvider';
 
 import { filterExercises, MUSCLES, useExercises, type MuscleGroup } from './api';
+import { BodyMap } from './BodyMap';
 import { ExerciseThumb } from './ExerciseVideo';
 
 type Props = {
@@ -32,16 +33,17 @@ export function ExercisePicker({
   const theme = useTheme();
   const { data = [] } = useExercises();
   const [search, setSearch] = useState('');
-  const [muscle, setMuscle] = useState<MuscleGroup | null>(null);
+  const [muscles, setMuscles] = useState<MuscleGroup[]>([]);
+  const [bodyOpen, setBodyOpen] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
   const multi = !!onPickMany;
 
   const list = useMemo(
     () =>
-      filterExercises(data, { search, muscle, includeArchived: false }).filter(
+      filterExercises(data, { search, muscles, includeArchived: false }).filter(
         (e) => !excludeIds.includes(e.id),
       ),
-    [data, search, muscle, excludeIds],
+    [data, search, muscles, excludeIds],
   );
 
   const muscleOptions = [
@@ -83,11 +85,18 @@ export function ExercisePicker({
           autoFocus
           accessibilityLabel={t('common.search')}
         />
+        <Button
+          variant="secondary"
+          icon={bodyOpen ? 'chevron-up' : 'body-outline'}
+          label={bodyOpen ? t('exercises.hideBody') : t('exercises.showBody')}
+          onPress={() => setBodyOpen((v) => !v)}
+        />
+        {bodyOpen ? <BodyMap selected={muscles} onSelect={setMuscles} width={110} /> : null}
         <Segmented
           scrollable
           options={muscleOptions}
-          value={muscle ?? 'all'}
-          onChange={(v) => setMuscle(v === 'all' ? null : v)}
+          value={muscles.length === 0 ? 'all' : muscles.length === 1 ? muscles[0] : null}
+          onChange={(v) => setMuscles(v === 'all' ? [] : [v])}
         />
       </VStack>
       <FlatList

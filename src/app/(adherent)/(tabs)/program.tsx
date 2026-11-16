@@ -51,6 +51,12 @@ export default function ProgramScreen() {
           title={t('training.noProgram')}
           body={t('training.noProgramBody')}
         />
+        <Button
+          variant="secondary"
+          icon="body-outline"
+          label={t('exercises.catalogOpen')}
+          onPress={() => router.push('/exercises')}
+        />
       </Screen>
     );
   }
@@ -80,6 +86,12 @@ export default function ProgramScreen() {
         </VStack>
         <SyncBadge />
       </HStack>
+      <Button
+        variant="secondary"
+        icon="body-outline"
+        label={t('exercises.catalogOpen')}
+        onPress={() => router.push('/exercises')}
+      />
       <Segmented
         scrollable
         options={Array.from({ length: program.duration_weeks }, (_, i) => ({

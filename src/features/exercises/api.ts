@@ -110,21 +110,30 @@ export function normalizeSearch(text: string): string {
   return text.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
 }
 
+/**
+ * Filtre la bibliothèque (recherche, muscles, archivés). Avec des muscles sélectionnés,
+ * les exercices dont c'est le muscle PRINCIPAL viennent en premier, puis ceux où il
+ * n'est que secondaire.
+ */
 export function filterExercises(
   list: readonly Exercise[],
   {
     search,
-    muscle,
+    muscles,
     includeArchived,
-  }: { search: string; muscle: MuscleGroup | null; includeArchived: boolean },
+  }: { search: string; muscles: readonly MuscleGroup[] | null; includeArchived: boolean },
 ): Exercise[] {
   const q = normalizeSearch(search);
-  return list.filter(
-    (e) =>
-      (includeArchived || e.archived_at === null) &&
-      (muscle === null || e.primary_muscle === muscle || e.secondary_muscles.includes(muscle)) &&
-      (q === '' || normalizeSearch(e.name).includes(q)),
-  );
+  const wanted = muscles && muscles.length > 0 ? muscles : null;
+  const primary = (e: Exercise) => wanted !== null && wanted.includes(e.primary_muscle);
+  return list
+    .filter(
+      (e) =>
+        (includeArchived || e.archived_at === null) &&
+        (wanted === null || primary(e) || e.secondary_muscles.some((m) => wanted.includes(m))) &&
+        (q === '' || normalizeSearch(e.name).includes(q)),
+    )
+    .sort((a, b) => Number(primary(b)) - Number(primary(a)));
 }
 
 export function useSaveExercise() {
