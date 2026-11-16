@@ -3,5 +3,4 @@ dist
 .expo
 coverage
 supabase/.temp
-src/lib/database.types.ts
 package-lock.json
