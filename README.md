@@ -337,7 +337,7 @@ Pour les notifications push et l'alerte du minuteur en arrière-plan, il faut un
 
 | Commande                       | À quoi ça sert                                                           |
 | ------------------------------ | ------------------------------------------------------------------------ |
-| `npm run web`                  | Lancer l'app dans le navigateur                                          |
+| `npm run web`                  | Lancer l’app dans le navigateur (vide le cache : toujours à jour)        |
 | `npm run phone`                | Ouvrir l'app dans le navigateur du téléphone (même Wi-Fi, code QR)       |
 | `npm start`                    | Serveur pour la version de développement native (section 8)              |
 | `npm run check`                | Vérifier tout le code (types, style, tests)                              |

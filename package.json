@@ -5,7 +5,7 @@
   "main": "expo-router/entry",
   "scripts": {
     "start": "expo start",
-    "web": "expo start --web",
+    "web": "expo start --web --clear",
     "phone": "node scripts/phone.mjs",
     "ios": "expo start --ios",
     "android": "expo start --android",
