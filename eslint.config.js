@@ -35,4 +35,9 @@ module.exports = defineConfig([
       'no-console': ['warn', { allow: ['warn', 'error'] }],
     },
   },
+  {
+    // Scripts en ligne de commande : l'affichage dans le terminal est normal.
+    files: ['scripts/**'],
+    rules: { 'no-console': 'off' },
+  },
 ]);

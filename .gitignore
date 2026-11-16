@@ -50,3 +50,5 @@ supabase/.branches
 
 # Tests
 coverage/
+supabase/functions/.env
+supabase/functions/.local-ca.pem

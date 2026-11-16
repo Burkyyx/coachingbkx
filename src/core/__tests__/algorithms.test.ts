@@ -361,6 +361,7 @@ describe('§8.2 stagnation', () => {
       exerciseName: 'Développé haltères',
     });
     expect(out?.alertMessage).toContain('aucune progression depuis 3 séances');
+    expect(out?.alertMessage).toContain('meilleure performance 80 kg × 8');
     expect(out?.justification).toContain('variante proposée : Développé haltères');
   });
   it('sans alternative → changement de fourchette', () => {
@@ -453,6 +454,36 @@ describe('§8.2 stagnation', () => {
       evaluateStagnation({
         exerciseName: 'X',
         sessions: empty,
+        prescription: null,
+        alternatives: [],
+        params,
+      }),
+    ).toBeNull();
+  });
+  it('une hausse de charge suivie de reps plus basses n’est PAS une stagnation', () => {
+    // 60 × 12 puis +2,5 kg : 62,5 × 8 → 9 → 10 (le 1RM estimé recule, mais on progresse).
+    const s = [
+      session('2026-01-01', [[60, 12]]),
+      session('2026-01-04', [[62.5, 8]]),
+      session('2026-01-08', [[62.5, 9]]),
+      session('2026-01-11', [[62.5, 10]]),
+    ];
+    expect(
+      evaluateStagnation({
+        exerciseName: 'X',
+        sessions: s,
+        prescription: null,
+        alternatives: [],
+        params,
+      }),
+    ).toBeNull();
+  });
+  it('exercice au temps (sans reps) : pas d’analyse de stagnation', () => {
+    const timed = [1, 2, 3, 4].map((i) => session(`2026-01-0${i}`, [[null, null]]));
+    expect(
+      evaluateStagnation({
+        exerciseName: 'Gainage',
+        sessions: timed,
         prescription: null,
         alternatives: [],
         params,

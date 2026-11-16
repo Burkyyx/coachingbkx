@@ -7,9 +7,11 @@ import type { StagnationParams } from './rules.ts';
  * §8.2 — Stagnation : aucune progression (charge ou reps) sur un exercice pendant
  * N séances → alerte + suggestion (variante, changement de fourchette ou décharge).
  *
- * La performance d'une séance est mesurée par le meilleur 1RM estimé (Epley), qui
- * augmente quand la charge OU les répétitions augmentent. Pour les exercices sans
- * charge, on utilise le nombre maximal de répétitions.
+ * « Progresser » = soulever une charge plus lourde qu'avant, OU faire plus de
+ * répétitions à la meilleure charge. (Le 1RM estimé n'est PAS utilisé ici : après
+ * une hausse de charge, les reps baissent normalement et le 1RM estimé recule
+ * quelques séances — ce n'est pas une stagnation.)
+ * Pour les exercices sans charge, seules les répétitions comptent.
  */
 
 export type StagnationInput = {
@@ -27,15 +29,29 @@ export type StagnationOutcome = {
     | { kind: 'rep_range'; repsMin: number; repsMax: number }
     | { kind: 'deload' };
   justification: string;
-  bestBefore: number;
+  bestBefore: { load: number; reps: number };
   unit: 'kg' | 'reps';
 };
 
-function sessionScore(s: ExerciseSession): { value: number; unit: 'kg' | 'reps' } | null {
-  const e1rm = best1RM(s.sets);
-  if (e1rm !== null) return { value: e1rm, unit: 'kg' };
-  const reps = countedSets(s.sets).map((x) => x.reps ?? 0);
-  return reps.length ? { value: Math.max(...reps), unit: 'reps' } : null;
+/** Meilleure performance d'une séance : charge la plus lourde et reps faites à cette charge. */
+type Perf = { load: number; reps: number };
+
+function sessionPerf(s: ExerciseSession): Perf | null {
+  const sets = countedSets(s.sets).filter((x) => (x.reps ?? 0) > 0);
+  if (sets.length === 0) return null;
+  const load = Math.max(...sets.map((x) => x.loadKg ?? 0));
+  const reps = Math.max(...sets.filter((x) => (x.loadKg ?? 0) === load).map((x) => x.reps ?? 0));
+  return { load, reps };
+}
+
+/** Vrai si `p` fait mieux que `best` (plus lourd, ou plus de reps à la même charge). */
+function beats(p: Perf, best: Perf, minImprovementPercent: number): boolean {
+  if (p.load > best.load * (1 + minImprovementPercent / 100) && p.load > best.load) return true;
+  return p.load >= best.load && p.reps > best.reps;
+}
+
+function better(a: Perf, b: Perf): Perf {
+  return a.load > b.load || (a.load === b.load && a.reps > b.reps) ? a : b;
 }
 
 /** Nouvelle fourchette proposée en cas de stagnation (ex. 8–12 → 5–8 ; 3–5 → 8–12). */
@@ -51,23 +67,24 @@ export function evaluateStagnation(input: StagnationInput): StagnationOutcome | 
   const window = params.sessions;
   if (sessions.length < window + 1) return null;
 
-  const scored = sessions.map(sessionScore);
-  const before = scored.slice(0, sessions.length - window).filter((s) => s !== null);
-  const recent = scored.slice(sessions.length - window);
-  if (before.length === 0 || recent.some((s) => s === null)) return null;
+  const perfs = sessions.map(sessionPerf);
+  const before = perfs.slice(0, sessions.length - window).filter((x): x is Perf => x !== null);
+  const recent = perfs.slice(sessions.length - window);
+  if (before.length === 0 || recent.some((x) => x === null)) return null;
 
-  const unit = before[0]!.unit;
-  if (recent.some((s) => s!.unit !== unit) || before.some((s) => s.unit !== unit)) return null;
+  // Chaque séance récente est comparée au meilleur niveau atteint avant elle.
+  let best = before.reduce(better);
+  const bestBefore = best;
+  for (const perf of recent as Perf[]) {
+    if (beats(perf, best, params.minImprovementPercent)) return null;
+    best = better(perf, best);
+  }
 
-  const bestBefore = Math.max(...before.map((s) => s.value));
-  const threshold = bestBefore * (1 + params.minImprovementPercent / 100);
-  const progressed = recent.some((s) => s!.value > threshold);
-  if (progressed) return null;
-
+  const unit: 'kg' | 'reps' = bestBefore.load > 0 ? 'kg' : 'reps';
   const bestText =
     unit === 'kg'
-      ? `meilleur 1RM estimé ${formatKg(Math.round(bestBefore * 10) / 10)}`
-      : `${bestBefore} reps max`;
+      ? `meilleure performance ${formatKg(bestBefore.load)} × ${bestBefore.reps}`
+      : `${bestBefore.reps} reps max`;
   const alertMessage = `Stagnation sur ${input.exerciseName} : aucune progression depuis ${window} séances (${bestText}).`;
 
   // Choix de l'action
