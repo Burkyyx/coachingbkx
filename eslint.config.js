@@ -17,6 +17,7 @@ module.exports = defineConfig([
       '.expo/*',
       'coverage/*',
       'src/lib/database.types.ts',
+      'expo-env.d.ts',
     ],
   },
   {
