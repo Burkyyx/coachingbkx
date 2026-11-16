@@ -370,6 +370,15 @@ export function validateSet(
   set.status = completed ? 'done' : 'failed';
   set.performedAt = new Date(ctx.now).toISOString();
 
+  // Séries suivantes sans charge prévue : on reprend la charge qui vient d'être utilisée.
+  if (set.loadKg !== null) {
+    for (const later of ex.sets.slice(setIdx + 1)) {
+      if (later.status === 'todo' && later.loadKg === null && later.targetLoadKg === null) {
+        later.loadKg = set.loadKg;
+      }
+    }
+  }
+
   // Record : comparé à tout l'historique + séries déjà faites aujourd'hui sur cet exercice.
   const prior: LoggedSet[] = [
     ...exerciseHistory(bundle, ex.exerciseId, next.id).flatMap((h) => h.sets),

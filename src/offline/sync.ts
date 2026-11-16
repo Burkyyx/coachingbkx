@@ -117,6 +117,14 @@ export function useSyncManager() {
     const appState = AppState.addEventListener('change', (s) => {
       if (s === 'active') void syncNow();
     });
+    // Web : l'événement « online » du navigateur est le signal le plus rapide.
+    const onOnline = () => {
+      useSyncStatus.getState().set({ online: true });
+      void syncNow();
+    };
+    if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+      window.addEventListener('online', onOnline);
+    }
     const interval = setInterval(() => {
       if (useSyncStatus.getState().pending > 0) void syncNow();
     }, 20_000);
@@ -125,6 +133,9 @@ export function useSyncManager() {
       offNet();
       appState.remove();
       clearInterval(interval);
+      if (typeof window !== 'undefined' && typeof window.removeEventListener === 'function') {
+        window.removeEventListener('online', onOnline);
+      }
       if (debounce) clearTimeout(debounce);
     };
   }, []);

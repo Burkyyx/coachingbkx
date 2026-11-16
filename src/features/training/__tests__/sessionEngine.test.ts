@@ -410,4 +410,23 @@ describe('mode séance', () => {
     expect(done.localRecord.session.status).toBe('completed');
     expect(done.localRecord.sets).toHaveLength(2);
   });
+
+  it('reprend la charge utilisée pour les séries suivantes sans charge prévue', () => {
+    const b = bundle({ sets: [], sessions: [] });
+    const { session } = buildSession({
+      bundle: b,
+      workout: workout([
+        {
+          id: 'we1',
+          exercise: 'bench',
+          sets: [ps('a', 0, { load_kg: null }), ps('b', 1, { load_kg: null })],
+        },
+      ]),
+      adherentId: 'u1',
+      ctx: ctx(),
+    });
+    expect(session.exercises[0]?.sets[1]?.loadKg).toBeNull();
+    const r = validateSet(updateSet(session, 0, 0, { loadKg: 50 }).session, 0, 0, true, b, ctx());
+    expect(r.session.exercises[0]?.sets[1]?.loadKg).toBe(50);
+  });
 });
