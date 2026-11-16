@@ -1,7 +1,7 @@
 -- Vérifications globales : RLS partout, buckets privés, tâches planifiées.
 begin;
 \ir _helpers.sql
-select plan(7);
+select plan(11);
 
 -- Aucune table du schéma public sans RLS (protège aussi les futures tables).
 select is_empty(
@@ -31,6 +31,19 @@ values ('00000000-0000-0000-0000-00000000aa01', 1, extract(isodow from current_d
 select public.run_hourly_jobs((current_date + time '06:10') at time zone 'Europe/Paris');
 select is((select count(*)::int from public.alerts where type = 'missed_workout'), 1, 'Alerte « séance prévue non faite »');
 select is((select count(*)::int from public.alerts where type = 'inactive'), 1, 'Alerte « adhérent inactif »');
+
+-- Statistiques du tableau de bord : réservées au coach
+select ok(not has_function_privilege('anon', 'public.coach_weekly_stats(integer)', 'execute'),
+  'Un visiteur non connecté ne peut pas lire les statistiques');
+select tests.login(:'alice');
+select throws_ok('select * from public.coach_weekly_stats(4)', '42501', null,
+  'Un adhérent ne peut pas lire les statistiques du coach');
+select throws_ok('select * from public.coach_overview()', '42501', null,
+  'Un adhérent ne peut pas lire la vue d''ensemble du coach');
+select tests.login(:'coach');
+select is((select count(*)::int from public.coach_weekly_stats(4)), 4,
+  'Le coach lit ses statistiques (une ligne par semaine)');
+select tests.logout();
 
 select * from finish();
 rollback;

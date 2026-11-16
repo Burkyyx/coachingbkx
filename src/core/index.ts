@@ -20,3 +20,4 @@ export * from './session/summary.ts';
 export * from './dates.ts';
 export * from './notifications/pushGrouping.ts';
 export * from './youtube.ts';
+export * from './adherents.ts';

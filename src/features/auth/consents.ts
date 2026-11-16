@@ -30,14 +30,7 @@ export function missingRequiredConsents(consents: readonly ConsentRow[]): Consen
   return REQUIRED_CONSENTS.filter((t) => !hasActiveConsent(consents, t));
 }
 
-/** Âge en années révolues à une date donnée. */
-export function ageOn(birthDate: string, today: string): number {
-  const [by, bm, bd] = birthDate.split('-').map(Number);
-  const [ty, tm, td] = today.split('-').map(Number);
-  let age = (ty ?? 0) - (by ?? 0);
-  if ((tm ?? 0) < (bm ?? 0) || ((tm ?? 0) === (bm ?? 0) && (td ?? 0) < (bd ?? 0))) age--;
-  return age;
-}
+export { ageOn } from '@/core';
 
 /** Âge minimum pour utiliser l'app (pas de consentement parental géré : choix du coach). */
 export const MINIMUM_AGE = 15;

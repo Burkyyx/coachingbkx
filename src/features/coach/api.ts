@@ -19,6 +19,10 @@ export type Overview = {
   last_checkin_week: string | null;
   recent_weights: Json;
   active_program_name: string | null;
+  birth_date: string | null;
+  sex: Tables<'profiles'>['sex'];
+  level: Tables<'profiles'>['level'];
+  activity_level: Tables<'profiles'>['activity_level'];
 };
 
 export function fullName(p: {
@@ -32,6 +36,7 @@ export function fullName(p: {
 export const coachKeys = {
   overview: ['coach', 'overview'] as const,
   alerts: ['coach', 'alerts'] as const,
+  weeklyStats: ['coach', 'weekly-stats'] as const,
   suggestions: (status: 'pending' | 'decided') => ['coach', 'suggestions', status] as const,
   adherent: (id: string) => ['coach', 'adherent', id] as const,
 };
@@ -43,6 +48,28 @@ export function useOverview() {
       const { data, error } = await supabase.rpc('coach_overview');
       if (error) throw error;
       return data as Overview[];
+    },
+  });
+}
+
+export type WeeklyStats = {
+  week_start: string;
+  sessions_planned: number;
+  sessions_done: number;
+  active_adherents: number;
+  records: number;
+  checkins_received: number;
+  checkins_expected: number;
+};
+
+/** Statistiques des 8 dernières semaines (la dernière ligne = semaine en cours). */
+export function useWeeklyStats(weeks = 8) {
+  return useQuery({
+    queryKey: [...coachKeys.weeklyStats, weeks],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc('coach_weekly_stats', { p_weeks: weeks });
+      if (error) throw error;
+      return data as WeeklyStats[];
     },
   });
 }
