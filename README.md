@@ -59,8 +59,12 @@ Ce guide est écrit pour quelqu'un qui n'est pas développeur. Suis les étapes 
    ```bash
    git clone https://github.com/burkyyx/coachingbkx.git
    cd coachingbkx
+   git checkout claude/spec-md-instructions-14v2w9
    npm install
    ```
+   > Le code de la Phase 1 se trouve pour l'instant sur la branche `claude/spec-md-instructions-14v2w9`
+   > (la branche `main` ne contient que le fichier de départ). Une fois la Phase 1 validée et fusionnée
+   > dans `main`, la ligne `git checkout …` ne sera plus nécessaire.
 
 > Sur Windows : mêmes outils (Node.js, Docker Desktop) ; utiliser PowerShell. `psql` s'installe avec
 > PostgreSQL (https://www.postgresql.org/download/windows/).
