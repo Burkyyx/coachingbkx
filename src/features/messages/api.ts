@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 
+import { closeChannel, uniqueChannel } from '@/lib/realtime';
 import { supabase, type Tables } from '@/lib/supabase';
 import { extensionFor, uploadFile } from '@/lib/storage';
 import { uuid } from '@/lib/uuid';
@@ -35,8 +36,7 @@ export function useMessages(conversationId: string | null) {
   const qc = useQueryClient();
   useEffect(() => {
     if (!conversationId) return;
-    const channel = supabase
-      .channel(`messages:${conversationId}`)
+    const channel = uniqueChannel(`messages:${conversationId}`)
       .on(
         'postgres_changes',
         {
@@ -49,7 +49,7 @@ export function useMessages(conversationId: string | null) {
       )
       .subscribe();
     return () => {
-      void supabase.removeChannel(channel);
+      closeChannel(channel);
     };
   }, [conversationId, qc]);
 
@@ -119,15 +119,14 @@ export async function markConversationRead(conversationId: string, myId: string)
 export function useCoachConversations(coachId: string | null) {
   const qc = useQueryClient();
   useEffect(() => {
-    const channel = supabase
-      .channel('coach-conversations')
+    const channel = uniqueChannel('coach-conversations')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, () => {
         void qc.invalidateQueries({ queryKey: keys.list });
         void qc.invalidateQueries({ queryKey: ['coach', 'badges'] });
       })
       .subscribe();
     return () => {
-      void supabase.removeChannel(channel);
+      closeChannel(channel);
     };
   }, [qc]);
   return useQuery({

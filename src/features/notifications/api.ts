@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { router, type Href } from 'expo-router';
 import { useEffect } from 'react';
 
+import { closeChannel, uniqueChannel } from '@/lib/realtime';
 import { supabase, type Tables } from '@/lib/supabase';
 
 export type AppNotification = Tables<'notifications'>;
@@ -24,8 +25,7 @@ export function useNotifications(uid: string | null) {
   const qc = useQueryClient();
   useEffect(() => {
     if (!uid) return;
-    const channel = supabase
-      .channel(`notifications:${uid}`)
+    const channel = uniqueChannel(`notifications:${uid}`)
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${uid}` },
@@ -33,7 +33,7 @@ export function useNotifications(uid: string | null) {
       )
       .subscribe();
     return () => {
-      void supabase.removeChannel(channel);
+      closeChannel(channel);
     };
   }, [uid, qc]);
   return useQuery({
