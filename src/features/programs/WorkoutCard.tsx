@@ -115,13 +115,13 @@ function ExerciseBlock({
         <Text weight="700" style={{ flex: 1, minWidth: 140 }}>
           {exercise?.name ?? '—'}
         </Text>
-        <View style={{ width: 120 }}>
+        <View style={{ width: 150 }}>
           <SelectMenu
             compact
             label={t('programs.superset')}
             value={node.superset_group ?? '-'}
             options={[
-              { value: '-', label: `${t('programs.superset')} : ${t('programs.noSuperset')}` },
+              { value: '-', label: t('programs.noSuperset') },
               ...SUPERSET_LETTERS.map((l) => ({
                 value: l,
                 label: `${t('programs.superset')} ${l}`,

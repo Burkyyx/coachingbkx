@@ -337,7 +337,7 @@ export const fr = {
     addExercise: 'Ajouter un exercice',
     removeExercise: 'Retirer l’exercice',
     superset: 'Superset',
-    noSuperset: 'Aucun',
+    noSuperset: 'Sans superset',
     coachNotes: 'Notes pour l’adhérent',
     moveUp: 'Monter',
     moveDown: 'Descendre',

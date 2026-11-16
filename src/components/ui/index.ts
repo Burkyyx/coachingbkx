@@ -16,3 +16,4 @@ export { FeedbackProvider, useFeedback } from './Feedback';
 export { Sheet } from './Sheet';
 export { NumberCell } from './NumberCell';
 export { SelectMenu } from './SelectMenu';
+export { CommitTextField } from './CommitTextField';

@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
 import {
   Badge,
@@ -80,17 +80,23 @@ export default function ProgramsScreen() {
               last_name: string | null;
             } | null;
             return (
-              <Card
-                key={p.id}
-                onPress={() => router.push(`/coach/programs/${p.id}`)}
-                accessibilityLabel={p.name}
-                style={{ flexGrow: 1, flexBasis: 320, maxWidth: 560 }}
-              >
+              <Card key={p.id} style={{ flexGrow: 1, flexBasis: 320, maxWidth: 560 }}>
                 <VStack gap="sm">
                   <HStack justify="space-between">
-                    <Text variant="subtitle" style={{ flex: 1 }} numberOfLines={2}>
-                      {p.name}
-                    </Text>
+                    <Pressable
+                      accessibilityRole="link"
+                      accessibilityLabel={p.name}
+                      onPress={() => router.push(`/coach/programs/${p.id}`)}
+                      style={{ flex: 1 }}
+                    >
+                      <Text
+                        variant="subtitle"
+                        numberOfLines={2}
+                        style={{ textDecorationLine: 'underline' }}
+                      >
+                        {p.name}
+                      </Text>
+                    </Pressable>
                     {kind === 'assigned' ? (
                       <Badge
                         label={t(`enums.programStatus.${p.status}`)}
@@ -112,24 +118,32 @@ export default function ProgramsScreen() {
                       ? ` · ${t('programs.startsOn', { date: formatFrenchDate(p.start_date) })}`
                       : ''}
                   </Text>
-                  {kind === 'template' ? (
-                    <HStack gap="xs">
-                      <Button
-                        variant="secondary"
-                        icon="send-outline"
-                        label={t('programs.assign')}
-                        onPress={() => setAssigning({ id: p.id, name: p.name })}
-                      />
-                      <IconButton
-                        icon="copy-outline"
-                        label={t('common.duplicate')}
-                        onPress={async () => {
-                          await duplicate.mutateAsync(p.id);
-                          toast(t('programs.duplicated'));
-                        }}
-                      />
-                    </HStack>
-                  ) : null}
+                  <HStack gap="xs">
+                    <Button
+                      variant="secondary"
+                      icon="create-outline"
+                      label={t('common.edit')}
+                      onPress={() => router.push(`/coach/programs/${p.id}`)}
+                    />
+                    {kind === 'template' ? (
+                      <>
+                        <Button
+                          variant="secondary"
+                          icon="send-outline"
+                          label={t('programs.assign')}
+                          onPress={() => setAssigning({ id: p.id, name: p.name })}
+                        />
+                        <IconButton
+                          icon="copy-outline"
+                          label={t('common.duplicate')}
+                          onPress={async () => {
+                            await duplicate.mutateAsync(p.id);
+                            toast(t('programs.duplicated'));
+                          }}
+                        />
+                      </>
+                    ) : null}
+                  </HStack>
                 </VStack>
               </Card>
             );
