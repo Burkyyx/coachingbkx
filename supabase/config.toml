@@ -441,3 +441,9 @@ enabled = true
 # (secret de la tâche planifiée ou jeton de l'utilisateur connecté).
 [functions.compute-suggestions]
 verify_jwt = false
+
+[functions.send-push]
+verify_jwt = false
+
+[functions.delete-account]
+verify_jwt = false

@@ -3,9 +3,10 @@ import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 
 import { BottomBar, Sidebar, useIsDesktop, type NavItem } from '@/components/AppNav';
-import { Button, Text, VStack } from '@/components/ui';
+import { Button, HStack, Text, VStack } from '@/components/ui';
 import { signOut } from '@/features/auth/api';
 import { useCoachBadges } from '@/features/coach/useCoachBadges';
+import { NotificationBell } from '@/features/notifications/NotificationBell';
 import { useTheme } from '@/theme/ThemeProvider';
 
 /**
@@ -95,10 +96,15 @@ export default function CoachLayout() {
               gap="xxs"
               style={{ paddingHorizontal: theme.spacing.lg, paddingBottom: theme.spacing.lg }}
             >
-              <Text variant="title">{t('app.name')}</Text>
-              <Text variant="caption" color="textSubtle">
-                Espace coach
-              </Text>
+              <HStack justify="space-between">
+                <VStack gap="xxs">
+                  <Text variant="title">{t('app.name')}</Text>
+                  <Text variant="caption" color="textSubtle">
+                    Espace coach
+                  </Text>
+                </VStack>
+                <NotificationBell />
+              </HStack>
             </VStack>
           }
           footer={

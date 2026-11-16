@@ -20,6 +20,7 @@ import { scheduledWorkouts, suggestedWorkout } from '@/features/training/derive'
 import { useActiveSession } from '@/features/training/session/store';
 import { WorkoutSummaryCard } from '@/features/training/WorkoutSummaryCard';
 import { supabase } from '@/lib/supabase';
+import { NotificationBell } from '@/features/notifications/NotificationBell';
 import { SyncBadge } from '@/offline/SyncBadge';
 
 /** Onglet « Aujourd'hui » : séance du jour, dernier message du coach, rappel du bilan. */
@@ -87,7 +88,10 @@ export default function TodayScreen() {
         <Text variant="headline" accessibilityRole="header">
           {t('training.hello', { name: profile?.first_name ?? '' })}
         </Text>
-        <SyncBadge />
+        <HStack gap="sm">
+          <SyncBadge />
+          <NotificationBell />
+        </HStack>
       </HStack>
 
       {active ? (

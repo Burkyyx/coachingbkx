@@ -13,11 +13,14 @@ import { useTheme } from '@/theme/ThemeProvider';
  */
 export default function AdherentLayout() {
   const theme = useTheme();
-  const { userId } = useAuth();
+  const { userId, profile } = useAuth();
   useSyncManager();
   useEffect(() => {
     if (userId) void sessionActions.hydrate(userId);
   }, [userId]);
+  const restAlarm =
+    (profile?.notification_prefs as Record<string, unknown> | null)?.rest_timer !== false;
+  useEffect(() => sessionActions.setRestAlarm(restAlarm), [restAlarm]);
   // Dès qu'une séance arrive sur le serveur, on demande son analyse (suggestions pour le coach).
   useEffect(
     () =>

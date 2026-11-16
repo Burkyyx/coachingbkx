@@ -11,6 +11,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Button, ErrorState, FeedbackProvider, LoadingState, Text, VStack } from '@/components/ui';
 import { signOut } from '@/features/auth/api';
 import { AuthProvider, useAuth, type AuthStatus } from '@/features/auth/AuthProvider';
+import { usePushNotifications } from '@/features/notifications/push';
 import { isConfigured } from '@/lib/env';
 import { queryClient } from '@/lib/queryClient';
 import { ThemeProvider, useTheme } from '@/theme/ThemeProvider';
@@ -32,7 +33,8 @@ const SETUP_STATUSES: readonly AuthStatus[] = [
 function RootNavigator() {
   const theme = useTheme();
   const { t } = useTranslation();
-  const { status, isCoach, refresh } = useAuth();
+  const { status, isCoach, refresh, userId } = useAuth();
+  usePushNotifications(status === 'ready' ? userId : null);
 
   useEffect(() => {
     if (status !== 'loading') void SplashScreen.hideAsync().catch(() => undefined);

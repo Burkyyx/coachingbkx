@@ -25,6 +25,8 @@ type State = {
   hydrated: boolean;
   /** Dernier record battu (pour l'animation de célébration). */
   celebration: RecordDraft | null;
+  /** Alerte de fin de repos activée (préférence de notifications). */
+  restAlarm: boolean;
 };
 
 export const useActiveSession = create<State>()(() => ({
@@ -32,6 +34,7 @@ export const useActiveSession = create<State>()(() => ({
   session: null,
   hydrated: false,
   celebration: null,
+  restAlarm: true,
 }));
 
 async function persist(session: engine.ActiveSession | null) {
@@ -47,7 +50,9 @@ async function apply(session: engine.ActiveSession | null, ops: engine.SyncOp[])
   await persist(session);
   for (const op of ops) await saveOffline(op.table, op.payload);
   const rest = session?.rest ?? null;
-  if (rest && rest.endsAt !== previousRest?.endsAt) await scheduleRestAlarm(rest.endsAt);
+  if (rest && rest.endsAt !== previousRest?.endsAt && useActiveSession.getState().restAlarm) {
+    await scheduleRestAlarm(rest.endsAt);
+  }
   if (!rest && previousRest) await cancelRestAlarm();
 }
 
@@ -55,6 +60,10 @@ const ctx = () => ({ now: Date.now(), makeId: uuid });
 
 export const sessionActions = {
   /** Recharge une séance interrompue (au démarrage de l'espace adhérent). */
+  setRestAlarm(enabled: boolean) {
+    useActiveSession.setState({ restAlarm: enabled });
+  },
+
   async hydrate(uid: string) {
     const saved = await localStore.getDoc<engine.ActiveSession>(key(uid));
     useActiveSession.setState({ uid, session: saved, hydrated: true });

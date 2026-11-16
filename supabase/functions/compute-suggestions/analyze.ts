@@ -64,23 +64,42 @@ export async function analyzeSession(db: SupabaseClient, sessionId: string, rule
   const sessionIds = (sessions ?? []).map((s) => s.id);
   const { data: setsData } = await db
     .from('set_logs')
-    .select('id, session_log_id, exercise_id, prescribed_set_id, position, set_type, load_kg, reps, rir, rpe, completed, rest_seconds_actual, rest_seconds_prescribed')
-    .in('session_log_id', sessionIds.length ? sessionIds : ['00000000-0000-0000-0000-000000000000']);
+    .select(
+      'id, session_log_id, exercise_id, prescribed_set_id, position, set_type, load_kg, reps, rir, rpe, completed, rest_seconds_actual, rest_seconds_prescribed',
+    )
+    .in(
+      'session_log_id',
+      sessionIds.length ? sessionIds : ['00000000-0000-0000-0000-000000000000'],
+    );
   const sets = (setsData ?? []) as SetRow[];
   const sessionDate = new Map((sessions ?? []).map((s) => [s.id, s.started_at as string]));
 
   // Programme : prochaine prescription de chaque exercice.
   const programId: string | null = session.program_id;
   const { data: program } = programId
-    ? await db.from('programs').select('id, start_date, duration_weeks').eq('id', programId).maybeSingle()
+    ? await db
+        .from('programs')
+        .select('id, start_date, duration_weeks')
+        .eq('id', programId)
+        .maybeSingle()
     : { data: null };
-  const [{ data: workouts }, { data: wes }, { data: pss }, { data: exercises }, { data: alts }] = await Promise.all([
-    programId ? db.from('workouts').select('id, week_index, day_of_week').eq('program_id', programId) : Promise.resolve({ data: [] }),
-    programId ? db.from('workout_exercises').select('id, workout_id, exercise_id, alternative_exercise_ids').eq('program_id', programId) : Promise.resolve({ data: [] }),
-    programId ? db.from('prescribed_sets').select('*').eq('program_id', programId) : Promise.resolve({ data: [] }),
-    db.from('exercises').select('id, name, type, load_increment_kg'),
-    db.from('exercise_alternatives').select('exercise_id, alternative_id'),
-  ]);
+  const [{ data: workouts }, { data: wes }, { data: pss }, { data: exercises }, { data: alts }] =
+    await Promise.all([
+      programId
+        ? db.from('workouts').select('id, week_index, day_of_week').eq('program_id', programId)
+        : Promise.resolve({ data: [] }),
+      programId
+        ? db
+            .from('workout_exercises')
+            .select('id, workout_id, exercise_id, alternative_exercise_ids')
+            .eq('program_id', programId)
+        : Promise.resolve({ data: [] }),
+      programId
+        ? db.from('prescribed_sets').select('*').eq('program_id', programId)
+        : Promise.resolve({ data: [] }),
+      db.from('exercises').select('id, name, type, load_increment_kg'),
+      db.from('exercise_alternatives').select('exercise_id, alternative_id'),
+    ]);
   const { data: doneWorkouts } = await db
     .from('session_logs')
     .select('workout_id')
@@ -89,12 +108,17 @@ export async function analyzeSession(db: SupabaseClient, sessionId: string, rule
   const done = new Set((doneWorkouts ?? []).map((d) => d.workout_id));
   const exById = new Map((exercises ?? []).map((e) => [e.id, e]));
   const workoutDateById = new Map(
-    (workouts ?? []).map((w) => [w.id, program?.start_date ? workoutDate(program.start_date, w.week_index, w.day_of_week) : '']),
+    (workouts ?? []).map((w) => [
+      w.id,
+      program?.start_date ? workoutDate(program.start_date, w.week_index, w.day_of_week) : '',
+    ]),
   );
   const prescribedById = new Map((pss ?? []).map((p) => [p.id, p]));
 
   const engineExercises: EngineExercise[] = [];
-  const exerciseIds = [...new Set(sets.filter((s) => s.session_log_id === sessionId).map((s) => s.exercise_id))];
+  const exerciseIds = [
+    ...new Set(sets.filter((s) => s.session_log_id === sessionId).map((s) => s.exercise_id)),
+  ];
   for (const exerciseId of exerciseIds) {
     const ex = exById.get(exerciseId);
     if (!ex) continue;
@@ -105,16 +129,24 @@ export async function analyzeSession(db: SupabaseClient, sessionId: string, rule
       .filter((x) => x.date >= today)
       .sort((a, b) => a.date.localeCompare(b.date))[0];
     const working = upcoming
-      ? (pss ?? []).filter((p) => p.workout_exercise_id === upcoming.we.id && p.set_type === 'working').sort((a, b) => a.position - b.position)[0]
+      ? (pss ?? [])
+          .filter((p) => p.workout_exercise_id === upcoming.we.id && p.set_type === 'working')
+          .sort((a, b) => a.position - b.position)[0]
       : undefined;
     const altIds: string[] = upcoming?.we.alternative_exercise_ids?.length
       ? upcoming.we.alternative_exercise_ids
       : (alts ?? []).filter((a) => a.exercise_id === exerciseId).map((a) => a.alternative_id);
 
     const bySession = new Map<string, SetRow[]>();
-    for (const s of sets) if (s.exercise_id === exerciseId) bySession.set(s.session_log_id, [...(bySession.get(s.session_log_id) ?? []), s]);
+    for (const s of sets)
+      if (s.exercise_id === exerciseId)
+        bySession.set(s.session_log_id, [...(bySession.get(s.session_log_id) ?? []), s]);
     const history: ExerciseSession[] = [...bySession.entries()]
-      .map(([sid, list]) => ({ sessionId: sid, date: sessionDate.get(sid) ?? '', sets: list.sort((a, b) => a.position - b.position).map(toLogged) }))
+      .map(([sid, list]) => ({
+        sessionId: sid,
+        date: sessionDate.get(sid) ?? '',
+        sets: list.sort((a, b) => a.position - b.position).map(toLogged),
+      }))
       .sort((a, b) => a.date.localeCompare(b.date));
 
     engineExercises.push({
@@ -132,7 +164,9 @@ export async function analyzeSession(db: SupabaseClient, sessionId: string, rule
             restSeconds: working.rest_seconds,
           }
         : null,
-      alternatives: altIds.map((id) => ({ id, name: exById.get(id)?.name ?? '' })).filter((a) => a.name),
+      alternatives: altIds
+        .map((id) => ({ id, name: exById.get(id)?.name ?? '' }))
+        .filter((a) => a.name),
       history,
     });
   }
@@ -146,7 +180,13 @@ export async function analyzeSession(db: SupabaseClient, sessionId: string, rule
       .filter((x) => x.session_log_id === s.id)
       .map((x) => {
         const p = x.prescribed_set_id ? prescribedById.get(x.prescribed_set_id) : undefined;
-        const targetRir = p ? (p.target_rir !== null ? Number(p.target_rir) : p.target_rpe !== null ? 10 - Number(p.target_rpe) : null) : null;
+        const targetRir = p
+          ? p.target_rir !== null
+            ? Number(p.target_rir)
+            : p.target_rpe !== null
+              ? 10 - Number(p.target_rpe)
+              : null
+          : null;
         return { ...toLogged(x), targetRir };
       }),
   }));
@@ -206,13 +246,18 @@ export async function analyzeSession(db: SupabaseClient, sessionId: string, rule
   }
   if (output.alerts.length) {
     await db.from('alerts').upsert(
-      output.alerts.map((a) => ({ adherent_id: uid, type: a.type, message: a.message, payload: a.payload, dedupe_key: a.dedupeKey })),
+      output.alerts.map((a) => ({
+        adherent_id: uid,
+        type: a.type,
+        message: a.message,
+        payload: a.payload,
+        dedupe_key: a.dedupeKey,
+      })),
       { onConflict: 'dedupe_key', ignoreDuplicates: true },
     );
   }
   return { suggestions: output.suggestions.length, alerts: output.alerts.length };
 }
-
 
 /**
  * Analyse les séances terminées non encore analysées (toutes, ou celles d'un adhérent).
