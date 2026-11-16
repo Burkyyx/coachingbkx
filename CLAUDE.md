@@ -61,3 +61,7 @@ suggestions automatiques **validées par le coach**. Phases : 1 (entraînement, 
 - @testing-library/react-native **v14** : `render`, `fireEvent` sont **asynchrones** (`await`).
 - zod v4 : `z.email()`, `z.uuid()` ; messages via `{ error: '...' }`.
 - Expo Router : `web.output = 'single'` (SPA) pour l'hébergement statique Cloudflare Pages.
+- Environnement cloud : le serveur Metro ne voit pas toujours les modifications de fichiers
+  (cache périmé, types de routes non régénérés). Relancer `npx expo start --web --clear`.
+- Supabase local dans l'environnement cloud : `SUPABASE_INTERNAL_IMAGE_REGISTRY=docker.io npx supabase start
+  -x studio,imgproxy,vector,logflare,supavisor,postgres-meta,mailpit` (Docker : lancer `dockerd` d'abord).

@@ -1,6 +1,7 @@
 export { Badge, type BadgeTone } from './Badge';
 export { Button } from './Button';
 export { Card } from './Card';
+export { Checkbox } from './Checkbox';
 export { Icon, type IconName } from './Icon';
 export { IconButton } from './IconButton';
 export { Divider, HStack, Screen, SectionHeader, VStack } from './Layout';

@@ -17,3 +17,4 @@ export * from './algorithms/restTime.ts';
 export * from './algorithms/engine.ts';
 export * from './session/plan.ts';
 export * from './session/summary.ts';
+export * from './dates.ts';
