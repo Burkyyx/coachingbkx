@@ -81,6 +81,10 @@ suggestions automatiques **validées par le coach**. Phases : 1 (entraînement, 
 - Consentements demandés à l'arrivée de la fonctionnalité (CGU + entraînement à l'inscription,
   données corporelles au 1er bilan). Pas de mineurs < 15 ans (blocage).
 - Suppression de compte immédiate et définitive. Hébergement web : Cloudflare Pages. E-mails : Brevo.
+- Retours de test (nov. 2026) : niveau d'activité au quotidien (5 niveaux, `profiles.activity_level`,
+  demandé à l'inscription et aux anciens adhérents) ; pas de banque d'images automatique (photos du coach
+  + miniatures YouTube) ; tableau de bord = chiffres de la semaine + assiduité 8 semaines ; schéma du
+  corps cliquable (coach + catalogue adhérent en consultation, sans séance libre).
 
 ## Points techniques
 
