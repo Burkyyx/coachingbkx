@@ -44,6 +44,7 @@ import type { Tables } from '@/lib/supabase';
 import { useSignedUrl } from '@/lib/storage';
 import { useTheme } from '@/theme/ThemeProvider';
 
+import { RuleEditor } from './RuleEditor';
 import {
   useActiveProgram,
   useAdherentActions,
@@ -635,6 +636,14 @@ export function SettingsTab({ profile }: { profile: Profile }) {
           )}
         </VStack>
       </Card>
+
+      <VStack gap="xs">
+        <Text weight="700">{t('settings.adherentOverride')}</Text>
+        <Text variant="small" color="textMuted">
+          {t('settings.rulesHelp')}
+        </Text>
+        <RuleEditor adherentId={profile.id} />
+      </VStack>
 
       <ExercisePicker
         visible={picker}

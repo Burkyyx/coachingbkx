@@ -36,6 +36,7 @@ import {
 } from '@/features/exercises/api';
 import { ExercisePicker } from '@/features/exercises/ExercisePicker';
 import { ExerciseVideo } from '@/features/exercises/ExerciseVideo';
+import { RuleEditor } from '@/features/coach/RuleEditor';
 import { toUserMessage } from '@/lib/errors';
 import { extensionFor, removeFiles, uploadFile } from '@/lib/storage';
 import { supabase } from '@/lib/supabase';
@@ -427,6 +428,13 @@ function ExerciseForm({
         loading={save.isPending}
         onPress={() => void onSubmit()}
       />
+
+      {exercise ? (
+        <VStack gap="xs">
+          <Text variant="subtitle">{t('settings.rules')}</Text>
+          <RuleEditor exerciseId={exercise.id} only={['double_progression', 'stagnation']} />
+        </VStack>
+      ) : null}
 
       <ExercisePicker
         visible={pickerOpen}
