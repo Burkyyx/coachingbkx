@@ -1,7 +1,7 @@
-import { Pressable, ScrollView, View } from 'react-native';
+import { Pressable, ScrollView, View, useWindowDimensions } from 'react-native';
 
 import { useTheme } from '@/theme/ThemeProvider';
-import { MIN_TOUCH } from '@/theme/tokens';
+import { DESKTOP_BREAKPOINT, MIN_TOUCH } from '@/theme/tokens';
 
 import { Text } from './Text';
 
@@ -12,7 +12,7 @@ type Props<T extends string | number> = {
   value: T | null | undefined;
   onChange: (value: T) => void;
   accessibilityLabel?: string;
-  /** Défilement horizontal quand il y a beaucoup d'options. */
+  /** Défilement horizontal sur mobile quand il y a beaucoup d'options (retour à la ligne sur ordinateur). */
   scrollable?: boolean;
 };
 
@@ -25,6 +25,7 @@ export function Segmented<T extends string | number>({
   scrollable = false,
 }: Props<T>) {
   const theme = useTheme();
+  const { width } = useWindowDimensions();
   const items = options.map((opt) => {
     const selected = opt.value === value;
     return (
@@ -54,14 +55,17 @@ export function Segmented<T extends string | number>({
     );
   });
 
-  if (scrollable) {
+  // Sur ordinateur, les pastilles passent à la ligne (plus pratique à la souris).
+  if (scrollable && width < DESKTOP_BREAKPOINT) {
     return (
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
         accessibilityRole="radiogroup"
         accessibilityLabel={accessibilityLabel}
-        contentContainerStyle={{ gap: theme.spacing.sm }}
+        // Hauteur fixe : sans cela, une liste placée en dessous « écrase » la rangée.
+        style={{ flexGrow: 0, flexShrink: 0 }}
+        contentContainerStyle={{ gap: theme.spacing.sm, paddingVertical: 2, alignItems: 'center' }}
       >
         {items}
       </ScrollView>
