@@ -64,4 +64,31 @@ suggestions automatiques **validées par le coach**. Phases : 1 (entraînement, 
 - Environnement cloud : le serveur Metro ne voit pas toujours les modifications de fichiers
   (cache périmé, types de routes non régénérés). Relancer `npx expo start --web --clear`.
 - Supabase local dans l'environnement cloud : `SUPABASE_INTERNAL_IMAGE_REGISTRY=docker.io npx supabase start
-  -x studio,imgproxy,vector,logflare,supavisor,postgres-meta,mailpit` (Docker : lancer `dockerd` d'abord).
+-x studio,imgproxy,vector,logflare,supavisor,postgres-meta,mailpit` (Docker : lancer `dockerd` d'abord).
+
+## État d'avancement
+
+- **Phase 1 livrée** (en attente de validation d'Enzo). Phases 2 (nutrition) et 3 (communauté) : NON commencées.
+- Nom provisoire « Élan », thème noir & blanc (`src/theme/tokens.ts`).
+
+## Décisions validées avec Enzo (Phase 1)
+
+- Web d'abord ; connexion e-mail + Google + Apple ; inscription sur invitation (code 8 caractères, 7 jours, usage unique).
+- Programmes : semaines distinctes, jour fixé par le coach ; pas de séance libre hors programme.
+- % du 1RM : 1RM de référence saisi par le coach (`reference_1rm`), repli sur la dernière perf.
+- Repos réel : du « Valider » au « Je reprends » (ou à la validation suivante).
+- Échelle d'effort RIR/RPE réglée par adhérent. Vidéos messagerie : 60 s / 50 Mo.
+- Consentements demandés à l'arrivée de la fonctionnalité (CGU + entraînement à l'inscription,
+  données corporelles au 1er bilan). Pas de mineurs < 15 ans (blocage).
+- Suppression de compte immédiate et définitive. Hébergement web : Cloudflare Pages. E-mails : Brevo.
+
+## Points techniques
+
+- Suggestions : `src/core/algorithms` (pur, testé) → copie dans `supabase/functions/_shared/core`
+  (`npm run core:sync`, vérifiée en CI). Edge Function `compute-suggestions` (logique dans `analyze.ts`,
+  testable avec Node) déclenchée par l'app après synchro + tâche planifiée.
+- Hors-ligne : écritures via `saveOffline()` (`src/offline/sync.ts`) ; identifiants stables pour bilans/pesées
+  (`stableUuid`). Séance en cours persistée (`src/features/training/session/store.ts`).
+- Données de démo : `npm run seed:demo` (Node exécute directement le TypeScript).
+- Environnement cloud : le runtime local des Edge Functions ne peut pas télécharger ses dépendances
+  (proxy) → tester `analyze.ts` avec Node contre la base locale.

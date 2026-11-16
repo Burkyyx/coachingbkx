@@ -557,6 +557,7 @@ export const fr = {
       progress: 'Progression',
       records: 'Records',
       checkins: 'Bilans',
+      nutrition: 'Nutrition',
       notes: 'Notes',
       settings: 'Réglages',
     },
