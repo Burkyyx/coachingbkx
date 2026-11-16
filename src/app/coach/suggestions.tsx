@@ -1,14 +1,297 @@
+import { router } from 'expo-router';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Screen, Text } from '@/components/ui';
+import {
+  Badge,
+  Button,
+  Card,
+  Checkbox,
+  EmptyState,
+  ErrorState,
+  HStack,
+  LoadingState,
+  NumberCell,
+  Screen,
+  Segmented,
+  Text,
+  VStack,
+  useFeedback,
+} from '@/components/ui';
+import { formatKg, formatNumber, formatRelative, formatRepRange } from '@/core';
+import {
+  fullName,
+  useSuggestionActions,
+  useSuggestions,
+  type SuggestionRow,
+} from '@/features/coach/api';
+import { toUserMessage } from '@/lib/errors';
 
-export default function Page() {
+type Values = Record<string, unknown>;
+const num = (v: unknown) =>
+  typeof v === 'number' ? v : v === null || v === undefined ? null : Number(v);
+
+/** Résumé lisible « actuel → proposé ». */
+function useDescribe() {
   const { t } = useTranslation();
+  return (s: SuggestionRow, value: Values = s.proposed_value as Values): string | null => {
+    const cur = s.current_value as Values;
+    switch (s.kind) {
+      case 'load':
+        return `${formatKg(num(cur.load_kg) ?? 0)} → ${formatKg(num(value.load_kg) ?? 0)}`;
+      case 'rep_range':
+        return `${formatRepRange(num(cur.reps_min), num(cur.reps_max))} → ${formatRepRange(num(value.reps_min), num(value.reps_max))} reps`;
+      case 'deload':
+        return `${t('suggestions.weekLabel', { n: num(value.week_index) ?? '?' })} : ${t('suggestions.volume', { factor: formatNumber(num(value.volume_factor) ?? 0.5) })}`;
+      case 'variation':
+        return `${String(cur.exercise_name ?? '')} → ${String(value.exercise_name ?? '')}`;
+      case 'reps_target':
+        return typeof value.hint === 'string' ? value.hint : null;
+      default:
+        return null;
+    }
+  };
+}
+
+/** Éditeur de la valeur proposée (bouton « Modifier »). */
+function ModifyEditor({
+  s,
+  onApply,
+  onCancel,
+}: {
+  s: SuggestionRow;
+  onApply: (v: Values) => void;
+  onCancel: () => void;
+}) {
+  const { t } = useTranslation();
+  const proposed = s.proposed_value as Values;
+  const [value, setValue] = useState<Values>({ ...proposed });
+  const cell = (key: string, label: string, decimals = 2, max = 1000) => (
+    <NumberCell
+      label={label}
+      showLabel
+      value={num(value[key])}
+      decimals={decimals}
+      max={max}
+      width={90}
+      onCommit={(v) => setValue((x) => ({ ...x, [key]: v }))}
+    />
+  );
   return (
-    <Screen>
-      <Text variant="headline" accessibilityRole="header">
-        {t('nav.suggestions')}
-      </Text>
+    <VStack gap="sm">
+      <HStack gap="sm" wrap align="flex-end">
+        {s.kind === 'load' ? cell('load_kg', 'kg') : null}
+        {s.kind === 'rep_range' ? (
+          <>
+            {cell('reps_min', 'Reps min', 0, 100)}
+            {cell('reps_max', 'Reps max', 0, 100)}
+          </>
+        ) : null}
+        {s.kind === 'deload'
+          ? cell('volume_factor', t('settings.params.volumeFactor'), 2, 1)
+          : null}
+      </HStack>
+      <HStack gap="sm">
+        <Button label={t('suggestions.applyModified')} onPress={() => onApply(value)} />
+        <Button variant="ghost" label={t('common.cancel')} onPress={onCancel} />
+      </HStack>
+    </VStack>
+  );
+}
+
+export default function SuggestionsScreen() {
+  const { t } = useTranslation();
+  const { toast } = useFeedback();
+  const [tab, setTab] = useState<'pending' | 'decided'>('pending');
+  const list = useSuggestions(tab);
+  const actions = useSuggestionActions();
+  const describe = useDescribe();
+  const [selected, setSelected] = useState<string[]>([]);
+  const [editing, setEditing] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  const run = async (fn: () => Promise<void>, message: string) => {
+    setBusy(true);
+    try {
+      await fn();
+      toast(message);
+    } catch (e) {
+      toast(toUserMessage(e));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const rows = list.data ?? [];
+  const acceptMany = () =>
+    run(
+      async () => {
+        for (const id of selected) await actions.accept(id);
+        setSelected([]);
+      },
+      t('suggestions.acceptedMany', { count: selected.length }),
+    );
+
+  return (
+    <Screen maxWidth={1000} onRefresh={() => void list.refetch()} refreshing={list.isRefetching}>
+      <VStack gap="xxs">
+        <Text variant="headline" accessibilityRole="header">
+          {t('suggestions.title')}
+        </Text>
+        <Text color="textMuted">{t('suggestions.subtitle')}</Text>
+      </VStack>
+      <Segmented
+        options={[
+          { value: 'pending' as const, label: t('suggestions.pending') },
+          { value: 'decided' as const, label: t('suggestions.history') },
+        ]}
+        value={tab}
+        onChange={(v) => {
+          setTab(v);
+          setSelected([]);
+        }}
+      />
+
+      {tab === 'pending' && rows.length > 0 ? (
+        <HStack gap="sm" wrap>
+          <Button
+            variant="ghost"
+            icon="checkbox-outline"
+            label={t('suggestions.selectAll')}
+            onPress={() =>
+              setSelected(selected.length === rows.length ? [] : rows.map((r) => r.id))
+            }
+          />
+          <Button
+            icon="checkmark-done"
+            label={t('suggestions.acceptSelected', { count: selected.length })}
+            disabled={selected.length === 0 || busy}
+            onPress={() => void acceptMany()}
+          />
+          <Button
+            variant="danger"
+            label={t('suggestions.rejectSelected')}
+            disabled={selected.length === 0 || busy}
+            onPress={() =>
+              void run(async () => {
+                await actions.reject(selected);
+                setSelected([]);
+              }, t('suggestions.rejected'))
+            }
+          />
+        </HStack>
+      ) : null}
+
+      {list.isLoading ? (
+        <LoadingState />
+      ) : list.isError ? (
+        <ErrorState onRetry={() => void list.refetch()} />
+      ) : rows.length === 0 ? (
+        <EmptyState
+          icon="sparkles-outline"
+          title={tab === 'pending' ? t('suggestions.empty') : t('suggestions.emptyHistory')}
+        />
+      ) : (
+        rows.map((s) => {
+          const summary = describe(s, (s.final_value ?? s.proposed_value) as Values);
+          const applied = ['accepted', 'modified', 'auto_applied'].includes(s.status);
+          return (
+            <Card key={s.id}>
+              <VStack gap="sm">
+                <HStack gap="sm" wrap>
+                  {tab === 'pending' ? (
+                    <Checkbox
+                      label={s.adherent ? fullName(s.adherent) : '—'}
+                      checked={selected.includes(s.id)}
+                      onChange={(v) =>
+                        setSelected((x) => (v ? [...x, s.id] : x.filter((id) => id !== s.id)))
+                      }
+                    />
+                  ) : (
+                    <Text weight="700">{s.adherent ? fullName(s.adherent) : '—'}</Text>
+                  )}
+                  <Badge tone="info" label={t(`suggestions.kinds.${s.kind}`)} />
+                  {s.exercise ? <Badge label={s.exercise.name} /> : null}
+                  {tab === 'decided' ? (
+                    <Badge
+                      label={t(`suggestions.statuses.${s.status}`)}
+                      tone={
+                        s.status === 'rejected' || s.status === 'reverted' ? 'neutral' : 'success'
+                      }
+                    />
+                  ) : null}
+                  <Text variant="caption" color="textSubtle">
+                    {formatRelative(s.decided_at ?? s.created_at)}
+                  </Text>
+                </HStack>
+                <Text>{s.justification}</Text>
+                {summary ? (
+                  <Text weight="700" tabular>
+                    {summary}
+                  </Text>
+                ) : null}
+
+                {tab === 'pending' && editing === s.id ? (
+                  <ModifyEditor
+                    s={s}
+                    onCancel={() => setEditing(null)}
+                    onApply={(v) =>
+                      void run(async () => {
+                        await actions.accept(s.id, v);
+                        setEditing(null);
+                      }, t('suggestions.accepted'))
+                    }
+                  />
+                ) : tab === 'pending' ? (
+                  <HStack gap="sm" wrap>
+                    <Button
+                      icon="checkmark"
+                      label={
+                        s.kind === 'info' ? t('suggestions.acknowledge') : t('suggestions.accept')
+                      }
+                      disabled={busy}
+                      onPress={() =>
+                        void run(() => actions.accept(s.id), t('suggestions.accepted'))
+                      }
+                    />
+                    {['load', 'rep_range', 'deload'].includes(s.kind) ? (
+                      <Button
+                        variant="secondary"
+                        icon="create-outline"
+                        label={t('suggestions.modify')}
+                        onPress={() => setEditing(s.id)}
+                      />
+                    ) : null}
+                    <Button
+                      variant="ghost"
+                      icon="close"
+                      label={t('suggestions.reject')}
+                      disabled={busy}
+                      onPress={() =>
+                        void run(() => actions.reject([s.id]), t('suggestions.rejected'))
+                      }
+                    />
+                    <Button
+                      variant="ghost"
+                      label={t('nav.adherents')}
+                      onPress={() => router.push(`/coach/adherents/${s.adherent_id}`)}
+                    />
+                  </HStack>
+                ) : applied && s.kind !== 'info' ? (
+                  <Button
+                    variant="secondary"
+                    icon="arrow-undo"
+                    label={t('suggestions.revert')}
+                    disabled={busy}
+                    onPress={() => void run(() => actions.revert(s.id), t('suggestions.reverted'))}
+                    style={{ alignSelf: 'flex-start' }}
+                  />
+                ) : null}
+              </VStack>
+            </Card>
+          );
+        })
+      )}
     </Screen>
   );
 }
