@@ -3,3 +3,9 @@ jest.mock('@react-native-async-storage/async-storage', () =>
   // eslint-disable-next-line @typescript-eslint/no-require-imports -- jest.mock impose require()
   require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
+
+// Modules natifs non disponibles dans Jest.
+jest.mock('expo-sharing', () => ({
+  isAvailableAsync: jest.fn(async () => false),
+  shareAsync: jest.fn(),
+}));
