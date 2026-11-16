@@ -29,7 +29,7 @@ export type Profile = Tables<'profiles'>;
  *  - recovery : arrivé depuis le lien « mot de passe oublié »
  *  - needsInvitation : compte créé mais pas encore rattaché à une invitation
  *  - deactivated : accès désactivé par le coach
- *  - needsConsent / needsOnboarding : inscription à terminer
+ *  - needsConsent / needsOnboarding / needsActivity : inscription à terminer
  *  - underage : moins de 15 ans
  *  - ready : accès à l'app
  */
@@ -42,6 +42,7 @@ export type AuthStatus =
   | 'deactivated'
   | 'needsConsent'
   | 'needsOnboarding'
+  | 'needsActivity'
   | 'underage'
   | 'ready';
 
@@ -160,6 +161,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
     else if (!profile.onboarded_at) status = 'needsOnboarding';
     else if (profile.birth_date && ageOn(profile.birth_date, todayLocal()) < MINIMUM_AGE)
       status = 'underage';
+    else if (!profile.activity_level) status = 'needsActivity';
     else status = 'ready';
 
     return {

@@ -73,6 +73,8 @@ type Persona = {
   height: number;
   level: 'beginner' | 'intermediate' | 'advanced';
   goal: 'muscle_gain' | 'fat_loss' | 'recomposition' | 'performance' | 'health';
+  activity:
+    'sedentary' | 'lightly_active' | 'moderately_active' | 'very_active' | 'extremely_active';
   template: 'ppl' | 'fullbody';
   attendance: number;
   strength: number;
@@ -93,6 +95,7 @@ const PERSONAS: Persona[] = [
     height: 168,
     level: 'intermediate',
     goal: 'recomposition',
+    activity: 'lightly_active',
     template: 'ppl',
     attendance: 0.92,
     strength: 0.65,
@@ -111,6 +114,7 @@ const PERSONAS: Persona[] = [
     height: 181,
     level: 'beginner',
     goal: 'muscle_gain',
+    activity: 'sedentary',
     template: 'fullbody',
     attendance: 0.95,
     strength: 0.8,
@@ -129,6 +133,7 @@ const PERSONAS: Persona[] = [
     height: 164,
     level: 'intermediate',
     goal: 'fat_loss',
+    activity: 'moderately_active',
     template: 'ppl',
     attendance: 0.8,
     strength: 0.6,
@@ -147,6 +152,7 @@ const PERSONAS: Persona[] = [
     height: 176,
     level: 'advanced',
     goal: 'performance',
+    activity: 'very_active',
     template: 'ppl',
     attendance: 0.9,
     strength: 1.25,
@@ -165,6 +171,7 @@ const PERSONAS: Persona[] = [
     height: 159,
     level: 'beginner',
     goal: 'health',
+    activity: 'sedentary',
     template: 'fullbody',
     attendance: 0.65,
     strength: 0.5,
@@ -455,6 +462,7 @@ async function main() {
         sex: persona.sex,
         height_cm: persona.height,
         level: persona.level,
+        activity_level: persona.activity,
         goal: persona.goal,
         injuries: persona.injuries,
         effort_scale: persona.scale,

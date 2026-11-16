@@ -20,6 +20,8 @@ export default function Index() {
       return <Redirect href="/setup/consents" />;
     case 'needsOnboarding':
       return <Redirect href="/setup/onboarding" />;
+    case 'needsActivity':
+      return <Redirect href="/setup/activity" />;
     case 'ready':
       return <Redirect href={isCoach ? '/coach' : '/today'} />;
     default:

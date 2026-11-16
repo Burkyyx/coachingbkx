@@ -8,6 +8,7 @@ const ROUTE_BY_STATUS: Partial<Record<AuthStatus, Href>> = {
   needsInvitation: '/setup/invitation',
   needsConsent: '/setup/consents',
   needsOnboarding: '/setup/onboarding',
+  needsActivity: '/setup/activity',
   deactivated: '/setup/deactivated',
   underage: '/setup/underage',
 };

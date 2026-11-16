@@ -1,7 +1,7 @@
 -- Profils, invitations, consentements, notes du coach, réglages.
 begin;
 \ir _helpers.sql
-select plan(29);
+select plan(31);
 
 -- Données de test ---------------------------------------------------------------
 select tests.create_user('coach@test.fr', 'coach') as coach \gset
@@ -27,9 +27,14 @@ select throws_ok(
 select throws_ok(
   format($$update public.profiles set effort_scale = 'rpe' where id = %L$$, :'alice'),
   '42501', null, 'Alice ne peut pas changer son échelle d''effort (réglage coach)');
-update public.profiles set first_name = 'Pirate' where id = :'bob';
+select lives_ok(
+  format($$update public.profiles set activity_level = 'sedentary' where id = %L$$, :'alice'),
+  'Alice peut renseigner son niveau d''activité');
+update public.profiles set first_name = 'Pirate', activity_level = 'very_active' where id = :'bob';
 select tests.logout();
 select isnt((select first_name from public.profiles where id = :'bob'), 'Pirate', 'Alice ne peut pas modifier le profil de Bob');
+select is((select activity_level from public.profiles where id = :'bob'), null,
+  'Alice ne peut pas modifier le niveau d''activité de Bob');
 
 select tests.login(:'alice');
 select is_empty('select * from public.coach_notes', 'Alice ne voit pas les notes privées du coach');

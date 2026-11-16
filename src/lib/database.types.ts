@@ -1,5 +1,3 @@
-// Fichier GÉNÉRÉ automatiquement (npm run db:types) — ne pas modifier à la main.
-
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
 export type Database = {
@@ -652,6 +650,7 @@ export type Database = {
       };
       profiles: {
         Row: {
+          activity_level: Database['public']['Enums']['activity_level'] | null;
           avatar_path: string | null;
           birth_date: string | null;
           checkin_weekday: number | null;
@@ -675,6 +674,7 @@ export type Database = {
         };
         ComputedFields: never;
         Insert: {
+          activity_level?: Database['public']['Enums']['activity_level'] | null;
           avatar_path?: string | null;
           birth_date?: string | null;
           checkin_weekday?: number | null;
@@ -697,6 +697,7 @@ export type Database = {
           updated_at?: string;
         };
         Update: {
+          activity_level?: Database['public']['Enums']['activity_level'] | null;
           avatar_path?: string | null;
           birth_date?: string | null;
           checkin_weekday?: number | null;
@@ -1382,6 +1383,7 @@ export type Database = {
       bootstrap_coach: {
         Args: { p_email: string };
         Returns: {
+          activity_level: Database['public']['Enums']['activity_level'] | null;
           avatar_path: string | null;
           birth_date: string | null;
           checkin_weekday: number | null;
@@ -1419,21 +1421,37 @@ export type Database = {
         Args: Record<PropertyKey, never>;
         Returns: {
           active_program_name: string;
+          activity_level: Database['public']['Enums']['activity_level'];
           adherent_id: string;
           avatar_path: string;
+          birth_date: string;
           first_name: string;
           goal: Database['public']['Enums']['training_goal'];
           is_active: boolean;
           last_checkin_week: string;
           last_name: string;
           last_session_at: string;
+          level: Database['public']['Enums']['training_level'];
           nickname: string;
           onboarded: boolean;
           pending_suggestions: number;
           recent_weights: Json;
           sessions_done_28d: number;
           sessions_planned_28d: number;
+          sex: Database['public']['Enums']['sex'];
           unseen_alerts: number;
+        }[];
+      };
+      coach_weekly_stats: {
+        Args: { p_weeks?: number };
+        Returns: {
+          active_adherents: number;
+          checkins_expected: number;
+          checkins_received: number;
+          records: number;
+          sessions_done: number;
+          sessions_planned: number;
+          week_start: string;
         }[];
       };
       create_invitation: {
@@ -1481,6 +1499,7 @@ export type Database = {
       redeem_invitation: {
         Args: { p_code: string };
         Returns: {
+          activity_level: Database['public']['Enums']['activity_level'] | null;
           avatar_path: string | null;
           birth_date: string | null;
           checkin_weekday: number | null;
@@ -1543,6 +1562,8 @@ export type Database = {
       workout_date: { Args: { p_day: number; p_start: string; p_week: number }; Returns: string };
     };
     Enums: {
+      activity_level:
+        'sedentary' | 'lightly_active' | 'moderately_active' | 'very_active' | 'extremely_active';
       alert_type:
         | 'missed_workout'
         | 'inactive'
@@ -1711,6 +1732,13 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      activity_level: [
+        'sedentary',
+        'lightly_active',
+        'moderately_active',
+        'very_active',
+        'extremely_active',
+      ],
       alert_type: [
         'missed_workout',
         'inactive',

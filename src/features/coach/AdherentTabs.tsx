@@ -99,6 +99,10 @@ export function ProfileTab({ profile }: { profile: Profile }) {
             value={profile.level ? t(`enums.level.${profile.level}`) : '—'}
           />
           <Info
+            label={t('adherent.activity')}
+            value={profile.activity_level ? t(`enums.activity.${profile.activity_level}`) : '—'}
+          />
+          <Info
             label={t('adherent.height')}
             value={profile.height_cm ? `${formatNumber(Number(profile.height_cm))} cm` : '—'}
           />

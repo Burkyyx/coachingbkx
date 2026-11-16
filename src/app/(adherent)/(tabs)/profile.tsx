@@ -33,6 +33,7 @@ import { useAuth } from '@/features/auth/AuthProvider';
 import { CONSENT_VERSION, hasActiveConsent, type ConsentType } from '@/features/auth/consents';
 import { saveWeight } from '@/features/checkin/api';
 import { ADHERENT_TYPES, isEnabled } from '@/features/notifications/api';
+import { ActivityLevelPicker } from '@/features/profile/ActivityLevelPicker';
 import { deleteMyAccount, exportMyData } from '@/features/profile/export';
 import { useAdherentBundle } from '@/features/training/bundle';
 import { toUserMessage } from '@/lib/errors';
@@ -179,6 +180,15 @@ export default function ProfileScreen() {
             onCommit={(v) => updateProfile.mutate({ injuries: v || null })}
           />
         </VStack>
+      </Card>
+
+      <SectionHeader title={t('onboarding.activityLabel')} />
+      <Card>
+        <ActivityLevelPicker
+          value={profile.activity_level}
+          onChange={(v) => updateProfile.mutate({ activity_level: v })}
+          disabled={updateProfile.isPending}
+        />
       </Card>
 
       <SectionHeader title={t('profile.weights')} />

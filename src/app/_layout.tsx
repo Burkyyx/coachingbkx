@@ -22,6 +22,7 @@ const SETUP_STATUSES: readonly AuthStatus[] = [
   'needsInvitation',
   'needsConsent',
   'needsOnboarding',
+  'needsActivity',
   'deactivated',
   'underage',
 ];
