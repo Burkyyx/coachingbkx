@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { Button, ErrorState, LoadingState, Text, VStack } from '@/components/ui';
+import { Button, ErrorState, FeedbackProvider, LoadingState, Text, VStack } from '@/components/ui';
 import { signOut } from '@/features/auth/api';
 import { AuthProvider, useAuth, type AuthStatus } from '@/features/auth/AuthProvider';
 import { isConfigured } from '@/lib/env';
@@ -115,7 +115,9 @@ export default function RootLayout() {
         <ThemeProvider>
           {isConfigured ? (
             <AuthProvider>
-              <RootNavigator />
+              <FeedbackProvider>
+                <RootNavigator />
+              </FeedbackProvider>
             </AuthProvider>
           ) : (
             <NotConfigured />

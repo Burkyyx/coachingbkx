@@ -11,3 +11,6 @@ export { EmptyState, ErrorState, LoadingState } from './States';
 export { Stepper } from './Stepper';
 export { Text } from './Text';
 export { TextField } from './TextField';
+export { ChipSelect } from './ChipSelect';
+export { FeedbackProvider, useFeedback } from './Feedback';
+export { Sheet } from './Sheet';
