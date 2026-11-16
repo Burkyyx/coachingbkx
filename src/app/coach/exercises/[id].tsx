@@ -35,9 +35,10 @@ import {
   type Exercise,
 } from '@/features/exercises/api';
 import { ExercisePicker } from '@/features/exercises/ExercisePicker';
-import { ExerciseVideo } from '@/features/exercises/ExerciseVideo';
+import { ExerciseImage, ExerciseVideo } from '@/features/exercises/ExerciseVideo';
 import { RuleEditor } from '@/features/coach/RuleEditor';
 import { toUserMessage } from '@/lib/errors';
+import { pickPhoto } from '@/lib/media';
 import { extensionFor, removeFiles, uploadFile } from '@/lib/storage';
 import { supabase } from '@/lib/supabase';
 
@@ -89,6 +90,8 @@ function ExerciseForm({
   const [error, setError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [videoPath, setVideoPath] = useState<string | null>(exercise?.video_path ?? null);
+  const [imagePath, setImagePath] = useState<string | null>(exercise?.image_path ?? null);
+  const [imageBusy, setImageBusy] = useState(false);
 
   const schema = useMemo(
     () =>
@@ -179,6 +182,37 @@ function ExerciseForm({
     await supabase.from('exercises').update({ video_path: null }).eq('id', exercise.id);
     await removeFiles('exercise-media', [videoPath]).catch(() => undefined);
     setVideoPath(null);
+  };
+
+  // Image de l'exercice (photo ou schéma), compressée avant l'envoi.
+  const uploadImage = async () => {
+    if (!exercise) return;
+    const media = await pickPhoto();
+    if (!media) return;
+    setImageBusy(true);
+    setError(null);
+    try {
+      const path = `${exercise.id}/image-${Date.now()}.jpg`;
+      await uploadFile('exercise-media', path, media.uri, 'image/jpeg');
+      const { error: updateError } = await supabase
+        .from('exercises')
+        .update({ image_path: path })
+        .eq('id', exercise.id);
+      if (updateError) throw updateError;
+      if (imagePath) await removeFiles('exercise-media', [imagePath]).catch(() => undefined);
+      setImagePath(path);
+    } catch (e) {
+      setError(toUserMessage(e));
+    } finally {
+      setImageBusy(false);
+    }
+  };
+
+  const removeImage = async () => {
+    if (!exercise || !imagePath) return;
+    await supabase.from('exercises').update({ image_path: null }).eq('id', exercise.id);
+    await removeFiles('exercise-media', [imagePath]).catch(() => undefined);
+    setImagePath(null);
   };
 
   const toggleArchive = async () => {
@@ -348,6 +382,38 @@ function ExerciseForm({
 
       <Card>
         <VStack gap="md">
+          <Text variant="subtitle">{t('exercises.image')}</Text>
+          <Text variant="small" color="textMuted">
+            {t('exercises.imageHint')}
+          </Text>
+          {exercise && imagePath ? <ExerciseImage path={imagePath} /> : null}
+          {exercise ? (
+            <HStack gap="sm" wrap>
+              <Button
+                variant="secondary"
+                icon="image-outline"
+                label={imagePath ? t('exercises.imageReplace') : t('exercises.imageUpload')}
+                loading={imageBusy}
+                onPress={() => void uploadImage()}
+              />
+              {imagePath ? (
+                <Button
+                  variant="danger"
+                  label={t('exercises.imageRemove')}
+                  onPress={() => void removeImage()}
+                />
+              ) : null}
+            </HStack>
+          ) : (
+            <Text variant="small" color="textSubtle">
+              {t('exercises.saveFirst')}
+            </Text>
+          )}
+        </VStack>
+      </Card>
+
+      <Card>
+        <VStack gap="md">
           <Text variant="subtitle">{t('exercises.video')}</Text>
           {exercise && videoPath ? <ExerciseVideo path={videoPath} url={null} /> : null}
           {!videoPath && videoUrl ? <ExerciseVideo path={null} url={videoUrl} /> : null}
@@ -357,6 +423,7 @@ function ExerciseForm({
             render={({ field }) => (
               <TextField
                 label={t('exercises.videoLink')}
+                hint={t('exercises.videoLinkHint')}
                 value={field.value}
                 onChangeText={field.onChange}
                 autoCapitalize="none"

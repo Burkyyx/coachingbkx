@@ -19,6 +19,7 @@ import {
   VStack,
 } from '@/components/ui';
 import { filterExercises, MUSCLES, useExercises, type MuscleGroup } from '@/features/exercises/api';
+import { ExerciseThumb } from '@/features/exercises/ExerciseVideo';
 import { useTheme } from '@/theme/ThemeProvider';
 
 /** Bibliothèque d'exercices du coach. */
@@ -95,6 +96,7 @@ export default function ExercisesScreen() {
                 opacity: pressed ? 0.7 : 1,
               })}
             >
+              <ExerciseThumb imagePath={item.image_path} videoUrl={item.video_url} />
               <View style={{ flex: 1, gap: 2 }}>
                 <Text weight="600" color={item.archived_at ? 'textSubtle' : 'text'}>
                   {item.name}

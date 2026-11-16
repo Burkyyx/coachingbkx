@@ -119,6 +119,7 @@ export const LEGAL_DOCUMENTS: Record<LegalDocId, LegalDocument> = {
         paragraphs: [
           'Seul le coach a accès aux données. Aucune donnée n’est vendue ni utilisée à des fins publicitaires.',
           'Sous-traitants : Supabase (hébergement des données dans l’UE), [À COMPLÉTER : Expo pour les notifications push, fournisseur d’envoi d’e-mails].',
+          'Vidéos de démonstration intégrées : lecteur YouTube (Google) en mode « confidentialité renforcée » (youtube-nocookie.com) ; aucune donnée de l’app n’est transmise, mais YouTube peut recevoir l’adresse IP de l’appareil au moment de la lecture.',
         ],
       },
       {

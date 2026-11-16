@@ -31,7 +31,7 @@ import {
   type RecordDraft,
   type SessionSummary,
 } from '@/core';
-import { ExerciseVideo } from '@/features/exercises/ExerciseVideo';
+import { ExerciseImage, ExerciseVideo } from '@/features/exercises/ExerciseVideo';
 import { useAdherentBundle } from '@/features/training/bundle';
 import { exerciseHistory, scheduledWorkouts } from '@/features/training/derive';
 import {
@@ -389,6 +389,7 @@ export default function SessionScreen() {
 
       {/* Consignes et vidéo */}
       <Sheet visible={sheet === 'info'} onClose={() => setSheet(null)} title={info?.name ?? ''}>
+        <ExerciseImage path={info?.image_path ?? null} />
         <ExerciseVideo path={info?.video_path ?? null} url={info?.video_url ?? null} />
         <Text>{info?.instructions ?? t('exercises.instructionsEmpty')}</Text>
       </Sheet>

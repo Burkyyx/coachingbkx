@@ -310,6 +310,7 @@ export type Database = {
           created_at: string;
           equipment: Database['public']['Enums']['equipment'];
           id: string;
+          image_path: string | null;
           instructions: string | null;
           load_increment_kg: number;
           name: string;
@@ -326,6 +327,7 @@ export type Database = {
           created_at?: string;
           equipment: Database['public']['Enums']['equipment'];
           id?: string;
+          image_path?: string | null;
           instructions?: string | null;
           load_increment_kg?: number;
           name: string;
@@ -341,6 +343,7 @@ export type Database = {
           created_at?: string;
           equipment?: Database['public']['Enums']['equipment'];
           id?: string;
+          image_path?: string | null;
           instructions?: string | null;
           load_increment_kg?: number;
           name?: string;

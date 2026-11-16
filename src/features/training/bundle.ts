@@ -32,6 +32,7 @@ export type BundleExercise = Pick<
   | 'instructions'
   | 'video_path'
   | 'video_url'
+  | 'image_path'
 >;
 
 export type HistorySession = Pick<
@@ -101,7 +102,7 @@ async function fetchRemoteBundle(uid: string): Promise<AdherentBundle> {
     supabase
       .from('exercises')
       .select(
-        'id, name, primary_muscle, equipment, type, load_increment_kg, instructions, video_path, video_url',
+        'id, name, primary_muscle, equipment, type, load_increment_kg, instructions, video_path, video_url, image_path',
       ),
     supabase.from('exercise_alternatives').select('exercise_id, alternative_id'),
     supabase.from('reference_1rm').select('exercise_id, value_kg').eq('adherent_id', uid),

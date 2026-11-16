@@ -91,6 +91,7 @@ function bundle(over: Partial<AdherentBundle> = {}): AdherentBundle {
         instructions: null,
         video_path: null,
         video_url: null,
+        image_path: null,
       },
       {
         id: 'db',
@@ -102,6 +103,7 @@ function bundle(over: Partial<AdherentBundle> = {}): AdherentBundle {
         instructions: null,
         video_path: null,
         video_url: null,
+        image_path: null,
       },
       {
         id: 'row',
@@ -113,6 +115,7 @@ function bundle(over: Partial<AdherentBundle> = {}): AdherentBundle {
         instructions: null,
         video_path: null,
         video_url: null,
+        image_path: null,
       },
     ],
     alternatives: {},

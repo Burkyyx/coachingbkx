@@ -6,6 +6,7 @@ import { Button, Icon, Segmented, Sheet, Text, TextField, VStack } from '@/compo
 import { useTheme } from '@/theme/ThemeProvider';
 
 import { filterExercises, MUSCLES, useExercises, type MuscleGroup } from './api';
+import { ExerciseThumb } from './ExerciseVideo';
 
 type Props = {
   visible: boolean;
@@ -122,6 +123,7 @@ export function ExercisePicker({
                 backgroundColor: isSelected || pressed ? theme.colors.surfaceAlt : 'transparent',
               })}
             >
+              <ExerciseThumb imagePath={item.image_path} videoUrl={item.video_url} size={40} />
               <View style={{ flex: 1 }}>
                 <Text weight="600">{item.name}</Text>
                 <Text variant="caption" color="textMuted">
