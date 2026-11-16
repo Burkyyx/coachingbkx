@@ -3,7 +3,8 @@ import { useEffect } from 'react';
 
 import { useAuth } from '@/features/auth/AuthProvider';
 import { sessionActions } from '@/features/training/session/store';
-import { useSyncManager } from '@/offline/sync';
+import { supabase } from '@/lib/supabase';
+import { onSynced, useSyncManager } from '@/offline/sync';
 import { useTheme } from '@/theme/ThemeProvider';
 
 /**
@@ -17,6 +18,14 @@ export default function AdherentLayout() {
   useEffect(() => {
     if (userId) void sessionActions.hydrate(userId);
   }, [userId]);
+  // Dès qu'une séance arrive sur le serveur, on demande son analyse (suggestions pour le coach).
+  useEffect(
+    () =>
+      onSynced(() => {
+        void supabase.functions.invoke('compute-suggestions', { body: {} }).catch(() => undefined);
+      }),
+    [],
+  );
 
   return (
     <Stack

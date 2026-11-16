@@ -40,6 +40,7 @@ export default function CoachDashboard() {
   const alerts = useAlerts();
   const markSeen = useMarkAlertsSeen();
   const [analyzing, setAnalyzing] = useState(false);
+  const [showAll, setShowAll] = useState(false);
 
   if (overview.isLoading) return <LoadingState />;
   if (overview.isError) {
@@ -92,7 +93,13 @@ export default function CoachDashboard() {
         />
       </HStack>
 
-      <View style={{ flexDirection: desktop ? 'row' : 'column', gap: theme.spacing.lg }}>
+      <View
+        style={{
+          flexDirection: desktop ? 'row' : 'column',
+          alignItems: desktop ? 'flex-start' : 'stretch',
+          gap: theme.spacing.lg,
+        }}
+      >
         {/* Alertes */}
         <Card style={{ flex: 2 }}>
           <VStack gap="sm">
@@ -111,7 +118,7 @@ export default function CoachDashboard() {
             {alertList.length === 0 ? (
               <Text color="textMuted">{t('coach.noAlerts')}</Text>
             ) : (
-              alertList.slice(0, 12).map((a) => (
+              alertList.slice(0, showAll ? 50 : 6).map((a) => (
                 <HStack key={a.id} gap="sm" align="flex-start" style={{ paddingVertical: 4 }}>
                   <Badge
                     label={t(`coach.alertTypes.${a.type}`)}
@@ -142,6 +149,13 @@ export default function CoachDashboard() {
                 </HStack>
               ))
             )}
+            {alertList.length > 6 ? (
+              <Button
+                variant="ghost"
+                label={showAll ? 'Voir moins' : `Voir les ${alertList.length} alertes`}
+                onPress={() => setShowAll((v) => !v)}
+              />
+            ) : null}
           </VStack>
         </Card>
 
