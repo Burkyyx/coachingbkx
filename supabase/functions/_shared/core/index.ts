@@ -22,3 +22,4 @@ export * from './dates.ts';
 export * from './notifications/pushGrouping.ts';
 export * from './youtube.ts';
 export * from './adherents.ts';
+export * from './programs.ts';
