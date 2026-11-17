@@ -216,9 +216,14 @@ d'un exercice.
    npx supabase functions deploy send-push
    npx supabase functions deploy delete-account
    ```
-4. **Tâches planifiées** : ouvre `supabase/setup/cron_edge_functions.sql`, remplace `<PROJECT_REF>` et
-   `<CRON_SECRET>`, puis exécute-le dans _SQL Editor_. (La tâche des rappels et alertes horaires est
-   déjà créée par les migrations.)
+4. **Tâches planifiées** :
+   - dans Supabase, _Database → Extensions_ : active **pg_cron** et **pg_net** (sinon erreur
+     « schema "cron" does not exist ») ;
+   - ouvre le fichier `supabase/setup/cron_edge_functions.sql` (`open -e supabase/setup/cron_edge_functions.sql`),
+     copie tout, colle-le dans _SQL Editor → New query_ ;
+   - remplace `<PROJECT_REF>` (identifiant du projet, dans l'adresse de la page) et `<CRON_SECRET>`
+     (la phrase de l'étape 3) — 2 fois chacun — puis _Run_ ;
+   - vérification : `select jobname, schedule from cron.job;` doit afficher **3 lignes**.
 5. **E-mails** (confirmation, mot de passe oublié) : le service intégré de Supabase est limité à quelques
    e-mails par heure. Crée un compte **Brevo** (https://www.brevo.com, gratuit), puis dans Supabase
    _Authentication → Emails → SMTP Settings_ : hôte `smtp-relay.brevo.com`, port `587`, identifiants Brevo.
