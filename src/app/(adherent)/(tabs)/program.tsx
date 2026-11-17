@@ -154,7 +154,9 @@ export default function ProgramScreen() {
             workout={detail}
             bundle={bundle.data}
             footer={
-              !detail.done && !active ? (
+              detail.done || active ? null : detail.exercises.length === 0 ? (
+                <Text color="textMuted">{t('training.emptyWorkoutBody')}</Text>
+              ) : (
                 <Button
                   size="lg"
                   icon="barbell"
@@ -165,7 +167,7 @@ export default function ProgramScreen() {
                   }}
                   fullWidth
                 />
-              ) : null
+              )
             }
           />
         ) : null}

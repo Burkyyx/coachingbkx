@@ -489,6 +489,12 @@ export const fr = {
     save: 'Enregistrer la séance',
     abandon: 'Abandonner la séance',
     abandonConfirm: 'Abandonner la séance ? Les séries déjà validées sont conservées.',
+    emptyWorkoutTitle: 'Pas encore d’exercice',
+    emptyWorkoutBody:
+      'Ton coach n’a pas encore ajouté d’exercices à cette séance. Écris-lui si besoin.',
+    emptySessionTitle: 'Cette séance ne contient aucun exercice',
+    emptySessionBody: 'Elle a été lancée sans exercice : tu peux l’annuler sans souci.',
+    cancelEmptySession: 'Annuler la séance',
     unfinishedSets: 'Il reste {{count}} série(s) non faite(s). Terminer quand même ?',
     newRecord: 'Nouveau record !',
     recordTypes: {

@@ -78,6 +78,7 @@ export default function SessionScreen() {
   // Démarrage automatique (une seule fois) si aucune séance n'est en cours.
   useEffect(() => {
     if (!hydrated || !bundle.data || !workout || session || summary || started.current) return;
+    if (workout.exercises.length === 0) return;
     started.current = true;
     void requestRestAlarmPermission();
     void sessionActions.start(bundle.data, workout);
@@ -94,6 +95,34 @@ export default function SessionScreen() {
           body={t('training.otherSessionActiveBody', { name: session.workoutName })}
           actionLabel={t('training.resume')}
           onAction={() => router.replace(`/session/${session.workoutId ?? 'free'}`)}
+        />
+      </Screen>
+    );
+  }
+  if (session && session.exercises.length === 0) {
+    return (
+      <Screen>
+        <EmptyState
+          icon="alert-circle-outline"
+          title={t('training.emptySessionTitle')}
+          body={t('training.emptySessionBody')}
+          actionLabel={t('training.cancelEmptySession')}
+          onAction={() => {
+            void sessionActions.abandon().then(() => router.replace('/today'));
+          }}
+        />
+      </Screen>
+    );
+  }
+  if (!session && workout && workout.exercises.length === 0) {
+    return (
+      <Screen>
+        <EmptyState
+          icon="hourglass-outline"
+          title={t('training.emptyWorkoutTitle')}
+          body={t('training.emptyWorkoutBody')}
+          actionLabel={t('training.backHome')}
+          onAction={() => router.replace('/today')}
         />
       </Screen>
     );

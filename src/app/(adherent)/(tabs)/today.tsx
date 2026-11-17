@@ -12,12 +12,13 @@ import {
   Screen,
   Text,
   VStack,
+  useFeedback,
 } from '@/components/ui';
 import { formatRelative, isoWeekday, todayLocal, weekStart } from '@/core';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useAdherentBundle } from '@/features/training/bundle';
 import { scheduledWorkouts, suggestedWorkout } from '@/features/training/derive';
-import { useActiveSession } from '@/features/training/session/store';
+import { sessionActions, useActiveSession } from '@/features/training/session/store';
 import { WorkoutSummaryCard } from '@/features/training/WorkoutSummaryCard';
 import { supabase } from '@/lib/supabase';
 import { NotificationBell } from '@/features/notifications/NotificationBell';
@@ -26,6 +27,7 @@ import { SyncBadge } from '@/offline/SyncBadge';
 /** Onglet « Aujourd'hui » : séance du jour, dernier message du coach, rappel du bilan. */
 export default function TodayScreen() {
   const { t } = useTranslation();
+  const { confirm } = useFeedback();
   const { profile, userId } = useAuth();
   const bundle = useAdherentBundle();
   const active = useActiveSession((s) => s.session);
@@ -105,6 +107,19 @@ export default function TodayScreen() {
               onPress={() => router.push(`/session/${active.workoutId ?? 'free'}`)}
               fullWidth
             />
+            <Button
+              variant="ghost"
+              icon="close"
+              label={t('training.abandon')}
+              onPress={() =>
+                void confirm({
+                  title: t('training.abandon'),
+                  message: t('training.abandonConfirm'),
+                  confirmLabel: t('training.abandon'),
+                  destructive: true,
+                }).then((ok) => (ok ? sessionActions.abandon() : undefined))
+              }
+            />
           </VStack>
         </Card>
       ) : null}
@@ -127,7 +142,9 @@ export default function TodayScreen() {
                 : t('training.nextWorkout')
           }
           footer={
-            !active ? (
+            active ? null : suggestion.workout.exercises.length === 0 ? (
+              <Text color="textMuted">{t('training.emptyWorkoutBody')}</Text>
+            ) : (
               <Button
                 size="xl"
                 icon="barbell"
@@ -135,7 +152,7 @@ export default function TodayScreen() {
                 onPress={() => router.push(`/session/${suggestion.workout.id}`)}
                 fullWidth
               />
-            ) : null
+            )
           }
         />
       ) : (

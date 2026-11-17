@@ -67,11 +67,14 @@ export const sessionActions = {
   async hydrate(uid: string) {
     const saved = await localStore.getDoc<engine.ActiveSession>(key(uid));
     useActiveSession.setState({ uid, session: saved, hydrated: true });
+    // Séance sans exercice restée bloquée (ancienne version de l'app) : on l'annule.
+    if (saved && saved.exercises.length === 0) await sessionActions.abandon();
   },
 
   async start(bundle: AdherentBundle, workout: ScheduledWorkout) {
     const { uid } = useActiveSession.getState();
-    if (!uid) return null;
+    // Pas de séance sans exercice (le coach ne l'a pas encore remplie).
+    if (!uid || workout.exercises.length === 0) return null;
     const { session, ops } = engine.buildSession({ bundle, workout, adherentId: uid, ctx: ctx() });
     await apply(session, ops);
     return session;
