@@ -97,7 +97,8 @@ SUPABASE_SERVICE_ROLE_KEY=XXX npm run seed:demo
 npm run web
 ```
 
-L'app s'ouvre sur http://localhost:8081. Connecte-toi avec `coach@demo.fr` / `motdepasse123`.
+L'app s'ouvre sur http://localhost:8081 (≈ 1 min au démarrage). Connecte-toi avec `coach@demo.fr` /
+`motdepasse123`. Le Terminal affiche aussi un code QR pour l'ouvrir sur ton téléphone (voir ci-dessous).
 
 **Créer TON compte coach** (au lieu du compte de démo) : ouvre http://127.0.0.1:54323 (Supabase Studio),
 _Authentication → Add user_ (ton e-mail + mot de passe, coche « Auto confirm »), puis _SQL Editor_ :
@@ -111,11 +112,13 @@ select public.bootstrap_coach('ton-email@exemple.fr');
 
 ### Ouvrir l'app sur ton téléphone (même Wi-Fi que le Mac)
 
-1. Supabase doit tourner (`npm run db:start`). Arrête `npm run web` s'il tourne (Ctrl + C).
-2. Lance :
+1. Supabase doit tourner (`npm run db:start`).
+2. Lance l'app comme d'habitude :
    ```bash
-   npm run phone
+   npm run web
    ```
+   (`npm run phone` fait exactement la même chose ; si l'app tourne déjà dans une autre fenêtre,
+   il affiche juste le code QR.)
 3. Attends le cadre **« 📱 SUR TON TÉLÉPHONE »** avec un code QR (≈ 1 min la 1re fois).
    **Scanne CE code** avec l'appareil photo du téléphone (ou tape l'adresse affichée,
    ex. `http://192.168.1.20:8081`, dans Safari / Chrome).
@@ -123,9 +126,13 @@ select public.bootstrap_coach('ton-email@exemple.fr');
    de l'app, pas au navigateur._
 4. Si le Mac demande d'**autoriser les connexions entrantes** (pour « node » ou Docker) : _Autoriser_.
 
+Sous le code QR, deux lignes de vérification : **✓ App joignable** et **✓ Base de données joignable**.
+Un **✗** indique ce qui bloque (ex. Supabase arrêté → `npm run db:start`).
+
 Ça ne marche pas ?
 
 - Le téléphone doit être sur le **même Wi-Fi** que le Mac (pas en 4G/5G, pas sur un Wi-Fi « invités »).
+- Si le cadre propose d'autres adresses (« essaie plutôt »), tape-les dans le navigateur du téléphone.
 - La page ne s'ouvre pas : _Réglages Système → Réseau → Coupe-feu_ du Mac → désactive-le le temps
   du test, ou autorise « node ».
 - Le mode avion (hors-ligne) ne se teste qu'avec la version en ligne (https, [section 7](#7-mettre-le-site-web-en-ligne)) :
@@ -337,8 +344,8 @@ Pour les notifications push et l'alerte du minuteur en arrière-plan, il faut un
 
 | Commande                       | À quoi ça sert                                                           |
 | ------------------------------ | ------------------------------------------------------------------------ |
-| `npm run web`                  | Lancer l’app dans le navigateur (vide le cache : toujours à jour)        |
-| `npm run phone`                | Ouvrir l'app dans le navigateur du téléphone (même Wi-Fi, code QR)       |
+| `npm run web`                  | Lancer l’app (navigateur du Mac + code QR pour le téléphone)             |
+| `npm run phone`                | Idem ; si l’app tourne déjà, affiche seulement le code QR                |
 | `npm start`                    | Serveur pour la version de développement native (section 8)              |
 | `npm run check`                | Vérifier tout le code (types, style, tests)                              |
 | `npm run test:rls`             | Tests de sécurité de la base (Docker requis)                             |
