@@ -4,7 +4,14 @@
 // tâche planifiée (en-tête x-cron-secret).
 // -----------------------------------------------------------------------------
 import { buildPushMessages, type PendingNotification } from '../_shared/core/index.ts';
-import { adminClient, corsHeaders, identifyCaller, json, log } from '../_shared/admin.ts';
+import {
+  adminClient,
+  corsHeaders,
+  errorDetail,
+  identifyCaller,
+  json,
+  log,
+} from '../_shared/admin.ts';
 
 const EXPO_PUSH_URL = 'https://exp.host/--/api/v2/push/send';
 
@@ -22,7 +29,11 @@ Deno.serve(async (req) => {
     .gte('created_at', since)
     .order('created_at')
     .limit(500);
-  if (error) return json({ error: 'Lecture impossible' }, 500);
+  if (error) {
+    const d = errorDetail(error);
+    log('lecture des notifications en échec', d);
+    return json({ error: 'Lecture impossible', ...d }, 500);
+  }
   if (!rows?.length) return json({ sent: 0 });
 
   const userIds = [...new Set(rows.map((r) => r.user_id))];

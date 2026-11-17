@@ -5,7 +5,14 @@
 //  2. suppression du compte Auth → toutes ses données sont effacées en cascade.
 // Le compte coach ne peut pas être supprimé depuis l'app (sécurité).
 // -----------------------------------------------------------------------------
-import { adminClient, corsHeaders, identifyCaller, json, log } from '../_shared/admin.ts';
+import {
+  adminClient,
+  corsHeaders,
+  errorDetail,
+  identifyCaller,
+  json,
+  log,
+} from '../_shared/admin.ts';
 
 async function removeFolder(db: ReturnType<typeof adminClient>, bucket: string, prefix: string) {
   // Parcourt les sous-dossiers (ex. checkin-photos/<id>/<bilan>/photo.jpg).
@@ -33,7 +40,11 @@ Deno.serve(async (req) => {
     removed += (await removeFolder(db, bucket, caller.userId)).length;
   }
   const { error } = await db.auth.admin.deleteUser(caller.userId);
-  if (error) return json({ error: 'Suppression impossible' }, 500);
+  if (error) {
+    const d = errorDetail(error);
+    log('suppression de compte en échec', d);
+    return json({ error: 'Suppression impossible', ...d }, 500);
+  }
   log('compte supprimé', { files: removed });
   return json({ deleted: true });
 });

@@ -49,4 +49,4 @@ export async function identifyCaller(req: Request, admin: SupabaseClient): Promi
   return { kind: 'user', userId: data.user.id, role: profile.role };
 }
 
-export { log, todayParis } from './util.ts';
+export { errorDetail, log, todayParis } from './util.ts';

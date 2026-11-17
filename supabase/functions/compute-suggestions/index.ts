@@ -6,7 +6,14 @@
 // Appelée : par la tâche planifiée (toutes les 10 min) ET par l'app juste après
 // la synchronisation d'une séance (analyse immédiate).
 // -----------------------------------------------------------------------------
-import { adminClient, corsHeaders, identifyCaller, json } from '../_shared/admin.ts';
+import {
+  adminClient,
+  corsHeaders,
+  errorDetail,
+  identifyCaller,
+  json,
+  log,
+} from '../_shared/admin.ts';
 
 import { analyzePending } from './analyze.ts';
 
@@ -19,7 +26,9 @@ Deno.serve(async (req) => {
     // Un adhérent ne peut déclencher que l'analyse de ses propres séances.
     const adherentId = caller.kind === 'user' && caller.role === 'adherent' ? caller.userId : null;
     return json(await analyzePending(db, adherentId));
-  } catch {
-    return json({ error: 'Analyse impossible' }, 500);
+  } catch (e) {
+    const d = errorDetail(e);
+    log('analyse en échec', d);
+    return json({ error: 'Analyse impossible', ...d }, 500);
   }
 });
