@@ -207,8 +207,11 @@ d'un exercice.
    ```bash
    npx supabase login
    npx supabase link --project-ref <PROJECT_REF>     # visible dans l'URL du projet
-   npx supabase db push                              # crée toutes les tables et règles de sécurité
+   npx supabase db push --remote                     # crée toutes les tables et règles de sécurité
+   npx supabase migration list --remote              # vérification : 14 migrations dans « Remote »
    ```
+   ⚠️ Sans `--remote`, ces commandes visent la base **locale** de ton Mac (le terminal l'indique :
+   « Target: local stack »). À chaque nouvelle migration, refais `npx supabase db push --remote`.
 3. **Secrets des fonctions serveur** (invente une longue phrase pour CRON_SECRET) :
    ```bash
    npx supabase secrets set CRON_SECRET="une-longue-phrase-secrete"
