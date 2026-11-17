@@ -51,7 +51,9 @@ type Summary = SessionSummary & { records: RecordDraft[] };
  * MODE SÉANCE — utilisable d'une main, écran toujours allumé, fonctionne sans réseau.
  */
 export default function SessionScreen() {
-  useKeepAwake();
+  // Écran toujours allumé. Sur une adresse http (téléphone → Mac en local), le navigateur
+  // refuse : on ignore alors l'échec au lieu de planter en quittant la séance.
+  useKeepAwake(undefined, { suppressDeactivateWarnings: true });
   const { t } = useTranslation();
   const { confirm } = useFeedback();
   const { workoutId } = useLocalSearchParams<{ workoutId: string }>();
