@@ -4,6 +4,7 @@ import type { LocalStore, OutboxOp } from './types';
 
 /**
  * Stockage local sur iPhone / Android : base SQLite « elan.db ».
+ * (Nom technique historique, ancien nom de l'app : ne pas renommer, sinon perte des données locales.)
  *  - docs   : documents JSON (programme, historique, séance en cours…)
  *  - outbox : opérations à envoyer au serveur, dans l'ordre (colonne seq)
  */

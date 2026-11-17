@@ -1,4 +1,4 @@
-# Élan — application de coaching sportif
+# Divus — application de coaching sportif
 
 > Nom provisoire (modifiable dans `app.config.ts` et `src/i18n/locales/fr.ts`).
 > Application **iOS · Android · Web** pour le coaching d'Enzo : programmes d'entraînement,
@@ -232,7 +232,7 @@ d'un exercice.
    _Authentication → Emails → SMTP Settings_ : hôte `smtp-relay.brevo.com`, port `587`, identifiants Brevo.
    Active aussi _Confirm email_. Les modèles d'e-mails se traduisent dans _Email Templates_.
 6. _Authentication → URL Configuration_ : **Site URL** = l'adresse de ton site web (section 7) ;
-   ajoute aussi `elan://**` dans _Redirect URLs_ (pour l'app mobile).
+   ajoute aussi `divus://**` dans _Redirect URLs_ (pour l'app mobile).
 7. Crée ton compte coach (_Authentication → Add user_) puis dans _SQL Editor_ :
    `select public.bootstrap_coach('ton-email@exemple.fr');`
 8. Dans `.env.local` (et dans Cloudflare / EAS, sections 7–8) : `EXPO_PUBLIC_SUPABASE_URL` et
@@ -270,7 +270,7 @@ elle, est réservée à un usage non commercial).
    - Build command : `npm run build:web`
    - Build output directory : `dist`
    - Variables d'environnement : `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`,
-     `EXPO_PUBLIC_WEB_URL` (l'adresse finale, ex. `https://elan-coaching.pages.dev`), `NODE_VERSION=22`.
+     `EXPO_PUBLIC_WEB_URL` (l'adresse finale, ex. `https://divus-coaching.pages.dev`), `NODE_VERSION=22`.
 3. Ton site est disponible sur `https://<nom>.pages.dev` (nom de domaine personnalisé possible plus tard).
 4. Reporte cette adresse dans Supabase (_URL Configuration → Site URL_).
 
@@ -321,7 +321,7 @@ Pour les notifications push et l'alerte du minuteur en arrière-plan, il faut un
    npx eas-cli@latest submit --platform android   # vers Google Play (piste interne d'abord)
    ```
 3. **À préparer** dans App Store Connect et la Play Console :
-   - icône 1024×1024 et nom définitif (remplacer « Élan » et les images dans `assets/`) ;
+   - icône 1024×1024 et icône définitive (remplacer les images dans `assets/`) ;
    - captures d'écran : iPhone 6,7" et 6,5", iPad si activé, téléphone Android ;
    - description, mots-clés, catégorie « Santé et forme » ;
    - **URL de la politique de confidentialité** (page `/legal/privacy` du site web) ;

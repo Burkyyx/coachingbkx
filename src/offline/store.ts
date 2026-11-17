@@ -5,6 +5,8 @@ import type { LocalStore, OutboxOp } from './types';
  * Les données restent sur l'appareil même sans réseau (et après fermeture de l'onglet).
  * Sur iPhone / Android, c'est store.native.ts (SQLite) qui est utilisé.
  */
+// Préfixe technique historique (ancien nom « Élan ») : ne pas renommer, sinon les données
+// hors-ligne déjà enregistrées sur les appareils (séance en cours, envois en attente) seraient perdues.
 const DOC_PREFIX = 'elan:doc:';
 const OUTBOX_KEY = 'elan:outbox';
 

@@ -1,4 +1,4 @@
-# CLAUDE.md — Conventions du projet « Élan » (coaching sportif)
+# CLAUDE.md — Conventions du projet « Divus » (coaching sportif)
 
 Référence fonctionnelle : la spécification fournie par Enzo (coach, non développeur). Résumé :
 1 coach unique, des adhérents sur invitation, programmes d'entraînement, mode séance hors-ligne,
@@ -69,7 +69,9 @@ suggestions automatiques **validées par le coach**. Phases : 1 (entraînement, 
 ## État d'avancement
 
 - **Phase 1 livrée** (en attente de validation d'Enzo). Phases 2 (nutrition) et 3 (communauté) : NON commencées.
-- Nom provisoire « Élan », thème noir & blanc (`src/theme/tokens.ts`).
+- Nom de l'app : **« Divus »** (anciennement « Élan », renommée en nov. 2026), thème noir & blanc (`src/theme/tokens.ts`).
+  Identifiants techniques gardés volontairement avec « elan » (renommer = perte de données) :
+  `supabase/config.toml` project_id (base locale), préfixe `elan:` (stockage web) et `elan.db` (SQLite).
 
 ## Décisions validées avec Enzo (Phase 1)
 

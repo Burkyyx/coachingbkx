@@ -26,7 +26,7 @@ for (const f of files) hash.update(f).update(readFileSync(join(dist, f)));
 const version = hash.digest('hex').slice(0, 12);
 
 const sw = `/* Service worker généré automatiquement (scripts/postbuild-web.mjs). */
-const CACHE = 'elan-${version}';
+const CACHE = 'divus-${version}';
 const ASSETS = ${JSON.stringify(['/', ...files])};
 
 self.addEventListener('install', (event) => {

@@ -4,7 +4,7 @@
  */
 export const fr = {
   app: {
-    name: 'Élan',
+    name: 'Divus',
     tagline: 'Ton coaching, dans ta poche.',
   },
   common: {

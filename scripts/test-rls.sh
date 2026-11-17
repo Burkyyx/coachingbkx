@@ -12,7 +12,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 IMAGE="${RLS_TEST_IMAGE:-supabase/postgres:17.6.1.054}"
-NAME="elan-rls-test"
+NAME="divus-rls-test"
 PORT="${RLS_TEST_PORT:-54329}"
 export PGPASSWORD=postgres
 PSQL=(psql -h 127.0.0.1 -p "$PORT" -U postgres -d postgres -v ON_ERROR_STOP=1 -q -X)

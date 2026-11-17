@@ -3,13 +3,14 @@ import type { ExpoConfig } from 'expo/config';
 /**
  * Configuration de l'application.
  *
- * Le nom « Élan » et l'identifiant sont PROVISOIRES : pour les changer,
- * il suffit de modifier les constantes ci-dessous (et le thème dans src/theme).
+ * Nom de l'app : « Divus ». Pour le changer, il suffit de modifier les constantes
+ * ci-dessous (et le thème dans src/theme). ⚠️ SCHEME et BUNDLE_ID ne doivent plus changer
+ * une fois l'app publiée sur l'App Store / Google Play.
  */
-const APP_NAME = 'Élan';
-const SLUG = 'elan-coaching';
-const SCHEME = 'elan';
-const BUNDLE_ID = 'com.elancoaching.app';
+const APP_NAME = 'Divus';
+const SLUG = 'divus-coaching';
+const SCHEME = 'divus';
+const BUNDLE_ID = 'com.divuscoaching.app';
 
 const config: ExpoConfig = {
   name: APP_NAME,
