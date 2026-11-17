@@ -65,6 +65,7 @@ function workout(
       coach_notes: null,
       alternative_exercise_ids: [],
       next_session_hint: null,
+      next_session_target_reps: null,
       created_at: '',
       updated_at: '',
       sets: e.sets,

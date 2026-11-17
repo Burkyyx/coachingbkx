@@ -1218,6 +1218,7 @@ export type Database = {
           exercise_id: string;
           id: string;
           next_session_hint: string | null;
+          next_session_target_reps: number | null;
           position: number;
           program_id: string;
           superset_group: string | null;
@@ -1232,6 +1233,7 @@ export type Database = {
           exercise_id: string;
           id?: string;
           next_session_hint?: string | null;
+          next_session_target_reps?: number | null;
           position?: number;
           program_id: string;
           superset_group?: string | null;
@@ -1245,6 +1247,7 @@ export type Database = {
           exercise_id?: string;
           id?: string;
           next_session_hint?: string | null;
+          next_session_target_reps?: number | null;
           position?: number;
           program_id?: string;
           superset_group?: string | null;

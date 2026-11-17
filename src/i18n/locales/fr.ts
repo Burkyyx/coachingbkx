@@ -608,6 +608,20 @@ export const fr = {
     applyModified: 'Appliquer ma valeur',
     reverted: 'Suggestion annulée : valeurs d’origine restaurées.',
     accepted: 'Suggestion appliquée.',
+    acknowledged: 'Noté.',
+    appliedNothing:
+      'Rien n’a été modifié : aucune séance à venir de cet adhérent ne contient cet exercice.',
+    appliedRepsTarget:
+      'Objectif enregistré : les reps seront pré-remplies lors de sa prochaine séance.',
+    appliedSets_one: 'Appliquée : {{count}} série modifiée dans ses séances à venir.',
+    appliedSets_other: 'Appliquée : {{count}} séries modifiées dans ses séances à venir.',
+    appliedExercises_one: 'Appliquée : exercice remplacé dans {{count}} séance à venir.',
+    appliedExercises_other: 'Appliquée : exercice remplacé dans {{count}} séances à venir.',
+    targetReps: 'Objectif (reps)',
+    repsTargetSummary:
+      'Prochaine séance : {{from}} → {{to}} reps{{load}} (pré-rempli pour l’adhérent)',
+    scopeNote:
+      'Les suggestions ne modifient que le programme personnel de l’adhérent, jamais tes modèles.',
     rejected: 'Suggestion refusée.',
     acceptedMany_one: '{{count}} suggestion appliquée.',
     acceptedMany_other: '{{count}} suggestions appliquées.',

@@ -138,13 +138,16 @@ export function useSuggestionActions() {
     void qc.invalidateQueries({ queryKey: ['coach'] });
   };
   return {
-    async accept(id: string, finalValue?: Record<string, unknown>) {
-      const { error } = await supabase.rpc('apply_suggestion', {
+    /** Applique la suggestion ; renvoie le nombre d'éléments réellement modifiés. */
+    async accept(id: string, finalValue?: Record<string, unknown>): Promise<number> {
+      const { data, error } = await supabase.rpc('apply_suggestion', {
         p_id: id,
         p_final: (finalValue ?? null) as Json,
       });
       if (error) throw error;
       refresh();
+      const changes = (data as { applied_changes?: unknown } | null)?.applied_changes;
+      return Array.isArray(changes) ? changes.length : 0;
     },
     async reject(ids: string[]) {
       const { error } = await supabase

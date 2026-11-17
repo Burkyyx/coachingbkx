@@ -1,7 +1,7 @@
 -- Suggestions, alertes, règles, bilans, pesées, assignation de programmes.
 begin;
 \ir _helpers.sql
-select plan(32);
+select plan(39);
 
 select tests.create_user('coach@test.fr', 'coach') as coach \gset
 select tests.create_user('alice@test.fr') as alice \gset
@@ -64,6 +64,9 @@ select is((public.apply_suggestion('00000000-0000-0000-0000-000000005001')).stat
   'Le coach accepte la suggestion');
 select is((select array_agg(distinct load_kg)::numeric[] from public.prescribed_sets where program_id = :'prog_alice' and set_type = 'working'),
   array[62.5]::numeric[], 'La charge des séries de travail à venir passe à 62,5 kg');
+select is((select array_agg(distinct load_kg)::numeric[] from public.prescribed_sets
+           where program_id = '00000000-0000-0000-0000-00000000f000' and set_type = 'working'),
+  array[60]::numeric[], 'Le modèle n''est jamais modifié par une suggestion (seul le programme d''Alice change)');
 select is((select load_kg from public.prescribed_sets where program_id = :'prog_alice' and set_type = 'warmup' limit 1)::numeric,
   30::numeric, 'Les séries d''échauffement ne sont pas modifiées');
 select is((select load_kg from public.prescribed_sets ps join public.programs p on p.id = ps.program_id
@@ -95,6 +98,26 @@ select is_empty(format($$select * from public.program_week_adjustments where pro
 select lives_ok($$select public.apply_suggestion('00000000-0000-0000-0000-000000005004')$$, 'Appliquer une variante d''exercice');
 select is((select count(*)::int from public.workout_exercises where program_id = :'prog_alice' and exercise_id = '00000000-0000-0000-0000-0000000000e2'),
   4, 'L''exercice est remplacé dans toutes les séances à venir');
+
+-- Objectif « +1 rep » : message + reps pré-remplies sur la prochaine séance uniquement
+select tests.logout();
+insert into public.suggestions (id, adherent_id, kind, rule_key, exercise_id, program_id, current_value, proposed_value, justification, dedupe_key)
+values ('00000000-0000-0000-0000-000000005005', :'alice', 'reps_target', 'double_progression', '00000000-0000-0000-0000-0000000000e2', :'prog_alice',
+        '{"reps": 9, "load_kg": 60}', '{"reps": 10, "load_kg": 60, "hint": "Objectif : 10 reps à 60 kg sur chaque série."}', 'x', 'test:5');
+select tests.login(:'coach');
+select is(jsonb_array_length((public.apply_suggestion('00000000-0000-0000-0000-000000005005',
+  '{"reps": 11, "load_kg": 60, "hint": "Objectif : 11 reps à 60 kg sur chaque série."}'::jsonb)).applied_changes), 1,
+  'Objectif de reps : seule la prochaine séance est concernée');
+select is((select count(*)::int from public.workout_exercises where program_id = :'prog_alice' and next_session_target_reps = 11), 1,
+  'L''objectif modifié par le coach (11 reps) est enregistré');
+select is((select next_session_hint from public.workout_exercises where program_id = :'prog_alice' and next_session_target_reps = 11),
+  'Objectif : 11 reps à 60 kg sur chaque série.', '… avec le message correspondant');
+select is((select count(*)::int from public.workout_exercises where program_id = '00000000-0000-0000-0000-00000000f000'
+           and (next_session_target_reps is not null or next_session_hint is not null)), 0,
+  'Le modèle ne reçoit pas l''objectif');
+select lives_ok($$select public.revert_suggestion('00000000-0000-0000-0000-000000005005')$$, 'Annuler l''objectif de reps');
+select is((select count(*)::int from public.workout_exercises where program_id = :'prog_alice' and next_session_target_reps is not null), 0,
+  '… l''objectif est retiré');
 
 -- Bilans hebdo et pesées ---------------------------------------------------------------
 select tests.login(:'alice');

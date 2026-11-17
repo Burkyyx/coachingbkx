@@ -338,6 +338,21 @@ describe('préparation de la séance', () => {
     ]);
   });
 
+  it('pré-remplit les reps avec l’objectif accepté par le coach (séries de travail)', () => {
+    const [working, warmup] = planExerciseSets([ps({}), ps({ id: 'w', setType: 'warmup' })], {
+      reference1rmKg: null,
+      incrementKg: 2.5,
+      adjustment: null,
+    });
+    expect(prefillSet(working!, { loadKg: 60, reps: 9 }, 10)).toEqual({
+      loadKg: 60,
+      reps: 10,
+      source: 'target',
+    });
+    expect(prefillSet(warmup!, null, 10).reps).not.toBe(10);
+    expect(prefillSet(working!, { loadKg: 60, reps: 9 }, null).reps).toBe(9);
+  });
+
   it('pré-remplit avec la cible du coach ou la dernière performance', () => {
     const [planned] = planExerciseSets([ps({})], {
       reference1rmKg: null,

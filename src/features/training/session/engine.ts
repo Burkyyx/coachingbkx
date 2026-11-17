@@ -97,6 +97,7 @@ function buildSets(
   prescribed: Parameters<typeof planExerciseSets>[0],
   adjustment: { volumeFactor: number; loadFactor: number } | null,
   makeId: () => string,
+  coachTargetReps: number | null = null,
 ): ActiveSet[] {
   const ex = bundle.exercises.find((e) => e.id === exerciseId);
   const history = exerciseHistory(bundle, exerciseId);
@@ -108,7 +109,7 @@ function buildSets(
   let workingIndex = 0;
   return planned.map((p) => {
     const last = p.setType === 'warmup' ? null : lastPerformance(history, workingIndex++);
-    const prefill = prefillSet(p, last);
+    const prefill = prefillSet(p, last, coachTargetReps);
     return {
       id: makeId(),
       prescribedSetId: p.id,
@@ -179,6 +180,7 @@ export function buildSession(args: {
       })),
       adjustment,
       ctx.makeId,
+      we.next_session_target_reps ?? null,
     ),
   }));
 

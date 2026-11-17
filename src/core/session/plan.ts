@@ -99,10 +99,23 @@ export type Prefill = {
  * Valeurs pré-remplies d'une série :
  *  - charge : la cible du coach si elle existe (elle intègre les progressions validées),
  *    sinon la charge de la dernière performance ;
- *  - reps : celles de la dernière performance si elle a été faite à la même charge,
+ *  - reps : l'objectif fixé par le coach pour cette séance (suggestion « +1 rep » acceptée),
+ *    sinon celles de la dernière performance si elle a été faite à la même charge,
  *    sinon le bas de la fourchette cible.
  */
 export function prefillSet(
+  planned: PlannedSet,
+  last: Pick<LoggedSet, 'loadKg' | 'reps'> | null,
+  coachTargetReps: number | null = null,
+): Prefill {
+  const base = prefillWithoutCoachTarget(planned, last);
+  if (coachTargetReps !== null && planned.setType !== 'warmup' && base.reps !== null) {
+    return { ...base, reps: coachTargetReps };
+  }
+  return base;
+}
+
+function prefillWithoutCoachTarget(
   planned: PlannedSet,
   last: Pick<LoggedSet, 'loadKg' | 'reps'> | null,
 ): Prefill {

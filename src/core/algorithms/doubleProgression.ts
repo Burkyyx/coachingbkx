@@ -169,11 +169,17 @@ export function evaluateDoubleProgression(input: ProgressionInput): ProgressionO
       currentLoadKg: currentLoad,
       currentMinReps: minReps,
       targetReps: target,
-      hint: `Objectif : ${target} reps${loadText} sur chaque série.`,
+      hint: repsTargetHint(target, currentLoad),
       justification:
         `Reps dans la fourchette (${range})${loadText} → garder la charge et viser +1 rep ` +
         `(${minReps} → ${target} sur la série la plus faible).`,
     };
   }
   return null;
+}
+
+/** Message affiché à l'adhérent pour un objectif de reps (« Objectif : 10 reps à 60 kg… »). */
+export function repsTargetHint(reps: number, loadKg: number | null): string {
+  const loadText = loadKg !== null && loadKg > 0 ? ` à ${formatKg(loadKg)}` : '';
+  return `Objectif : ${reps} reps${loadText} sur chaque série.`;
 }

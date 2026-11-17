@@ -18,7 +18,7 @@ import {
   VStack,
   useFeedback,
 } from '@/components/ui';
-import { formatKg, formatNumber, formatRelative, formatRepRange } from '@/core';
+import { formatKg, formatNumber, formatRelative, formatRepRange, repsTargetHint } from '@/core';
 import {
   fullName,
   useSuggestionActions,
@@ -46,7 +46,15 @@ function useDescribe() {
       case 'variation':
         return `${String(cur.exercise_name ?? '')} → ${String(value.exercise_name ?? '')}`;
       case 'reps_target':
-        return typeof value.hint === 'string' ? value.hint : null;
+        return num(value.reps) !== null
+          ? t('suggestions.repsTargetSummary', {
+              from: num(cur.reps) ?? '?',
+              to: num(value.reps) ?? '?',
+              load: num(value.load_kg) ? ` à ${formatKg(num(value.load_kg) ?? 0)}` : '',
+            })
+          : typeof value.hint === 'string'
+            ? value.hint
+            : null;
       default:
         return null;
     }
@@ -81,6 +89,7 @@ function ModifyEditor({
     <VStack gap="sm">
       <HStack gap="sm" wrap align="flex-end">
         {s.kind === 'load' ? cell('load_kg', 'kg') : null}
+        {s.kind === 'reps_target' ? cell('reps', t('suggestions.targetReps'), 0, 100) : null}
         {s.kind === 'rep_range' ? (
           <>
             {cell('reps_min', 'Reps min', 0, 100)}
@@ -92,7 +101,17 @@ function ModifyEditor({
           : null}
       </HStack>
       <HStack gap="sm">
-        <Button label={t('suggestions.applyModified')} onPress={() => onApply(value)} />
+        <Button
+          label={t('suggestions.applyModified')}
+          onPress={() =>
+            onApply(
+              // Le message affiché à l'adhérent suit l'objectif modifié.
+              s.kind === 'reps_target' && num(value.reps) !== null
+                ? { ...value, hint: repsTargetHint(num(value.reps) ?? 0, num(value.load_kg)) }
+                : value,
+            )
+          }
+        />
         <Button variant="ghost" label={t('common.cancel')} onPress={onCancel} />
       </HStack>
     </VStack>
@@ -110,17 +129,29 @@ export default function SuggestionsScreen() {
   const [editing, setEditing] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  const run = async (fn: () => Promise<void>, message: string) => {
+  const run = async <T,>(fn: () => Promise<T>, message: string | ((result: T) => string)) => {
     setBusy(true);
     try {
-      await fn();
-      toast(message);
+      const result = await fn();
+      toast(typeof message === 'string' ? message : message(result));
     } catch (e) {
       toast(toUserMessage(e));
     } finally {
       setBusy(false);
     }
   };
+
+  /** Message après application : dit précisément ce qui a changé (ou que rien n'a changé). */
+  const appliedMessage =
+    (kind: SuggestionRow['kind']) =>
+    (count: number): string => {
+      if (kind === 'info') return t('suggestions.acknowledged');
+      if (count === 0) return t('suggestions.appliedNothing');
+      if (kind === 'reps_target') return t('suggestions.appliedRepsTarget');
+      if (kind === 'load' || kind === 'rep_range') return t('suggestions.appliedSets', { count });
+      if (kind === 'variation') return t('suggestions.appliedExercises', { count });
+      return t('suggestions.accepted');
+    };
 
   const rows = list.data ?? [];
   const acceptMany = () =>
@@ -139,6 +170,9 @@ export default function SuggestionsScreen() {
           {t('suggestions.title')}
         </Text>
         <Text color="textMuted">{t('suggestions.subtitle')}</Text>
+        <Text variant="small" color="textSubtle">
+          {t('suggestions.scopeNote')}
+        </Text>
       </VStack>
       <Segmented
         options={[
@@ -237,9 +271,10 @@ export default function SuggestionsScreen() {
                     onCancel={() => setEditing(null)}
                     onApply={(v) =>
                       void run(async () => {
-                        await actions.accept(s.id, v);
+                        const n = await actions.accept(s.id, v);
                         setEditing(null);
-                      }, t('suggestions.accepted'))
+                        return n;
+                      }, appliedMessage(s.kind))
                     }
                   />
                 ) : tab === 'pending' ? (
@@ -250,11 +285,9 @@ export default function SuggestionsScreen() {
                         s.kind === 'info' ? t('suggestions.acknowledge') : t('suggestions.accept')
                       }
                       disabled={busy}
-                      onPress={() =>
-                        void run(() => actions.accept(s.id), t('suggestions.accepted'))
-                      }
+                      onPress={() => void run(() => actions.accept(s.id), appliedMessage(s.kind))}
                     />
-                    {['load', 'rep_range', 'deload'].includes(s.kind) ? (
+                    {['load', 'rep_range', 'deload', 'reps_target'].includes(s.kind) ? (
                       <Button
                         variant="secondary"
                         icon="create-outline"
