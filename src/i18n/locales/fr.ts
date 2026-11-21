@@ -35,6 +35,7 @@ export const fr = {
     comingSoonBody: 'Cette partie de l’app arrive dans une prochaine version.',
     errorTitle: 'Oups, un problème est survenu',
     errorBody: 'Vérifie ta connexion puis réessaie. Si le problème continue, préviens ton coach.',
+    technicalDetail: 'Détail technique : {{detail}}',
     offlineBadge: 'Non synchronisé',
     offlineBadgeCount_one: '{{count}} élément à synchroniser',
     offlineBadgeCount_other: '{{count}} éléments à synchroniser',
@@ -113,6 +114,11 @@ export const fr = {
       emailNotConfirmed: 'Adresse e-mail non confirmée : vérifie ta boîte mail.',
       userExists: 'Un compte existe déjà avec cette adresse.',
       tooManyRequests: 'Trop de tentatives, réessaie dans quelques minutes.',
+      emailNotAuthorized:
+        'Impossible d’envoyer l’e-mail à cette adresse : l’envoi d’e-mails n’est pas encore configuré. Préviens ton coach.',
+      emailSendFailed:
+        'L’e-mail n’a pas pu être envoyé (service d’envoi non configuré ou indisponible). Préviens ton coach.',
+      signupDisabled: 'Les inscriptions sont fermées pour le moment. Préviens ton coach.',
       generic: 'La connexion a échoué. Réessaie.',
     },
   },

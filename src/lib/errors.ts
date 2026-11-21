@@ -17,6 +17,20 @@ export function isNetworkError(error: unknown): boolean {
 }
 
 /**
+ * Détail technique court pour le diagnostic (code + début du message), affiché en petit
+ * sous les messages d'erreur génériques. Les adresses e-mail éventuelles sont masquées.
+ */
+export function technicalDetail(error: unknown): string | null {
+  if (!error) return null;
+  const e = error as MaybeError;
+  const parts = [e?.code, e?.status ? `HTTP ${e.status}` : null, e?.message]
+    .filter((x): x is string => typeof x === 'string' && x.trim() !== '')
+    .map((x) => x.replace(/[^\s@]+@[^\s@]+/g, '…@…'));
+  const text = [...new Set(parts)].join(' · ').slice(0, 160);
+  return text || null;
+}
+
+/**
  * Transforme une erreur technique (Supabase, réseau…) en message clair en français.
  * Les détails techniques ne sont jamais affichés à l'utilisateur.
  */
@@ -40,10 +54,17 @@ export function toUserMessage(error: unknown): string {
       return t('auth.errors.tooManyRequests');
     case 'weak_password':
       return t('auth.errors.passwordTooShort');
+    case 'email_address_not_authorized':
+      return t('auth.errors.emailNotAuthorized');
+    case 'signup_disabled':
+      return t('auth.errors.signupDisabled');
     default:
       break;
   }
   if (msg.includes('invitation_invalide')) return t('auth.invitationInvalid');
   if (msg.includes('Invalid login credentials')) return t('auth.errors.invalidCredentials');
-  return t('common.unknownError');
+  if (/sending (confirmation|recovery|magic link|invite)? ?e?mail/i.test(msg))
+    return t('auth.errors.emailSendFailed');
+  const detail = technicalDetail(error);
+  return detail ? `${t('common.unknownError')} (${detail})` : t('common.unknownError');
 }

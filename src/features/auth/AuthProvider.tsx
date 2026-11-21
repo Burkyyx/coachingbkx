@@ -12,7 +12,7 @@ import {
 } from 'react';
 
 import { todayLocal } from '@/core';
-import { isNetworkError, toUserMessage } from '@/lib/errors';
+import { isNetworkError, technicalDetail, toUserMessage } from '@/lib/errors';
 import { kvStorage } from '@/lib/kvStorage';
 import { queryClient } from '@/lib/queryClient';
 import { supabase, type Tables } from '@/lib/supabase';
@@ -57,6 +57,8 @@ type AuthValue = {
   isCoach: boolean;
   /** Message d'erreur si le code d'invitation enregistré n'a pas pu être utilisé. */
   invitationError: string | null;
+  /** Détail technique quand le profil n'a pas pu être chargé (status « error »). */
+  errorDetail: string | null;
   refresh: () => Promise<void>;
   endRecovery: () => void;
 };
@@ -172,6 +174,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
       consents,
       isCoach: profile?.role === 'coach',
       invitationError,
+      errorDetail: me.isError ? technicalDetail(me.error) : null,
       refresh,
       endRecovery: () => setRecovery(false),
     };
@@ -179,6 +182,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
     me.data,
     me.isPending,
     me.isError,
+    me.error,
     sessionLoaded,
     session,
     recovery,

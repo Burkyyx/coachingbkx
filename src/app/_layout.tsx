@@ -34,7 +34,7 @@ const SETUP_STATUSES: readonly AuthStatus[] = [
 function RootNavigator() {
   const theme = useTheme();
   const { t } = useTranslation();
-  const { status, isCoach, refresh, userId } = useAuth();
+  const { status, isCoach, refresh, userId, errorDetail } = useAuth();
   usePushNotifications(status === 'ready' ? userId : null);
 
   useEffect(() => {
@@ -52,6 +52,11 @@ function RootNavigator() {
     return (
       <View style={{ flex: 1, backgroundColor: theme.colors.background, justifyContent: 'center' }}>
         <ErrorState onRetry={() => void refresh()} />
+        {errorDetail ? (
+          <Text variant="caption" color="textSubtle" align="center" selectable>
+            {t('common.technicalDetail', { detail: errorDetail })}
+          </Text>
+        ) : null}
         <Button variant="ghost" label={t('auth.signOut')} onPress={() => void signOut()} />
       </View>
     );
