@@ -7,6 +7,7 @@ suggestions automatiques **validées par le coach**. Phases : 1 (entraînement, 
 
 ## Règles de travail
 
+- **Toujours écrire à Enzo en français** (messages, explications, questions, étapes), sans exception.
 - Interface **100 % en français**, ton tutoiement côté adhérent. Textes dans `src/i18n/locales/fr.ts`
   (clés typées : `t('cle.inexistante')` ne compile pas).
 - Commits **en français**, un commit par fonctionnalité.
