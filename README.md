@@ -274,6 +274,16 @@ elle, est réservée à un usage non commercial).
 3. Ton site est disponible sur `https://<nom>.pages.dev` (nom de domaine personnalisé possible plus tard).
 4. Reporte cette adresse dans Supabase (_URL Configuration → Site URL_).
 
+**Mises à jour automatiques** : chaque modification poussée sur la branche est reconstruite et mise en
+ligne par Cloudflare en 3 à 5 minutes. Si aucun nouveau déploiement n'apparaît :
+
+- message « This project is disconnected from your Git account » : sur GitHub, _Settings → Applications →
+  Installed GitHub Apps → Cloudflare Workers and Pages → Configure_ → donner accès au dépôt `coachingbkx` ;
+- _Settings → Builds → Branch control_ : branche de production `claude/spec-md-instructions-14v2w9` et
+  déploiements automatiques activés ;
+- « Retry deployment » reconstruit l'**ancien** commit : pour prendre les dernières modifications, il faut
+  un nouveau commit sur la branche.
+
 Le site fonctionne **hors-ligne** une fois ouvert une première fois (service worker), et peut être
 ajouté à l'écran d'accueil du téléphone (_Partager → Sur l'écran d'accueil_ sur iPhone).
 
