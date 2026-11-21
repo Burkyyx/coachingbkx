@@ -270,7 +270,7 @@ elle, est réservée à un usage non commercial).
    - Build command : `npm run build:web`
    - Build output directory : `dist`
    - Variables d'environnement : `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`,
-     `EXPO_PUBLIC_WEB_URL` (l'adresse finale, ex. `https://divus-coaching.pages.dev`), `NODE_VERSION=22`.
+     `EXPO_PUBLIC_WEB_URL` (l'adresse finale, ex. `https://divuscoaching.pages.dev`), `NODE_VERSION=22`.
 3. Ton site est disponible sur `https://<nom>.pages.dev` (nom de domaine personnalisé possible plus tard).
 4. Reporte cette adresse dans Supabase (_URL Configuration → Site URL_).
 
