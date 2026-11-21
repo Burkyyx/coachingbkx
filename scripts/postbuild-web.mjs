@@ -30,15 +30,41 @@ function walk(dir) {
 const nodeModulesAssets = join(dist, 'assets', 'node_modules');
 if (existsSync(nodeModulesAssets)) {
   renameSync(nodeModulesAssets, join(dist, 'assets', 'vendor'));
-  let rewritten = 0;
+  // Un fichier de _expo/ dont le contenu change doit aussi changer de NOM : ces fichiers sont
+  // mis en cache 1 an sans revalidation (immutable), un navigateur garderait l'ancienne version.
+  const renames = new Map();
   for (const file of walk(dist)) {
     if (!/\.(js|html|css|json)$/.test(file)) continue;
     const text = readFileSync(file, 'utf8');
     if (!text.includes('assets/node_modules/')) continue;
-    writeFileSync(file, text.split('assets/node_modules/').join('assets/vendor/'));
-    rewritten++;
+    const updated = text.split('assets/node_modules/').join('assets/vendor/');
+    writeFileSync(file, updated);
+    const name = file.split(/[\\/]/).pop() ?? '';
+    const versioned = name.match(/^(.*)-([0-9a-f]{16,})\.js$/);
+    if (relative(dist, file).startsWith('_expo') && versioned) {
+      const digest = createHash('md5').update(updated).digest('hex');
+      const newName = `${versioned[1]}-${digest}.js`;
+      renameSync(file, join(file, '..', newName));
+      renames.set(name, newName);
+    }
   }
-  console.log(`✔ Ressources déplacées vers assets/vendor (${rewritten} fichier(s) mis à jour).`);
+  // Mise à jour des références vers les fichiers renommés (index.html…).
+  for (const file of walk(dist)) {
+    if (!/\.(js|html|json)$/.test(file)) continue;
+    let text = readFileSync(file, 'utf8');
+    let changed = false;
+    for (const [from, to] of renames) {
+      if (!text.includes(from)) continue;
+      text = text.split(from).join(to);
+      changed = true;
+    }
+    if (!changed) continue;
+    writeFileSync(file, text);
+    if (!file.endsWith('.html') && !file.endsWith('.json')) {
+      throw new Error(`Un fichier JS référence un fichier renommé : ${relative(dist, file)}`);
+    }
+  }
+  console.log(`✔ Ressources déplacées vers assets/vendor (${renames.size} fichier(s) renommé(s)).`);
 }
 
 const files = walk(dist)
@@ -110,6 +136,8 @@ writeFileSync(
     '  Cache-Control: no-cache',
     '/_expo/*',
     '  Cache-Control: public, max-age=31536000, immutable',
+    '/assets/*',
+    '  Cache-Control: public, max-age=86400',
     '',
   ].join('\n'),
 );
