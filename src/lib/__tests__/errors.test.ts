@@ -13,6 +13,18 @@ describe('messages d’erreur', () => {
     );
   });
 
+  it('ne confond pas un refus du serveur (500) avec une coupure réseau', () => {
+    const serverError = {
+      name: 'AuthRetryableFetchError',
+      status: 500,
+      code: 'unexpected_failure',
+      message: 'Error sending confirmation email',
+    };
+    expect(toUserMessage(serverError)).toMatch(/n’a pas pu être envoyé/);
+    const offline = { name: 'AuthRetryableFetchError', status: 0, message: 'Failed to fetch' };
+    expect(toUserMessage(offline)).toMatch(/Vérifie ta connexion/);
+  });
+
   it('ajoute le détail technique aux erreurs inconnues, sans adresse e-mail', () => {
     const msg = toUserMessage({
       code: '42501',

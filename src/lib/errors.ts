@@ -7,8 +7,11 @@ type MaybeError =
 export function isNetworkError(error: unknown): boolean {
   const e = error as MaybeError;
   const msg = (e?.message ?? '').toLowerCase();
+  // Supabase classe aussi les erreurs 5xx du serveur en « AuthRetryableFetchError » :
+  // si le serveur a répondu (statut HTTP > 0), ce n'est PAS un problème de réseau.
+  const serverAnswered = typeof e?.status === 'number' && e.status > 0;
   return (
-    e?.name === 'AuthRetryableFetchError' ||
+    (e?.name === 'AuthRetryableFetchError' && !serverAnswered) ||
     msg.includes('failed to fetch') ||
     msg.includes('network request failed') ||
     msg.includes('networkerror') ||
