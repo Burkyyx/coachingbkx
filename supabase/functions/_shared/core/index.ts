@@ -23,3 +23,4 @@ export * from './notifications/pushGrouping.ts';
 export * from './youtube.ts';
 export * from './adherents.ts';
 export * from './programs.ts';
+export * from './nutrition/energy.ts';
