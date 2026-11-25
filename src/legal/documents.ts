@@ -9,22 +9,22 @@ export type LegalSection = { title: string; paragraphs: string[] };
 export type LegalDocument = { title: string; updatedAt: string; sections: LegalSection[] };
 export type LegalDocId = 'mentions' | 'terms' | 'privacy';
 
-const COACH = '[À COMPLÉTER : nom et prénom du coach / raison sociale]';
-const CONTACT = '[À COMPLÉTER : adresse e-mail de contact]';
+const COACH = 'Enzo Vernon';
+const CONTACT = 'burkyxpro@gmail.com';
 
 export const LEGAL_DOCUMENTS: Record<LegalDocId, LegalDocument> = {
   mentions: {
     title: 'Mentions légales',
-    updatedAt: '[À COMPLÉTER : date]',
+    updatedAt: '25 novembre 2026',
     sections: [
       {
         title: 'Éditeur de l’application',
         paragraphs: [
           `${COACH}, coach sportif indépendant.`,
-          'Statut : [À COMPLÉTER : micro-entreprise, EI, société…] — SIRET : [À COMPLÉTER].',
-          'Adresse : [À COMPLÉTER].',
+          'Statut : entrepreneur individuel (micro-entreprise) — SIRET : en cours d’attribution.',
+          'Adresse : 39 avenue de Marinville, [À COMPLÉTER : code postal et ville].',
           `Contact : ${CONTACT}.`,
-          'Directeur de la publication : [À COMPLÉTER].',
+          `Directeur de la publication : ${COACH}.`,
         ],
       },
       {
@@ -44,7 +44,7 @@ export const LEGAL_DOCUMENTS: Record<LegalDocId, LegalDocument> = {
   },
   terms: {
     title: 'Conditions générales d’utilisation',
-    updatedAt: '[À COMPLÉTER : date]',
+    updatedAt: '25 novembre 2026',
     sections: [
       {
         title: '1. Objet',
@@ -56,7 +56,7 @@ export const LEGAL_DOCUMENTS: Record<LegalDocId, LegalDocument> = {
         title: '2. Accès',
         paragraphs: [
           'L’inscription se fait uniquement sur invitation du coach. L’utilisateur doit avoir au moins 15 ans.',
-          'Le coach peut désactiver un compte (fin du coaching, usage abusif). Les données sont alors conservées selon la politique de confidentialité.',
+          'Le coach peut désactiver un compte (fin du coaching, usage abusif) — les données sont alors conservées selon la politique de confidentialité — ou le supprimer définitivement avec toutes ses données.',
         ],
       },
       {
@@ -86,7 +86,10 @@ export const LEGAL_DOCUMENTS: Record<LegalDocId, LegalDocument> = {
       },
       {
         title: '7. Droit applicable',
-        paragraphs: ['Droit français. Tribunal compétent : [À COMPLÉTER].'],
+        paragraphs: [
+          'Les présentes conditions sont soumises au droit français.',
+          'En cas de litige, les parties recherchent d’abord une solution amiable (contact : voir les mentions légales). À défaut, le litige est porté devant les tribunaux français compétents ; l’utilisateur agissant en tant que consommateur peut saisir la juridiction de son lieu de domicile.',
+        ],
       },
     ],
   },
@@ -129,7 +132,7 @@ export const LEGAL_DOCUMENTS: Record<LegalDocId, LegalDocument> = {
       {
         title: 'Durée de conservation',
         paragraphs: [
-          'Pendant la durée du coaching, puis [À COMPLÉTER : ex. 3 ans] après la fin de la relation, sauf demande de suppression.',
+          'Pendant la durée du coaching, puis 3 ans après la fin de la relation, sauf demande de suppression plus tôt (suppression immédiate du compte possible à tout moment).',
         ],
       },
       {
