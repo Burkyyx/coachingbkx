@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import {
   Badge,
   Button,
-  EmptyState,
   ErrorState,
   HStack,
   LoadingState,
@@ -26,6 +25,7 @@ import {
   SettingsTab,
 } from '@/features/coach/AdherentTabs';
 import { fullName } from '@/features/coach/api';
+import { NutritionTargetsTab } from '@/features/nutrition/NutritionTargetsTab';
 
 type Tab =
   'profile' | 'sessions' | 'progress' | 'records' | 'checkins' | 'nutrition' | 'notes' | 'settings';
@@ -97,13 +97,7 @@ export default function AdherentScreen() {
       {tab === 'progress' ? <ProgressTab adherentId={p.id} /> : null}
       {tab === 'records' ? <RecordsTab adherentId={p.id} /> : null}
       {tab === 'checkins' ? <CheckinsTab adherentId={p.id} /> : null}
-      {tab === 'nutrition' ? (
-        <EmptyState
-          icon="restaurant-outline"
-          title={t('common.comingSoon')}
-          body={t('common.comingSoonBody')}
-        />
-      ) : null}
+      {tab === 'nutrition' ? <NutritionTargetsTab profile={p} /> : null}
       {tab === 'notes' ? <NotesTab adherentId={p.id} /> : null}
       {tab === 'settings' ? <SettingsTab profile={p} /> : null}
     </Screen>
