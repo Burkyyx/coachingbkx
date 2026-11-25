@@ -10,6 +10,7 @@ import { signOut } from '@/features/auth/api';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { CONSENT_VERSION, hasActiveConsent } from '@/features/auth/consents';
 import { saveWeight } from '@/features/checkin/api';
+import { defaultDisplayName, joinCommunity, markCommunityPrompted } from '@/features/community/api';
 import { AuthLayout, FormMessage } from '@/features/auth/components';
 import { toUserMessage } from '@/lib/errors';
 import { supabase, type Enums } from '@/lib/supabase';
@@ -27,6 +28,9 @@ export default function OnboardingScreen() {
   const healthConsent = hasActiveConsent(consents, 'health_data');
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  // Communauté (facultatif) : accord demandé dès l'inscription.
+  const [joinCommunityChoice, setJoinCommunityChoice] = useState(false);
+  const [autoPosts, setAutoPosts] = useState(false);
 
   const schema = useMemo(
     () =>
@@ -115,6 +119,20 @@ export default function OnboardingScreen() {
         }
         await saveWeight(userId, weightKg);
       }
+      // Communauté : la proposition est faite ici une fois pour toutes.
+      if (joinCommunityChoice) {
+        await joinCommunity(userId, {
+          displayName: defaultDisplayName({
+            nickname: v.nickname || null,
+            first_name: v.firstName,
+            last_name: v.lastName,
+          }),
+          autoPosts,
+          hasConsent: hasActiveConsent(consents, 'community'),
+        });
+      } else {
+        await markCommunityPrompted(userId);
+      }
       await refresh();
     } catch (e) {
       setError(toUserMessage(e));
@@ -167,6 +185,22 @@ export default function OnboardingScreen() {
             />
           )}
         />
+        <VStack gap="xs">
+          <Checkbox
+            checked={joinCommunityChoice}
+            onChange={setJoinCommunityChoice}
+            label={`${t('onboarding.joinCommunity')} (${t('common.optional')})`}
+            description={t('onboarding.joinCommunityHint')}
+          />
+          {joinCommunityChoice ? (
+            <Checkbox
+              checked={autoPosts}
+              onChange={setAutoPosts}
+              label={t('community.autoPosts')}
+              description={t('community.autoPostsHint')}
+            />
+          ) : null}
+        </VStack>
         <Controller
           control={control}
           name="birthDate"

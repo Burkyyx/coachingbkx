@@ -3,7 +3,12 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from './supabase';
 
 export type Bucket =
-  'avatars' | 'exercise-media' | 'checkin-photos' | 'message-media' | 'meal-photos';
+  | 'avatars'
+  | 'exercise-media'
+  | 'checkin-photos'
+  | 'message-media'
+  | 'meal-photos'
+  | 'community-media';
 
 /** Durée de validité des liens signés (fichiers privés). */
 const SIGNED_URL_SECONDS = 60 * 60;

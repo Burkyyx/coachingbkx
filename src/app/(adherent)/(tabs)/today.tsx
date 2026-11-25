@@ -17,6 +17,7 @@ import {
 } from '@/components/ui';
 import { formatRelative, isoWeekday, todayLocal, weekStart } from '@/core';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { CommunityPrompt } from '@/features/community/CommunityPrompt';
 import { useAdherentBundle } from '@/features/training/bundle';
 import { scheduledWorkouts, suggestedWorkout } from '@/features/training/derive';
 import { sessionActions, useActiveSession } from '@/features/training/session/store';
@@ -217,6 +218,7 @@ export default function TodayScreen() {
           </VStack>
         </Card>
       ) : null}
+      <CommunityPrompt />
     </Screen>
   );
 }
