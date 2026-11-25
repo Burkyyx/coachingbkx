@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { FlatList, Pressable, View } from 'react-native';
 
 import { Button, Icon, Segmented, Sheet, Text, TextField, VStack } from '@/components/ui';
+import { useIsDesktop } from '@/components/AppNav';
 import { useTheme } from '@/theme/ThemeProvider';
 
 import { filterExercises, MUSCLES, useExercises, type MuscleGroup } from './api';
@@ -31,6 +32,7 @@ export function ExercisePicker({
 }: Props) {
   const { t } = useTranslation();
   const theme = useTheme();
+  const desktop = useIsDesktop();
   const { data = [] } = useExercises();
   const [search, setSearch] = useState('');
   const [muscles, setMuscles] = useState<MuscleGroup[]>([]);
@@ -77,33 +79,48 @@ export function ExercisePicker({
         ) : undefined
       }
     >
-      <VStack gap="sm">
-        <TextField
-          placeholder={t('exercises.searchPlaceholder')}
-          value={search}
-          onChangeText={setSearch}
-          autoFocus
-          accessibilityLabel={t('common.search')}
-        />
-        <Button
-          variant="secondary"
-          icon={bodyOpen ? 'chevron-up' : 'body-outline'}
-          label={bodyOpen ? t('exercises.hideBody') : t('exercises.showBody')}
-          onPress={() => setBodyOpen((v) => !v)}
-        />
-        {bodyOpen ? <BodyMap selected={muscles} onSelect={setMuscles} width={110} /> : null}
-        <Segmented
-          scrollable
-          options={muscleOptions}
-          value={muscles.length === 0 ? 'all' : muscles.length === 1 ? muscles[0] : null}
-          onChange={(v) => setMuscles(v === 'all' ? [] : [v])}
-        />
-      </VStack>
+      {/* Recherche, schéma et filtres défilent avec la liste : sur téléphone (clavier ouvert,
+          petit écran), la liste n'est plus écrasée par le schéma. */}
       <FlatList
         data={list}
         keyExtractor={(e) => e.id}
-        style={{ maxHeight: 420 }}
+        style={{ flexGrow: 0, flexShrink: 1 }}
         keyboardShouldPersistTaps="handled"
+        ListHeaderComponent={
+          <VStack gap="sm" style={{ paddingBottom: theme.spacing.sm }}>
+            <TextField
+              placeholder={t('exercises.searchPlaceholder')}
+              value={search}
+              onChangeText={setSearch}
+              // Sur téléphone, le clavier ouvert d'office cacherait la moitié de la liste.
+              autoFocus={desktop}
+              accessibilityLabel={t('common.search')}
+            />
+            <Button
+              variant="secondary"
+              icon={bodyOpen ? 'chevron-up' : 'body-outline'}
+              label={bodyOpen ? t('exercises.hideBody') : t('exercises.showBody')}
+              onPress={() => setBodyOpen((v) => !v)}
+            />
+            {bodyOpen ? (
+              <BodyMap
+                selected={muscles}
+                onSelect={(m) => {
+                  setMuscles(m);
+                  // Sur téléphone, on replie le schéma pour montrer tout de suite les exercices.
+                  if (!desktop && m.length > 0) setBodyOpen(false);
+                }}
+                width={110}
+              />
+            ) : null}
+            <Segmented
+              scrollable
+              options={muscleOptions}
+              value={muscles.length === 0 ? 'all' : muscles.length === 1 ? muscles[0] : null}
+              onChange={(v) => setMuscles(v === 'all' ? [] : [v])}
+            />
+          </VStack>
+        }
         ListEmptyComponent={<Text color="textMuted">{t('exercises.empty')}</Text>}
         renderItem={({ item }) => {
           const isSelected = selected.includes(item.id);
