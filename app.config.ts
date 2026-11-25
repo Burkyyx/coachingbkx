@@ -49,6 +49,14 @@ const config: ExpoConfig = {
       monochromeImage: './assets/android-icon-monochrome.png',
     },
     permissions: ['VIBRATE', 'POST_NOTIFICATIONS'],
+    // Permissions ajoutées par des bibliothèques mais inutiles ici (vérifiées par Google Play) :
+    // pas d'enregistrement de son, pas de fenêtre par-dessus les autres apps, pas d'écriture
+    // dans le stockage partagé (photos et vidéos choisies via le sélecteur du système).
+    blockedPermissions: [
+      'android.permission.RECORD_AUDIO',
+      'android.permission.SYSTEM_ALERT_WINDOW',
+      'android.permission.WRITE_EXTERNAL_STORAGE',
+    ],
   },
   web: {
     favicon: './assets/favicon.png',

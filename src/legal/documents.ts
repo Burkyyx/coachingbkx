@@ -139,6 +139,13 @@ export const LEGAL_DOCUMENTS: Record<LegalDocId, LegalDocument> = {
         ],
       },
       {
+        title: 'Supprimer votre compte',
+        paragraphs: [
+          'Dans l’app (téléphone ou site web) : Profil → « Supprimer mon compte », puis confirmer. La suppression est immédiate et définitive : compte, séances, bilans, pesées, repas, photos, vidéos et messages sont effacés.',
+          `Vous pouvez aussi demander la suppression par e-mail à ${CONTACT} ; elle est effectuée sous 30 jours au plus.`,
+        ],
+      },
+      {
         title: 'Vos droits',
         paragraphs: [
           'Accès, rectification, effacement, portabilité, opposition et retrait du consentement à tout moment.',

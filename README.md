@@ -19,7 +19,7 @@ Ce guide est écrit pour quelqu'un qui n'est pas développeur. Suis les étapes 
 6. [Connexion Google et Apple](#6-connexion-google-et-apple)
 7. [Mettre le site web en ligne (Cloudflare Pages)](#7-mettre-le-site-web-en-ligne)
 8. [Installer l'app sur ton iPhone / Android (EAS)](#8-installer-lapp-sur-ton-téléphone-eas)
-9. [Publier sur l'App Store et Google Play](#9-publier-sur-les-stores)
+9. [Publier sur Google Play (App Store : plus tard)](#9-publier-sur-google-play-app-store--plus-tard)
 10. [Sauvegardes de la base](#10-sauvegardes)
 11. [Commandes utiles et dépannage](#11-commandes-utiles-et-dépannage)
 
@@ -305,55 +305,108 @@ ajouté à l'écran d'accueil du téléphone (_Partager → Sur l'écran d'accue
 ## 8. Installer l'app sur ton téléphone (EAS)
 
 Pour les notifications push et l'alerte du minuteur en arrière-plan, il faut une **version installée**
-(pas le navigateur, pas Expo Go).
+(pas le navigateur, pas Expo Go). Les versions sont construites dans le cloud par **EAS** (Expo) :
+pas besoin d'Android Studio ni de Xcode.
 
-1. Crée un compte https://expo.dev, puis :
+1. **Compte Expo et projet** (une seule fois) :
    ```bash
-   npx eas-cli@latest login
-   npx eas-cli@latest init        # crée le projet EAS (note l'ID affiché)
+   npx eas-cli@latest login       # compte gratuit créé sur https://expo.dev
+   npx eas-cli@latest init        # crée le projet « divus-coaching » et affiche son ID
    ```
-   Ajoute `EAS_PROJECT_ID=<l'ID>` dans tes variables EAS (_expo.dev → projet → Environment variables_),
-   ainsi que les variables `EXPO_PUBLIC_…`.
-2. **Android** (aucun compte payant requis pour tester) :
+   Envoie-moi l'**ID du projet** (format `xxxxxxxx-xxxx-…`, il n'est pas secret) : je l'inscris dans
+   `app.config.ts`.
+2. **Variables de l'app** (une seule fois) — l'adresse de Supabase et la clé publique, pour les versions
+   « preview » (test) et « production » (Google Play) :
+   ```bash
+   npx eas-cli@latest env:create --environment preview --environment production --visibility plaintext \
+     --name EXPO_PUBLIC_SUPABASE_URL --value https://lzjcowifdikadgaiurfk.supabase.co
+   npx eas-cli@latest env:create --environment preview --environment production --visibility plaintext \
+     --name EXPO_PUBLIC_SUPABASE_ANON_KEY --value <clé publique, la même que dans Cloudflare>
+   npx eas-cli@latest env:create --environment preview --environment production --visibility plaintext \
+     --name EXPO_PUBLIC_WEB_URL --value https://divuscoaching.pages.dev
+   ```
+   (Ce sont les mêmes valeurs publiques que dans Cloudflare ; **jamais** la clé « service_role ».)
+3. **Version de test Android** (aucun compte payant requis) :
    ```bash
    npx eas-cli@latest build --profile preview --platform android
    ```
-   Ouvre le lien reçu sur le téléphone Android pour installer l'app.
-3. **iPhone** : nécessite le **compte Apple Developer (99 €/an)**.
+   Environ 15 minutes. Ouvre le lien reçu sur le téléphone Android pour installer l'app (fichier APK).
+4. **iPhone** (plus tard) : nécessite le compte Apple Developer (99 €/an).
    ```bash
    npx eas-cli@latest device:create            # enregistre ton iPhone (scanne le QR code)
    npx eas-cli@latest build --profile preview --platform ios
    ```
-   Ouvre le lien sur l'iPhone et installe l'app (_Réglages → Général → VPN et gestion de l'appareil_
-   pour faire confiance au développeur si demandé).
-4. Pour le développement (rechargement instantané), utilise `--profile development` puis `npm start`.
 
 ---
 
-## 9. Publier sur les stores
+## 9. Publier sur Google Play (App Store : plus tard)
 
-**Comptes nécessaires** : Apple Developer (99 €/an) et Google Play Console (25 $, une seule fois).
+### 9.1 Comptes et prérequis
+- **Compte Google Play Console** : https://play.google.com/console — 25 $ une seule fois, vérification
+  d'identité (pièce d'identité, téléphone ; compter quelques jours).
+  - Compte **personnel** : Google impose un **test fermé avec au moins 12 testeurs pendant 14 jours**
+    avant la mise en production publique (tes adhérents peuvent servir de testeurs).
+  - Compte **organisation** (entreprise avec numéro D-U-N-S) : pas de test obligatoire.
+- Avoir rempli les `[À COMPLÉTER]` des pages légales (`src/legal/documents.ts`) : identité, SIRET,
+  contact, durée de conservation. Dis-moi les informations, je les intègre.
 
-1. Construire les versions de production :
-   ```bash
-   npx eas-cli@latest build --profile production --platform all
-   ```
-2. Envoyer aux stores :
-   ```bash
-   npx eas-cli@latest submit --platform ios       # vers App Store Connect / TestFlight
-   npx eas-cli@latest submit --platform android   # vers Google Play (piste interne d'abord)
-   ```
-3. **À préparer** dans App Store Connect et la Play Console :
-   - icône 1024×1024 et icône définitive (remplacer les images dans `assets/`) ;
-   - captures d'écran : iPhone 6,7" et 6,5", iPad si activé, téléphone Android ;
-   - description, mots-clés, catégorie « Santé et forme » ;
-   - **URL de la politique de confidentialité** (page `/legal/privacy` du site web) ;
-   - **Déclarations de confidentialité** (« App Privacy » chez Apple, « Data safety » chez Google) :
-     données collectées = nom, e-mail, données de santé et de forme (séances, poids), photos, messages ;
-     finalité = fonctionnement de l'app ; **pas de suivi publicitaire**, pas de partage avec des tiers ;
-     données liées à l'identité ; suppression possible dans l'app (_Profil → Supprimer mon compte_) ;
-   - un **compte de démonstration** pour les testeurs Apple/Google (un adhérent invité exprès).
-4. L'app est gratuite, sans achat intégré ni publicité.
+### 9.2 Créer la fiche de l'app (Play Console → « Créer une application »)
+- Nom : **Divus** · langue par défaut : français · type : application · gratuite.
+- Identifiant technique (fixé dans l'app, ne plus jamais le changer) : `com.divuscoaching.app`.
+
+### 9.3 Construire et envoyer la première version
+```bash
+npx eas-cli@latest build --profile production --platform android   # fichier .aab (≈ 15 min)
+```
+- **Premier envoi : à la main** (exigence de Google) — télécharge le fichier `.aab` depuis le lien EAS,
+  puis Play Console → _Tests → Tests internes → Créer une version_ → dépose le fichier → enregistre.
+- Ensuite, les envois peuvent se faire en une commande :
+  ```bash
+  npx eas-cli@latest submit --platform android --profile production   # piste « tests internes »
+  ```
+  (EAS demande alors une clé de compte de service Google : suis le lien qu'il affiche, une seule fois.)
+- Chaque nouvelle version reçoit automatiquement un numéro de version supérieur.
+
+### 9.4 Formulaires à remplir dans la Play Console (_Tableau de bord → Configurer l'application_)
+- **Règles de confidentialité** : `https://divuscoaching.pages.dev/legal/privacy`
+- **Accès à l'application** : « Certaines fonctionnalités sont restreintes » → fournir un **compte de
+  démonstration adhérent** (crée une invitation, inscris un compte « test-google@… » avec un programme).
+- **Annonces** : non. **Classification du contenu** : questionnaire (pas de violence, pas de jeux
+  d'argent, partage de contenus entre utilisateurs : messagerie avec le coach uniquement).
+- **Public cible** : 16-17 ans et 18 ans et plus (l'app bloque les moins de 15 ans).
+- **Catégorie** : Santé et remise en forme.
+- **Suppression de compte** : oui, depuis l'app ; lien web : `https://divuscoaching.pages.dev/legal/privacy`
+  (section « Supprimer votre compte »).
+- **Sécurité des données** (« Data safety ») :
+
+  | Question | Réponse |
+  | --- | --- |
+  | Données collectées | Oui |
+  | Données chiffrées en transit | Oui |
+  | Suppression possible par l'utilisateur | Oui (dans l'app) |
+  | Informations personnelles | Nom, adresse e-mail, identifiants utilisateur |
+  | Santé et remise en forme | Informations de santé (poids, mensurations, alimentation), informations de remise en forme (séances) |
+  | Photos et vidéos | Photos, vidéos (bilans, repas, messages) |
+  | Messages | Autres messages intégrés à l'app (messagerie avec le coach) |
+  | Finalité (pour tout) | Fonctionnalité de l'application, gestion du compte |
+  | Données partagées avec des tiers | Non (Supabase, Anthropic, Brevo, Expo sont des **sous-traitants**, ce qui n'est pas un « partage » au sens de Google) |
+  | Collecte facultative ? | Santé, photos : facultatif (consentements séparés) ; nom, e-mail : obligatoire |
+
+- **Fiche du Store** : description courte (80 caractères) et longue, icône 512×512, image de présentation
+  1024×500, au moins 2 captures d'écran de téléphone. Je peux te préparer les textes et les captures.
+
+### 9.5 Notifications push sur Android (facultatif, recommandé)
+Sans cette étape, l'app fonctionne mais n'envoie pas de notifications sur Android.
+1. Console Firebase (https://console.firebase.google.com) → créer un projet → ajouter une app Android
+   avec l'identifiant `com.divuscoaching.app` → télécharger `google-services.json` et me l'envoyer
+   (il n'est pas secret ; je l'ajoute à l'app).
+2. Firebase → _Paramètres du projet → Comptes de service → Générer une clé privée_ (fichier JSON,
+   **secret**) → l'ajouter dans EAS : `npx eas-cli@latest credentials` → Android → production →
+   « Google Service Account » → « FCM V1 ». Ne me l'envoie pas.
+
+### 9.6 App Store (plus tard)
+Compte Apple Developer (99 €/an), puis `build --platform ios`, `submit --platform ios`, et les mêmes
+formulaires côté App Store Connect (« App Privacy »).
 
 ---
 
