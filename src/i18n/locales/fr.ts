@@ -168,6 +168,11 @@ export const fr = {
     birthDate: 'Date de naissance (JJ/MM/AAAA)',
     sex: 'Sexe',
     height: 'Taille (cm)',
+    weight: 'Poids actuel (kg)',
+    weightHint:
+      'Sert au suivi de ta progression et au calcul de tes besoins. Visible par toi et ton coach.',
+    weightInvalid: 'Indique un poids entre 25 et 350 kg (ex. : 72,5).',
+    weightConsentRequired: 'Coche cette case pour enregistrer ton poids, ou laisse le champ vide.',
     level: 'Niveau',
     goal: 'Objectif',
     injuries: 'Blessures ou contraintes',
