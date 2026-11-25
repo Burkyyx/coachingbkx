@@ -28,3 +28,4 @@ export * from './nutrition/journal.ts';
 export * from './nutrition/openFoodFacts.ts';
 export * from './nutrition/mealAnalysis.ts';
 export * from './nutrition/calorieAdjust.ts';
+export * from './community/progression.ts';

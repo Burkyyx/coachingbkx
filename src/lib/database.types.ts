@@ -106,6 +106,7 @@ export type Database = {
           invitation_validity_days: number;
           session_reminder_hour: number;
           updated_at: string;
+          xp_rules: NonNullable<Json>;
         };
         ComputedFields: never;
         Insert: {
@@ -116,6 +117,7 @@ export type Database = {
           invitation_validity_days?: number;
           session_reminder_hour?: number;
           updated_at?: string;
+          xp_rules?: NonNullable<Json>;
         };
         Update: {
           checkin_reminder_hour?: number;
@@ -125,8 +127,36 @@ export type Database = {
           invitation_validity_days?: number;
           session_reminder_hour?: number;
           updated_at?: string;
+          xp_rules?: NonNullable<Json>;
         };
         Relationships: [];
+      };
+      badges_earned: {
+        Row: {
+          adherent_id: string;
+          badge_key: string;
+          earned_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          adherent_id: string;
+          badge_key: string;
+          earned_at?: string;
+        };
+        Update: {
+          adherent_id?: string;
+          badge_key?: string;
+          earned_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'badges_earned_adherent_id_fkey';
+            columns: ['adherent_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
       };
       body_weights: {
         Row: {
@@ -157,6 +187,103 @@ export type Database = {
             columns: ['adherent_id'];
             isOneToOne: false;
             referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      challenge_participants: {
+        Row: {
+          adherent_id: string;
+          challenge_id: string;
+          completed_at: string | null;
+          joined_at: string;
+          progress: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          adherent_id: string;
+          challenge_id: string;
+          completed_at?: string | null;
+          joined_at?: string;
+          progress?: number;
+        };
+        Update: {
+          adherent_id?: string;
+          challenge_id?: string;
+          completed_at?: string | null;
+          joined_at?: string;
+          progress?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'challenge_participants_adherent_id_fkey';
+            columns: ['adherent_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'challenge_participants_challenge_id_fkey';
+            columns: ['challenge_id'];
+            isOneToOne: false;
+            referencedRelation: 'challenges';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      challenges: {
+        Row: {
+          collective: boolean;
+          created_at: string;
+          description: string | null;
+          ends_on: string;
+          exercise_id: string | null;
+          id: string;
+          leaderboard: boolean;
+          metric: Database['public']['Enums']['challenge_metric'];
+          real_reward: string | null;
+          starts_on: string;
+          target: number;
+          title: string;
+          xp_reward: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          collective?: boolean;
+          created_at?: string;
+          description?: string | null;
+          ends_on: string;
+          exercise_id?: string | null;
+          id?: string;
+          leaderboard?: boolean;
+          metric: Database['public']['Enums']['challenge_metric'];
+          real_reward?: string | null;
+          starts_on: string;
+          target: number;
+          title: string;
+          xp_reward?: number;
+        };
+        Update: {
+          collective?: boolean;
+          created_at?: string;
+          description?: string | null;
+          ends_on?: string;
+          exercise_id?: string | null;
+          id?: string;
+          leaderboard?: boolean;
+          metric?: Database['public']['Enums']['challenge_metric'];
+          real_reward?: string | null;
+          starts_on?: string;
+          target?: number;
+          title?: string;
+          xp_reward?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'challenges_exercise_id_fkey';
+            columns: ['exercise_id'];
+            isOneToOne: false;
+            referencedRelation: 'exercises';
             referencedColumns: ['id'];
           },
         ];
@@ -251,6 +378,105 @@ export type Database = {
           {
             foreignKeyName: 'coach_notes_adherent_id_fkey';
             columns: ['adherent_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      community_banned_words: {
+        Row: {
+          word: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          word: string;
+        };
+        Update: {
+          word?: string;
+        };
+        Relationships: [];
+      };
+      community_members: {
+        Row: {
+          adherent_id: string;
+          auto_posts: boolean;
+          display_name: string;
+          joined_at: string;
+          suspended_at: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          adherent_id: string;
+          auto_posts?: boolean;
+          display_name: string;
+          joined_at?: string;
+          suspended_at?: string | null;
+        };
+        Update: {
+          adherent_id?: string;
+          auto_posts?: boolean;
+          display_name?: string;
+          joined_at?: string;
+          suspended_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'community_members_adherent_id_fkey';
+            columns: ['adherent_id'];
+            isOneToOne: true;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      community_reports: {
+        Row: {
+          comment_id: string | null;
+          created_at: string;
+          id: string;
+          post_id: string | null;
+          reason: string | null;
+          reporter_id: string;
+          resolved_at: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          comment_id?: string | null;
+          created_at?: string;
+          id?: string;
+          post_id?: string | null;
+          reason?: string | null;
+          reporter_id: string;
+          resolved_at?: string | null;
+        };
+        Update: {
+          comment_id?: string | null;
+          created_at?: string;
+          id?: string;
+          post_id?: string | null;
+          reason?: string | null;
+          reporter_id?: string;
+          resolved_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'community_reports_comment_id_fkey';
+            columns: ['comment_id'];
+            isOneToOne: false;
+            referencedRelation: 'post_comments';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'community_reports_post_id_fkey';
+            columns: ['post_id'];
+            isOneToOne: false;
+            referencedRelation: 'posts';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'community_reports_reporter_id_fkey';
+            columns: ['reporter_id'];
             isOneToOne: false;
             referencedRelation: 'profiles';
             referencedColumns: ['id'];
@@ -844,6 +1070,128 @@ export type Database = {
           },
         ];
       };
+      post_comments: {
+        Row: {
+          author_id: string;
+          body: string;
+          created_at: string;
+          hidden_at: string | null;
+          id: string;
+          post_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          author_id: string;
+          body: string;
+          created_at?: string;
+          hidden_at?: string | null;
+          id?: string;
+          post_id: string;
+        };
+        Update: {
+          author_id?: string;
+          body?: string;
+          created_at?: string;
+          hidden_at?: string | null;
+          id?: string;
+          post_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'post_comments_author_id_fkey';
+            columns: ['author_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'post_comments_post_id_fkey';
+            columns: ['post_id'];
+            isOneToOne: false;
+            referencedRelation: 'posts';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      post_reactions: {
+        Row: {
+          author_id: string;
+          created_at: string;
+          emoji: string;
+          post_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          author_id: string;
+          created_at?: string;
+          emoji: string;
+          post_id: string;
+        };
+        Update: {
+          author_id?: string;
+          created_at?: string;
+          emoji?: string;
+          post_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'post_reactions_author_id_fkey';
+            columns: ['author_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'post_reactions_post_id_fkey';
+            columns: ['post_id'];
+            isOneToOne: false;
+            referencedRelation: 'posts';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      posts: {
+        Row: {
+          author_id: string;
+          body: string | null;
+          created_at: string;
+          hidden_at: string | null;
+          id: string;
+          kind: Database['public']['Enums']['post_kind'];
+          payload: NonNullable<Json>;
+          photo_path: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          author_id: string;
+          body?: string | null;
+          created_at?: string;
+          hidden_at?: string | null;
+          id?: string;
+          kind?: Database['public']['Enums']['post_kind'];
+          payload?: NonNullable<Json>;
+          photo_path?: string | null;
+        };
+        Update: {
+          author_id?: string;
+          body?: string | null;
+          created_at?: string;
+          hidden_at?: string | null;
+          id?: string;
+          kind?: Database['public']['Enums']['post_kind'];
+          payload?: NonNullable<Json>;
+          photo_path?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'posts_author_id_fkey';
+            columns: ['author_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       prescribed_sets: {
         Row: {
           created_at: string;
@@ -926,6 +1274,7 @@ export type Database = {
           avatar_path: string | null;
           birth_date: string | null;
           checkin_weekday: number | null;
+          community_prompted_at: string | null;
           created_at: string;
           effort_scale: Database['public']['Enums']['effort_scale'];
           first_name: string | null;
@@ -950,6 +1299,7 @@ export type Database = {
           avatar_path?: string | null;
           birth_date?: string | null;
           checkin_weekday?: number | null;
+          community_prompted_at?: string | null;
           created_at?: string;
           effort_scale?: Database['public']['Enums']['effort_scale'];
           first_name?: string | null;
@@ -973,6 +1323,7 @@ export type Database = {
           avatar_path?: string | null;
           birth_date?: string | null;
           checkin_weekday?: number | null;
+          community_prompted_at?: string | null;
           created_at?: string;
           effort_scale?: Database['public']['Enums']['effort_scale'];
           first_name?: string | null;
@@ -1595,6 +1946,48 @@ export type Database = {
           },
         ];
       };
+      xp_events: {
+        Row: {
+          adherent_id: string;
+          context: string | null;
+          created_at: string;
+          id: string;
+          kind: Database['public']['Enums']['xp_kind'];
+          occurred_on: string;
+          points: number;
+          source: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          adherent_id: string;
+          context?: string | null;
+          created_at?: string;
+          id?: string;
+          kind: Database['public']['Enums']['xp_kind'];
+          occurred_on: string;
+          points: number;
+          source: string;
+        };
+        Update: {
+          adherent_id?: string;
+          context?: string | null;
+          created_at?: string;
+          id?: string;
+          kind?: Database['public']['Enums']['xp_kind'];
+          occurred_on?: string;
+          points?: number;
+          source?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'xp_events_adherent_id_fkey';
+            columns: ['adherent_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
     };
     Views: {
       [_ in never]: never;
@@ -1656,6 +2049,17 @@ export type Database = {
         Args: { p_activate?: boolean; p_adherents: string[]; p_source: string; p_start: string };
         Returns: string[];
       };
+      award_badge: { Args: { p_adherent: string; p_key: string }; Returns: undefined };
+      award_xp: {
+        Args: {
+          p_adherent: string;
+          p_context?: string;
+          p_kind: Database['public']['Enums']['xp_kind'];
+          p_on: string;
+          p_source: string;
+        };
+        Returns: number;
+      };
       bootstrap_coach: {
         Args: { p_email: string };
         Returns: {
@@ -1663,6 +2067,7 @@ export type Database = {
           avatar_path: string | null;
           birth_date: string | null;
           checkin_weekday: number | null;
+          community_prompted_at: string | null;
           created_at: string;
           effort_scale: Database['public']['Enums']['effort_scale'];
           first_name: string | null;
@@ -1691,7 +2096,38 @@ export type Database = {
       can_access_adherent: { Args: { p_adherent: string }; Returns: boolean };
       can_access_conversation: { Args: { p_conversation: string }; Returns: boolean };
       can_read_program: { Args: { p_program: string }; Returns: boolean };
+      challenge_board: {
+        Args: { p_challenge: string };
+        Returns: {
+          adherent_id: string;
+          completed: boolean;
+          display_name: string;
+          is_me: boolean;
+          progress: number;
+          total: number;
+        }[];
+      };
+      challenge_counts: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          challenge_id: string;
+          participants: number;
+          total: number;
+        }[];
+      };
+      challenge_metric_value: {
+        Args: {
+          p_adherent: string;
+          p_exercise: string;
+          p_from: string;
+          p_metric: Database['public']['Enums']['challenge_metric'];
+          p_to: string;
+        };
+        Returns: number;
+      };
+      check_banned_words: { Args: { p_text: string }; Returns: undefined };
       check_invitation: { Args: { p_code: string }; Returns: boolean };
+      check_training_badges: { Args: { p_adherent: string }; Returns: undefined };
       clear_conversation: { Args: { p_conversation: string }; Returns: number };
       coach_id: { Args: Record<PropertyKey, never>; Returns: string };
       coach_overview: {
@@ -1731,6 +2167,35 @@ export type Database = {
           week_start: string;
         }[];
       };
+      community_people: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          badges: number;
+          display_name: string;
+          id: string;
+          is_coach: boolean;
+          is_me: boolean;
+          xp: number;
+        }[];
+      };
+      complete_challenge: {
+        Args: {
+          p_adherent: string;
+          p_challenge: Omit<
+            Database['public']['Tables']['challenges']['Row'],
+            Database['public']['Tables']['challenges']['ComputedFields']
+          >;
+        };
+        Returns: undefined;
+      };
+      create_auto_post: {
+        Args: {
+          p_adherent: string;
+          p_kind: Database['public']['Enums']['post_kind'];
+          p_payload: Json;
+        };
+        Returns: undefined;
+      };
       create_invitation: {
         Args: { p_label?: string };
         Returns: {
@@ -1763,8 +2228,14 @@ export type Database = {
         Returns: string;
       };
       export_my_data: { Args: Record<PropertyKey, never>; Returns: Json };
+      full_week_streak: {
+        Args: { p_adherent: string; p_from?: string; p_to?: string };
+        Returns: number;
+      };
+      has_community_consent: { Args: { p_user: string }; Returns: boolean };
       is_active_user: { Args: Record<PropertyKey, never>; Returns: boolean };
       is_coach: { Args: Record<PropertyKey, never>; Returns: boolean };
+      is_community_member: { Args: Record<PropertyKey, never>; Returns: boolean };
       notify: {
         Args: { p_body: string; p_data?: Json; p_title: string; p_type: string; p_user: string };
         Returns: undefined;
@@ -1774,6 +2245,7 @@ export type Database = {
         Returns: undefined;
       };
       owns_session: { Args: { p_session: string }; Returns: boolean };
+      paris_date: { Args: { p_ts: string }; Returns: string };
       redeem_invitation: {
         Args: { p_code: string };
         Returns: {
@@ -1781,6 +2253,7 @@ export type Database = {
           avatar_path: string | null;
           birth_date: string | null;
           checkin_weekday: number | null;
+          community_prompted_at: string | null;
           created_at: string;
           effort_scale: Database['public']['Enums']['effort_scale'];
           first_name: string | null;
@@ -1806,6 +2279,7 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      refresh_challenge_progress: { Args: { p_adherent: string }; Returns: undefined };
       revert_suggestion: {
         Args: { p_id: string };
         Returns: {
@@ -1852,6 +2326,7 @@ export type Database = {
         | 'new_record'
         | 'long_rest'
         | 'deficit_performance';
+      challenge_metric: 'sessions' | 'streak_weeks' | 'volume' | 'reps';
       consent_type: 'terms' | 'training_data' | 'health_data' | 'ai_photo' | 'community';
       effort_scale: 'rir' | 'rpe';
       equipment:
@@ -1892,6 +2367,7 @@ export type Database = {
         | 'calves'
         | 'full_body'
         | 'cardio';
+      post_kind: 'manual' | 'record' | 'session' | 'badge' | 'challenge';
       program_kind: 'template' | 'assigned';
       program_status: 'draft' | 'active' | 'completed' | 'archived';
       record_type: 'max_load' | 'estimated_1rm' | 'reps_at_load' | 'session_volume';
@@ -1905,6 +2381,7 @@ export type Database = {
       training_goal: 'muscle_gain' | 'fat_loss' | 'recomposition' | 'performance' | 'health';
       training_level: 'beginner' | 'intermediate' | 'advanced';
       user_role: 'coach' | 'adherent';
+      xp_kind: 'session' | 'checkin' | 'full_week' | 'record' | 'challenge' | 'journal_day';
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -2034,6 +2511,7 @@ export const Constants = {
         'long_rest',
         'deficit_performance',
       ],
+      challenge_metric: ['sessions', 'streak_weeks', 'volume', 'reps'],
       consent_type: ['terms', 'training_data', 'health_data', 'ai_photo', 'community'],
       effort_scale: ['rir', 'rpe'],
       equipment: [
@@ -2076,6 +2554,7 @@ export const Constants = {
         'full_body',
         'cardio',
       ],
+      post_kind: ['manual', 'record', 'session', 'badge', 'challenge'],
       program_kind: ['template', 'assigned'],
       program_status: ['draft', 'active', 'completed', 'archived'],
       record_type: ['max_load', 'estimated_1rm', 'reps_at_load', 'session_volume'],
@@ -2102,6 +2581,7 @@ export const Constants = {
       training_goal: ['muscle_gain', 'fat_loss', 'recomposition', 'performance', 'health'],
       training_level: ['beginner', 'intermediate', 'advanced'],
       user_role: ['coach', 'adherent'],
+      xp_kind: ['session', 'checkin', 'full_week', 'record', 'challenge', 'journal_day'],
     },
   },
 } as const;
