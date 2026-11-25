@@ -52,3 +52,6 @@ supabase/.branches
 coverage/
 supabase/functions/.env
 supabase/functions/.local-ca.pem
+
+# moteur de lecture des codes-barres (copié depuis node_modules)
+/public/zxing/

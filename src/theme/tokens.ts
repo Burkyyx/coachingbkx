@@ -157,3 +157,6 @@ export function buildTheme(scheme: ColorScheme): Theme {
     typography,
   };
 }
+
+/** Viseur caméra (scan) : fixe quel que soit le thème, car posé sur l'image de la caméra. */
+export const cameraColors = { background: '#000000', frame: '#FFFFFF' } as const;

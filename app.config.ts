@@ -1,5 +1,9 @@
 import type { ExpoConfig } from 'expo/config';
 
+/** Texte unique (iOS n'affiche qu'une seule explication pour la caméra). */
+const CAMERA_PERMISSION =
+  'La caméra sert à prendre des photos (progression, repas), à filmer une série pour ton coach et à scanner le code-barres des aliments.';
+
 /**
  * Configuration de l'application.
  *
@@ -69,9 +73,15 @@ const config: ExpoConfig = {
       'expo-image-picker',
       {
         photosPermission: 'L’accès aux photos permet d’envoyer une image ou une vidéo à ton coach.',
-        cameraPermission:
-          'La caméra sert à prendre des photos de progression et à filmer une série pour ton coach.',
+        cameraPermission: CAMERA_PERMISSION,
         microphonePermission: 'Le micro sert à enregistrer le son des vidéos envoyées à ton coach.',
+      },
+    ],
+    [
+      'expo-camera',
+      {
+        cameraPermission: CAMERA_PERMISSION,
+        recordAudioAndroid: false,
       },
     ],
     'expo-video',

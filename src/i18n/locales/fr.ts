@@ -801,6 +801,29 @@ export const fr = {
       errorEmpty: 'Ajoute une description ou au moins un aliment.',
       errorKcal: 'Indique les calories.',
       errorItem: 'Chaque aliment a besoin d’un nom.',
+      modeBarcode: 'Code-barres',
+      scan: 'Scanner avec la caméra',
+      scanHelp: 'Vise le code-barres du produit, bien à plat et éclairé.',
+      stopScan: 'Fermer la caméra',
+      manualCode: 'Ou tape les chiffres sous le code-barres',
+      search: 'Rechercher',
+      invalidCode: 'Ce code ne semble pas valide : vérifie les chiffres.',
+      notFound:
+        'Produit introuvable dans Open Food Facts. Ajoute-le avec le mode « Détaillé » (valeurs de l’étiquette).',
+      lookupError:
+        'Impossible de joindre Open Food Facts. Vérifie ta connexion ou utilise le mode « Détaillé ».',
+      per100: 'Pour 100 g : {{kcal}} kcal · P {{protein}} g · G {{carbs}} g · L {{fat}} g',
+      incomplete: 'Fiche incomplète : compare avec l’étiquette.',
+      portion: '1 portion ({{grams}} g)',
+      addProduct: 'Ajouter au journal',
+      otherProduct: 'Scanner un autre produit',
+      offSource:
+        'Valeurs issues d’Open Food Facts, une base collaborative : en cas de doute, fie-toi à l’étiquette.',
+      cameraPermission: 'Autorise la caméra pour scanner le code-barres.',
+      allowCamera: 'Autoriser la caméra',
+      cameraDenied:
+        'L’accès à la caméra est refusé : autorise-le dans les réglages, ou tape le code à la main.',
+      cameraUnavailable: 'Caméra indisponible ici : tape le code à la main.',
     },
   },
   adherent: {

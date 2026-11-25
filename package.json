@@ -9,7 +9,7 @@
     "phone": "node scripts/phone.mjs",
     "ios": "expo start --ios",
     "android": "expo start --android",
-    "build:web": "expo export --platform web && node scripts/postbuild-web.mjs",
+    "build:web": "node scripts/copy-wasm.mjs && expo export --platform web && node scripts/postbuild-web.mjs",
     "lint": "eslint .",
     "format": "prettier --write .",
     "typecheck": "tsc --noEmit",
@@ -25,7 +25,8 @@
     "db:types:test": "KEEP_DB=1 bash scripts/test-rls.sh && supabase gen types typescript --db-url postgresql://postgres:postgres@127.0.0.1:54329/postgres --schema public > src/lib/database.types.ts && prettier --write src/lib/database.types.ts",
     "test:coverage": "jest --coverage",
     "core:sync": "node scripts/sync-core.mjs",
-    "core:check": "node scripts/sync-core.mjs --check"
+    "core:check": "node scripts/sync-core.mjs --check",
+    "postinstall": "node scripts/copy-wasm.mjs"
   },
   "dependencies": {
     "@expo/metro-runtime": "~58.0.17",
@@ -35,10 +36,12 @@
     "@react-native-community/netinfo": "^12.0.1",
     "@supabase/supabase-js": "^2.119.0",
     "@tanstack/react-query": "^5.107.1",
+    "barcode-detector": "^3.2.5",
     "expo": "~58.0.25",
     "expo-apple-authentication": "~58.0.3",
     "expo-asset": "~58.0.21",
     "expo-auth-session": "~58.0.18",
+    "expo-camera": "~58.0.14",
     "expo-clipboard": "~58.0.4",
     "expo-constants": "~58.0.16",
     "expo-crypto": "~58.0.8",

@@ -15,11 +15,19 @@ import {
   VStack,
   useFeedback,
 } from '@/components/ui';
-import { formatInt, macrosForGrams, mealTypeForHour, sumMacros, todayLocal } from '@/core';
+import {
+  formatInt,
+  macrosForGrams,
+  mealTypeForHour,
+  sumMacros,
+  todayLocal,
+  type FoodProduct,
+} from '@/core';
 import { toUserMessage } from '@/lib/errors';
 import { uuid } from '@/lib/uuid';
 import { useTheme } from '@/theme/ThemeProvider';
 
+import { BarcodePanel } from './BarcodePanel';
 import {
   MEAL_TYPES,
   mealTotals,
@@ -30,7 +38,7 @@ import {
   type MealType,
 } from './journal';
 
-type Mode = 'quick' | 'detailed' | 'recent';
+type Mode = 'quick' | 'detailed' | 'barcode' | 'recent';
 
 type ItemDraft = {
   key: string;
@@ -157,6 +165,29 @@ function AddMealForm({ visible, onClose, adherentId, day, initialType, numbers }
     }
   };
 
+  const addProduct = async (product: FoodProduct, grams: number) => {
+    setError(null);
+    try {
+      await add.mutateAsync({
+        mealType,
+        eatenAt: eatenAtFor(day, mealType),
+        source: 'barcode',
+        items: [
+          {
+            name: product.brand ? `${product.name} (${product.brand})` : product.name,
+            quantityG: grams,
+            ...macrosForGrams(product.per100g, grams),
+            barcode: product.barcode,
+          },
+        ],
+      });
+      toast(t('nutrition.journal.saved'));
+      onClose();
+    } catch (e) {
+      setError(toUserMessage(e));
+    }
+  };
+
   const addAgain = async (meal: Meal) => {
     try {
       await copy(meal, mealType, eatenAtFor(day, mealType));
@@ -173,7 +204,10 @@ function AddMealForm({ visible, onClose, adherentId, day, initialType, numbers }
   const modes = [
     { value: 'quick' as const, label: t('nutrition.journal.modeQuick') },
     ...(numbers
-      ? [{ value: 'detailed' as const, label: t('nutrition.journal.modeDetailed') }]
+      ? [
+          { value: 'barcode' as const, label: t('nutrition.journal.modeBarcode') },
+          { value: 'detailed' as const, label: t('nutrition.journal.modeDetailed') },
+        ]
       : []),
     { value: 'recent' as const, label: t('nutrition.journal.modeRecent') },
   ];
@@ -187,7 +221,7 @@ function AddMealForm({ visible, onClose, adherentId, day, initialType, numbers }
       onClose={onClose}
       title={t('nutrition.journal.sheetTitle')}
       footer={
-        mode === 'recent' ? undefined : (
+        mode === 'recent' || mode === 'barcode' ? undefined : (
           <VStack gap="sm">
             {error ? (
               <Text variant="small" color="danger">
@@ -365,6 +399,17 @@ function AddMealForm({ visible, onClose, adherentId, day, initialType, numbers }
               fat: formatInt(total.fatG),
             })}
           </Text>
+        </VStack>
+      ) : null}
+
+      {mode === 'barcode' ? (
+        <VStack gap="sm">
+          <BarcodePanel saving={add.isPending} onAdd={(p, g) => void addProduct(p, g)} />
+          {error ? (
+            <Text variant="small" color="danger">
+              {error}
+            </Text>
+          ) : null}
         </VStack>
       ) : null}
 

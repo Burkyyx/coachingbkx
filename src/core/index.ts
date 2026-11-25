@@ -24,3 +24,4 @@ export * from './adherents.ts';
 export * from './programs.ts';
 export * from './nutrition/energy.ts';
 export * from './nutrition/journal.ts';
+export * from './nutrition/openFoodFacts.ts';
