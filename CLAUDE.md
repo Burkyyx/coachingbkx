@@ -119,5 +119,9 @@ suggestions automatiques **validées par le coach**. Phases : 1 (entraînement, 
 - Hors-ligne : écritures via `saveOffline()` (`src/offline/sync.ts`) ; identifiants stables pour bilans/pesées
   (`stableUuid`). Séance en cours persistée (`src/features/training/session/store.ts`).
 - Données de démo : `npm run seed:demo` (Node exécute directement le TypeScript).
+- Mise en ligne : `.github/workflows/deploy-supabase.yml` applique les migrations et déploie les fonctions
+  à chaque push touchant `supabase/` sur la branche de prod (après les tests RLS ; secrets GitHub
+  `SUPABASE_ACCESS_TOKEN` + `SUPABASE_DB_PASSWORD`). Web : Cloudflare Pages. Android : EAS (`eas.json`,
+  profil production → piste de tests internes Google Play).
 - Environnement cloud : le runtime local des Edge Functions ne peut pas télécharger ses dépendances
   (proxy) → tester `analyze.ts` avec Node contre la base locale.

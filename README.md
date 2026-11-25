@@ -232,6 +232,20 @@ d'un exercice.
    d'un dixième de centime par photo ; le nombre d'analyses par jour et par adhérent se règle
    dans l'onglet Nutrition de chaque adhérent (10 par défaut), et chaque analyse est notée dans
    la table `ai_usage`.
+   **Mise en ligne automatique (recommandé)** : une fois ces deux secrets enregistrés, chaque
+   modification des migrations ou des fonctions envoyée sur GitHub est mise en ligne toute seule
+   (après les tests de sécurité) — plus besoin de `db push` ni de `functions deploy` :
+   - jeton Supabase : https://supabase.com/dashboard/account/tokens → _Generate new token_ (nom :
+     « GitHub ») → copie-le ;
+   - GitHub → dépôt `coachingbkx` → _Settings → Secrets and variables → Actions → New repository
+     secret_ :
+     - `SUPABASE_ACCESS_TOKEN` = le jeton ;
+     - `SUPABASE_DB_PASSWORD` = le mot de passe de la base (Supabase → _Project Settings → Database_ ;
+       s'il est perdu : _Reset database password_, puis mets à jour le secret).
+   - Suivi : onglet _Actions_ du dépôt → « Mise en ligne Supabase » (✅ vert = en ligne ; ❌ rouge =
+     ouvre le détail et envoie-moi le message). Bouton _Run workflow_ pour relancer à la main.
+   - Les secrets des fonctions (`CRON_SECRET`, `ANTHROPIC_API_KEY`) restent dans Supabase : ils ne
+     changent pas à chaque mise en ligne.
 4. **Tâches planifiées** :
    - dans Supabase, _Database → Extensions_ : active **pg_cron** et **pg_net** (sinon erreur
      « schema "cron" does not exist ») ;
