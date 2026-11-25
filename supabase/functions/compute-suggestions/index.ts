@@ -16,6 +16,7 @@ import {
 } from '../_shared/admin.ts';
 
 import { analyzePending } from './analyze.ts';
+import { analyzeNutrition } from './nutrition.ts';
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
@@ -25,7 +26,13 @@ Deno.serve(async (req) => {
   try {
     // Un adhérent ne peut déclencher que l'analyse de ses propres séances.
     const adherentId = caller.kind === 'user' && caller.role === 'adherent' ? caller.userId : null;
-    return json(await analyzePending(db, adherentId));
+    const training = await analyzePending(db, adherentId);
+    // Nutrition : un échec n'empêche pas l'analyse des séances.
+    const nutrition = await analyzeNutrition(db, adherentId).catch((e) => {
+      log('analyse nutrition en échec', errorDetail(e));
+      return { suggestions: 0, alerts: 0 };
+    });
+    return json({ ...training, nutrition });
   } catch (e) {
     const d = errorDetail(e);
     log('analyse en échec', d);

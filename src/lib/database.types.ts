@@ -1822,7 +1822,8 @@ export type Database = {
         | 'high_fatigue'
         | 'checkin_missing'
         | 'new_record'
-        | 'long_rest';
+        | 'long_rest'
+        | 'deficit_performance';
       consent_type: 'terms' | 'training_data' | 'health_data' | 'ai_photo' | 'community';
       effort_scale: 'rir' | 'rpe';
       equipment:
@@ -1869,7 +1870,8 @@ export type Database = {
       session_status: 'in_progress' | 'completed' | 'abandoned';
       set_type: 'warmup' | 'working' | 'drop' | 'failure' | 'backoff' | 'amrap';
       sex: 'male' | 'female' | 'other';
-      suggestion_kind: 'load' | 'reps_target' | 'deload' | 'variation' | 'rep_range' | 'info';
+      suggestion_kind:
+        'load' | 'reps_target' | 'deload' | 'variation' | 'rep_range' | 'info' | 'calories';
       suggestion_status:
         'pending' | 'accepted' | 'modified' | 'rejected' | 'auto_applied' | 'reverted';
       training_goal: 'muscle_gain' | 'fat_loss' | 'recomposition' | 'performance' | 'health';
@@ -2002,6 +2004,7 @@ export const Constants = {
         'checkin_missing',
         'new_record',
         'long_rest',
+        'deficit_performance',
       ],
       consent_type: ['terms', 'training_data', 'health_data', 'ai_photo', 'community'],
       effort_scale: ['rir', 'rpe'],
@@ -2051,7 +2054,15 @@ export const Constants = {
       session_status: ['in_progress', 'completed', 'abandoned'],
       set_type: ['warmup', 'working', 'drop', 'failure', 'backoff', 'amrap'],
       sex: ['male', 'female', 'other'],
-      suggestion_kind: ['load', 'reps_target', 'deload', 'variation', 'rep_range', 'info'],
+      suggestion_kind: [
+        'load',
+        'reps_target',
+        'deload',
+        'variation',
+        'rep_range',
+        'info',
+        'calories',
+      ],
       suggestion_status: [
         'pending',
         'accepted',

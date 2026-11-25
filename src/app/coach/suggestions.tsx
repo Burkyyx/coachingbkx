@@ -19,7 +19,15 @@ import {
   VStack,
   useFeedback,
 } from '@/components/ui';
-import { formatKg, formatNumber, formatRelative, formatRepRange, repsTargetHint } from '@/core';
+import {
+  adjustMacrosForKcal,
+  formatInt,
+  formatKg,
+  formatNumber,
+  formatRelative,
+  formatRepRange,
+  repsTargetHint,
+} from '@/core';
 import {
   fullName,
   useSuggestionActions,
@@ -56,10 +64,32 @@ function useDescribe() {
           : typeof value.hint === 'string'
             ? value.hint
             : null;
+      case 'calories':
+        return t('suggestions.caloriesSummary', {
+          from: formatInt(num(cur.kcal) ?? 0),
+          to: formatInt(num(value.kcal) ?? 0),
+          carbsFrom: formatInt(num(cur.carbs_g) ?? 0),
+          carbsTo: formatInt(num(value.carbs_g) ?? 0),
+        });
       default:
         return null;
     }
   };
+}
+
+/** Calories modifiées par le coach : seuls les glucides absorbent la différence. */
+function caloriesValue(s: SuggestionRow, kcal: number): Values {
+  const cur = s.current_value as Values;
+  const m = adjustMacrosForKcal(
+    {
+      kcal: num(cur.kcal) ?? 0,
+      proteinG: num(cur.protein_g) ?? 0,
+      carbsG: num(cur.carbs_g) ?? 0,
+      fatG: num(cur.fat_g) ?? 0,
+    },
+    Math.round(kcal),
+  );
+  return { kcal: m.kcal, protein_g: m.proteinG, carbs_g: m.carbsG, fat_g: m.fatG };
 }
 
 /** Éditeur de la valeur proposée (bouton « Modifier »). */
@@ -100,6 +130,7 @@ function ModifyEditor({
         {s.kind === 'deload'
           ? cell('volume_factor', t('settings.params.volumeFactor'), 2, 1)
           : null}
+        {s.kind === 'calories' ? cell('kcal', t('suggestions.kcalPerDay'), 0, 8000) : null}
       </HStack>
       <HStack gap="sm">
         <Button
@@ -109,7 +140,9 @@ function ModifyEditor({
               // Le message affiché à l'adhérent suit l'objectif modifié.
               s.kind === 'reps_target' && num(value.reps) !== null
                 ? { ...value, hint: repsTargetHint(num(value.reps) ?? 0, num(value.load_kg)) }
-                : value,
+                : s.kind === 'calories'
+                  ? caloriesValue(s, num(value.kcal) ?? 0)
+                  : value,
             )
           }
         />
@@ -151,6 +184,7 @@ export default function SuggestionsScreen() {
       if (kind === 'reps_target') return t('suggestions.appliedRepsTarget');
       if (kind === 'load' || kind === 'rep_range') return t('suggestions.appliedSets', { count });
       if (kind === 'variation') return t('suggestions.appliedExercises', { count });
+      if (kind === 'calories') return t('suggestions.appliedCalories');
       return t('suggestions.accepted');
     };
 
@@ -293,7 +327,7 @@ export default function SuggestionsScreen() {
                       disabled={busy}
                       onPress={() => void run(() => actions.accept(s.id), appliedMessage(s.kind))}
                     />
-                    {['load', 'rep_range', 'deload', 'reps_target'].includes(s.kind) ? (
+                    {['load', 'rep_range', 'deload', 'reps_target', 'calories'].includes(s.kind) ? (
                       <Button
                         variant="secondary"
                         icon="create-outline"

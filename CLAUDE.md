@@ -69,7 +69,8 @@ suggestions automatiques **validées par le coach**. Phases : 1 (entraînement, 
 
 ## État d'avancement
 
-- **Phase 1 validée par Enzo** (nov. 2026). **Phase 2 (nutrition) : validée, en cadrage.** Phase 3 (communauté) : NON commencée.
+- **Phase 1 validée par Enzo** (nov. 2026). **Phase 2 (nutrition) : validée et livrée** (objectifs, journal, code-barres, photo IA,
+  suggestions caloriques + alerte déficit/force, journal côté coach). Phase 3 (communauté) : NON commencée.
 - Phase 2 — décisions : analyse photo avec **Claude Haiku 5.5** (`claude-haiku-5-5`, modèle réglable par variable
   d'environnement de l'Edge Function) ; code-barres **caméra + saisie manuelle** (Open Food Facts) ; compte
   Anthropic créé plus tard par Enzo. Objectifs : calcul **DEJ = métabolisme de base × NAP** (sexe, taille, poids,
@@ -80,6 +81,11 @@ suggestions automatiques **validées par le coach**. Phases : 1 (entraînement, 
   - plancher = **MB** (jamais < 1 200 kcal) ; perte limitée à 1 %/semaine ;
   - objectif : sèche DEJ − 15 %, prise de masse + 10 %, sinon = DEJ ; protéines 1,8 g/kg (2 g/kg en sèche),
     lipides 1 g/kg, glucides = le reste. Tout reste modifiable par adhérent.
+  - Ajustement calorique (`src/core/nutrition/calorieAdjust.ts`, Edge Function `compute-suggestions/nutrition.ts`) :
+    pente du poids sur 21 j (≥ 5 pesées, ≥ 14 j) vs vitesse visée (réglage coach, sinon sèche −0,5 · masse +0,25 · autres 0 %/sem.) ;
+    écart > 0,25 → ±100 kcal (±150 si ≥ 0,5) ; perte > 1 %/sem. → +150 ; plancher respecté ; glucides seuls ajustés ;
+    1 suggestion en attente max, 14 j entre deux décisions. Alerte « deficit_performance » : perte ≥ 0,25 %/sem. et
+    1RM estimé 14 j vs j15–42 en baisse ≥ 5 % (≥ 2 exercices ou en moyenne).
 - Nom de l'app : **« Divus »** (anciennement « Élan », renommée en nov. 2026). Thème (`src/theme/tokens.ts`) : base noir & blanc
   + **une couleur d'accent par domaine** (`theme.accent` : entraînement orange, programme bleu ciel, nutrition vert, records or,
   bilans violet, messages bleu, suggestions rose…), via `IconBadge`, `StatTile`, `Avatar`, `SectionHeader icon/accent`, `Card accent`.

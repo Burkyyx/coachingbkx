@@ -15,6 +15,8 @@ export const ADHERENT_TYPES = [
   'coach_message',
   'checkin_reminder',
   'checkin_reply',
+  'nutrition_updated',
+  'meal_comment',
 ] as const;
 export const COACH_TYPES = ['new_checkin', 'new_message', 'new_record', 'inactivity'] as const;
 
@@ -73,6 +75,9 @@ export function targetOf(n: Pick<AppNotification, 'type' | 'data'>): Href | null
       return '/messages';
     case 'program_updated':
       return '/program';
+    case 'nutrition_updated':
+    case 'meal_comment':
+      return '/nutrition';
     case 'checkin_reply':
     case 'checkin_reminder':
       return '/checkin';

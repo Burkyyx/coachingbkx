@@ -196,7 +196,9 @@ export default function CoachDashboard() {
                   tone={
                     a.type === 'new_record'
                       ? 'highlight'
-                      : a.type === 'high_fatigue' || a.type === 'inactive'
+                      : a.type === 'high_fatigue' ||
+                          a.type === 'inactive' ||
+                          a.type === 'deficit_performance'
                         ? 'danger'
                         : 'warning'
                   }
