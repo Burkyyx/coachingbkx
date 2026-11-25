@@ -41,7 +41,11 @@ export function toUserMessage(error: unknown): string {
   const t = i18n.t.bind(i18n);
   if (!error) return t('common.unknownError');
   const e = error as MaybeError;
-  if (isNetworkError(error)) return t('common.errorBody');
+  if (isNetworkError(error)) {
+    // Détail court (ex. « Failed to fetch ») : aide à distinguer coupure réseau / blocage / ancienne version.
+    const detail = technicalDetail(error);
+    return detail ? `${t('common.errorBody')} (${detail})` : t('common.errorBody');
+  }
   const code = e?.code ?? '';
   const msg = e?.message ?? '';
   switch (code) {

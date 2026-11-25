@@ -23,6 +23,7 @@ describe('messages d’erreur', () => {
     expect(toUserMessage(serverError)).toMatch(/n’a pas pu être envoyé/);
     const offline = { name: 'AuthRetryableFetchError', status: 0, message: 'Failed to fetch' };
     expect(toUserMessage(offline)).toMatch(/Vérifie ta connexion/);
+    expect(toUserMessage(offline)).toContain('Failed to fetch');
   });
 
   it('ajoute le détail technique aux erreurs inconnues, sans adresse e-mail', () => {
