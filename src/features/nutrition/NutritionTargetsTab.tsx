@@ -10,6 +10,7 @@ import {
   HStack,
   Icon,
   LoadingState,
+  Segmented,
   NumberCell,
   Text,
   TextField,
@@ -38,6 +39,7 @@ import {
   useSaveNutritionTargets,
   type NutritionTargetsRow,
 } from './api';
+import { CoachJournal } from './CoachJournal';
 import { IconBadge, MacroBreakdown, StackedBar, StatTile } from './NutritionVisuals';
 
 type Profile = Tables<'profiles'>;
@@ -56,17 +58,33 @@ type Form = {
 
 /** Onglet « Nutrition » de la fiche adhérent : calcul proposé + objectifs modifiables. */
 export function NutritionTargetsTab({ profile }: { profile: Profile }) {
+  const { t } = useTranslation();
   const targets = useNutritionTargets(profile.id);
   const weights = useAdherentWeights(profile.id);
+  const [view, setView] = useState<'journal' | 'targets'>('journal');
   if (targets.isLoading || weights.isLoading || targets.data === undefined) return <LoadingState />;
   const last = weights.data?.at(-1)?.weight_kg;
   return (
-    <TargetsEditor
-      key={profile.id}
-      profile={profile}
-      row={targets.data}
-      lastWeight={last === undefined ? null : Number(last)}
-    />
+    <VStack gap="lg">
+      <Segmented
+        options={[
+          { value: 'journal' as const, label: t('nutrition.coach.tabJournal') },
+          { value: 'targets' as const, label: t('nutrition.coach.tabTargets') },
+        ]}
+        value={view}
+        onChange={setView}
+      />
+      {view === 'journal' ? (
+        <CoachJournal adherentId={profile.id} targets={targets.data} />
+      ) : (
+        <TargetsEditor
+          key={profile.id}
+          profile={profile}
+          row={targets.data}
+          lastWeight={last === undefined ? null : Number(last)}
+        />
+      )}
+    </VStack>
   );
 }
 
