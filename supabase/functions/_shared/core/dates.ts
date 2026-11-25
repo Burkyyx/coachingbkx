@@ -93,3 +93,18 @@ export function formatRelative(isoTimestamp: string, now: Date = new Date()): st
   if (days < 7) return `il y a ${days} jours`;
   return formatShortDate(new Date(isoTimestamp).toISOString());
 }
+
+/**
+ * Saisie d'une date JJ/MM/AAAA : les « / » s'ajoutent tout seuls pendant la frappe
+ * (et disparaissent avec l'effacement). `previous` = valeur avant la frappe.
+ */
+export function maskFrenchDate(text: string, previous = ''): string {
+  const digits = text.replace(/\D/g, '').slice(0, 8);
+  const deleting = text.length < previous.length;
+  let out = digits.slice(0, 2);
+  if (digits.length > 2 || (digits.length === 2 && !deleting)) out += '/';
+  out += digits.slice(2, 4);
+  if (digits.length > 4 || (digits.length === 4 && !deleting)) out += '/';
+  out += digits.slice(4, 8);
+  return out;
+}

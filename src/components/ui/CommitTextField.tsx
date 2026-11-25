@@ -10,10 +10,22 @@ type Props = {
   multiline?: boolean;
   placeholder?: string;
   hint?: string;
+  /** Mise en forme pendant la frappe (ex. date JJ/MM/AAAA). */
+  mask?: (next: string, previous: string) => string;
+  keyboardType?: 'default' | 'number-pad' | 'decimal-pad';
 };
 
 /** Champ texte enregistré automatiquement quand on le quitte (iOS, Android, web). */
-export function CommitTextField({ label, value, onCommit, multiline, placeholder, hint }: Props) {
+export function CommitTextField({
+  label,
+  value,
+  onCommit,
+  multiline,
+  placeholder,
+  hint,
+  mask,
+  keyboardType,
+}: Props) {
   const [draft, setDraft] = useState<string | null>(null);
   const commit = () => {
     if (draft !== null && draft.trim() !== value) onCommit(draft.trim());
@@ -26,7 +38,8 @@ export function CommitTextField({ label, value, onCommit, multiline, placeholder
       placeholder={placeholder}
       value={draft ?? value}
       onFocus={() => setDraft(value)}
-      onChangeText={setDraft}
+      onChangeText={(v) => setDraft((prev) => (mask ? mask(v, prev ?? '') : v))}
+      keyboardType={keyboardType}
       onBlur={commit}
       onSubmitEditing={multiline ? undefined : commit}
       multiline={multiline}

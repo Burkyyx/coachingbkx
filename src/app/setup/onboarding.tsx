@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
 import { Button, Checkbox, Segmented, Text, TextField, VStack } from '@/components/ui';
-import { parseFrenchDate } from '@/core';
+import { maskFrenchDate, parseFrenchDate } from '@/core';
 import { signOut } from '@/features/auth/api';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { CONSENT_VERSION, hasActiveConsent } from '@/features/auth/consents';
@@ -14,7 +14,8 @@ import { AuthLayout, FormMessage } from '@/features/auth/components';
 import { toUserMessage } from '@/lib/errors';
 import { supabase, type Enums } from '@/lib/supabase';
 
-const SEXES = ['female', 'male', 'other'] as const;
+/** Choix à l'inscription (« Autre » retiré) : sert aussi au calcul des besoins (Mifflin-St Jeor). */
+const SEXES = ['female', 'male'] as const;
 const LEVELS = ['beginner', 'intermediate', 'advanced'] as const;
 const GOALS = ['muscle_gain', 'fat_loss', 'recomposition', 'performance', 'health'] as const;
 
@@ -71,7 +72,7 @@ export default function OnboardingScreen() {
       lastName: profile?.last_name ?? '',
       nickname: profile?.nickname ?? '',
       birthDate: '',
-      sex: profile?.sex ?? null,
+      sex: profile?.sex === 'female' || profile?.sex === 'male' ? profile.sex : null,
       height: profile?.height_cm ? String(profile.height_cm) : '',
       weight: '',
       healthConsent: false,
@@ -173,9 +174,11 @@ export default function OnboardingScreen() {
             <TextField
               label={t('onboarding.birthDate')}
               value={field.value}
-              onChangeText={field.onChange}
+              onChangeText={(v) => field.onChange(maskFrenchDate(v, field.value))}
               placeholder="31/12/1995"
-              keyboardType="numbers-and-punctuation"
+              keyboardType="number-pad"
+              inputMode="numeric"
+              autoComplete="birthdate-full"
               error={formState.errors.birthDate?.message}
             />
           )}

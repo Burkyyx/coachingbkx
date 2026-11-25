@@ -1,5 +1,6 @@
 import {
   formatFrenchDate,
+  maskFrenchDate,
   formatLongDate,
   formatRelative,
   formatShortDate,
@@ -33,5 +34,23 @@ describe('dates françaises', () => {
     expect(formatRelative('2026-11-15T08:00:00Z', now)).toBe('hier');
     expect(formatRelative('2026-11-12T08:00:00Z', now)).toBe('il y a 4 jours');
     expect(formatRelative('2026-10-01T08:00:00Z', now)).toBe('1 oct.');
+  });
+});
+
+describe('saisie de date avec « / » automatiques', () => {
+  it('ajoute les barres pendant la frappe', () => {
+    let v = '';
+    for (const ch of '31121995') v = maskFrenchDate(v + ch, v);
+    expect(v).toBe('31/12/1995');
+    expect(maskFrenchDate('3', '')).toBe('3');
+    expect(maskFrenchDate('31', '3')).toBe('31/');
+  });
+
+  it('permet d’effacer et accepte un collage', () => {
+    expect(maskFrenchDate('31', '31/')).toBe('31');
+    expect(maskFrenchDate('31/12', '31/12/')).toBe('31/12');
+    expect(maskFrenchDate('31/12/1995')).toBe('31/12/1995');
+    expect(maskFrenchDate('31121995')).toBe('31/12/1995');
+    expect(maskFrenchDate('31/12/19950')).toBe('31/12/1995');
   });
 });

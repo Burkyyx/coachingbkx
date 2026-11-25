@@ -20,7 +20,7 @@ import {
   VStack,
   useFeedback,
 } from '@/components/ui';
-import { formatFrenchDate, formatNumber, parseFrenchDate } from '@/core';
+import { formatFrenchDate, formatNumber, maskFrenchDate, parseFrenchDate } from '@/core';
 import { useExercises } from '@/features/exercises/api';
 import { AssignSheet } from '@/features/programs/AssignSheet';
 import {
@@ -244,6 +244,9 @@ export default function ProgramEditorScreen() {
                 <CommitTextField
                   label={t('programs.startDate')}
                   value={program.start_date ? formatFrenchDate(program.start_date) : ''}
+                  placeholder="JJ/MM/AAAA"
+                  mask={maskFrenchDate}
+                  keyboardType="number-pad"
                   onCommit={(v) => {
                     const iso = parseFrenchDate(v);
                     if (iso && iso !== program.start_date)

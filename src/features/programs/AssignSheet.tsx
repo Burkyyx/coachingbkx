@@ -2,7 +2,14 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Button, Checkbox, Sheet, Text, TextField, VStack, useFeedback } from '@/components/ui';
-import { addDays, formatFrenchDate, isoWeekday, parseFrenchDate, todayLocal } from '@/core';
+import {
+  addDays,
+  formatFrenchDate,
+  isoWeekday,
+  maskFrenchDate,
+  parseFrenchDate,
+  todayLocal,
+} from '@/core';
 import { toUserMessage } from '@/lib/errors';
 
 import { useActiveAdherents, useAssignProgram } from './api';
@@ -87,8 +94,10 @@ export function AssignSheet({ visible, onClose, programId, programName, onAssign
       <TextField
         label={t('programs.startDate')}
         value={date}
-        onChangeText={setDate}
-        keyboardType="numbers-and-punctuation"
+        onChangeText={(v) => setDate((prev) => maskFrenchDate(v, prev))}
+        placeholder="JJ/MM/AAAA"
+        keyboardType="number-pad"
+        inputMode="numeric"
       />
       <Checkbox label={t('programs.assignActivate')} checked={activate} onChange={setActivate} />
       {error ? <Text color="danger">{error}</Text> : null}
