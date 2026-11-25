@@ -1,6 +1,7 @@
 // -----------------------------------------------------------------------------
-// Edge Function « delete-account » : suppression DÉFINITIVE du compte de
-// l'utilisateur connecté (exigence App Store / RGPD) :
+// Edge Function « delete-account » : suppression DÉFINITIVE d'un compte
+//  - par l'adhérent lui-même (exigence App Store / RGPD) ;
+//  - ou par le coach, pour un adhérent ({ adherent_id }) :
 //  1. suppression de ses fichiers (avatar, photos de bilan, médias de messagerie) ;
 //  2. suppression du compte Auth → toutes ses données sont effacées en cascade.
 // Le compte coach ne peut pas être supprimé depuis l'app (sécurité).
@@ -32,19 +33,33 @@ Deno.serve(async (req) => {
   const db = adminClient();
   const caller = await identifyCaller(req, db);
   if (caller?.kind !== 'user') return json({ error: 'Non autorisé' }, 401);
-  if (caller.role === 'coach')
-    return json({ error: 'Le compte coach ne peut pas être supprimé ici.' }, 403);
+
+  // Le coach peut supprimer définitivement un adhérent ({ adherent_id }) ;
+  // un adhérent ne peut supprimer que son propre compte.
+  const body = (await req.json().catch(() => ({}))) as { adherent_id?: unknown };
+  let target = caller.userId;
+  if (caller.role === 'coach') {
+    if (typeof body.adherent_id !== 'string')
+      return json({ error: 'Le compte coach ne peut pas être supprimé ici.' }, 403);
+    const { data: profile } = await db
+      .from('profiles')
+      .select('role')
+      .eq('id', body.adherent_id)
+      .maybeSingle();
+    if (profile?.role !== 'adherent') return json({ error: 'Adhérent introuvable' }, 404);
+    target = body.adherent_id;
+  }
 
   let removed = 0;
   for (const bucket of ['avatars', 'checkin-photos', 'message-media', 'meal-photos']) {
-    removed += (await removeFolder(db, bucket, caller.userId)).length;
+    removed += (await removeFolder(db, bucket, target)).length;
   }
-  const { error } = await db.auth.admin.deleteUser(caller.userId);
+  const { error } = await db.auth.admin.deleteUser(target);
   if (error) {
     const d = errorDetail(error);
     log('suppression de compte en échec', d);
     return json({ error: 'Suppression impossible', ...d }, 500);
   }
-  log('compte supprimé', { files: removed });
+  log('compte supprimé', { files: removed, by: caller.role });
   return json({ deleted: true });
 });

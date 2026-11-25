@@ -208,7 +208,7 @@ d'un exercice.
    npx supabase login
    npx supabase link --project-ref <PROJECT_REF>     # visible dans l'URL du projet
    npx supabase db push --remote                     # crée toutes les tables et règles de sécurité
-   npx supabase migration list --remote              # vérification : 18 migrations dans « Remote »
+   npx supabase migration list --remote              # vérification : 19 migrations dans « Remote »
    ```
    ⚠️ Sans `--remote`, ces commandes visent la base **locale** de ton Mac (le terminal l'indique :
    « Target: local stack »). À chaque nouvelle migration, refais `npx supabase db push --remote`.

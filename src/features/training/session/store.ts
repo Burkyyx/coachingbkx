@@ -147,6 +147,11 @@ export const sessionActions = {
     ]);
   },
 
+  /** Séance supprimée par le coach : on l'arrête sans rien envoyer. */
+  async discard() {
+    await apply(null, []);
+  },
+
   clearCelebration() {
     useActiveSession.setState({ celebration: null });
   },

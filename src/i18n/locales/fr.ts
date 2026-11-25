@@ -443,6 +443,7 @@ export const fr = {
     missing1rm: '% du 1RM : pense à renseigner le 1RM de référence dans la fiche de l’adhérent.',
   },
   training: {
+    deletedByCoach: 'Ta séance en cours a été supprimée par ton coach.',
     hello: 'Salut {{name}} 👋',
     todayWorkout: 'Séance du jour',
     lateWorkout: 'Séance à rattraper',
@@ -964,6 +965,20 @@ export const fr = {
     reactivate: 'Réactiver l’adhérent',
     deactivateConfirm:
       'Désactiver cet adhérent ? Ses données sont conservées, mais il n’aura plus accès à l’app.',
+    deleteAdherent: 'Supprimer définitivement',
+    deleteAdherentHelp:
+      'Supprime son compte et toutes ses données (séances, bilans, photos, messages, repas). Irréversible.',
+    deleteAdherentConfirm:
+      'Supprimer définitivement {{name}} ? Son compte et toutes ses données seront effacés. Cette action est irréversible.',
+    deleteAdherentConfirm2:
+      'Dernière confirmation : {{name}} et toutes ses données vont être supprimés pour toujours.',
+    deleteAdherentDone: 'Adhérent supprimé.',
+    deleteSession: 'Supprimer la séance',
+    deleteSessionConfirm:
+      'Supprimer la séance « {{name}} » du {{date}} ? Ses séries et les records obtenus pendant cette séance seront supprimés.',
+    deleteSessionInProgress:
+      'Cette séance est en cours : elle sera aussi arrêtée sur le téléphone de l’adhérent.',
+    sessionDeleted: 'Séance supprimée.',
     saved: 'Enregistré.',
     weightTrend: 'Tendance du poids',
   },

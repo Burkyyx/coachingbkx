@@ -54,9 +54,12 @@ import {
   useAdherentSessions,
   useAdherentWeights,
   useCoachNotes,
+  useDeleteAdherent,
+  useDeleteSession,
   useReference1rm,
   type SessionWithSets,
 } from './adherent';
+import { fullName } from './api';
 
 type Profile = Tables<'profiles'>;
 
@@ -184,46 +187,84 @@ function effortText(s: Tables<'set_logs'>): string {
   return '';
 }
 
-function SessionCard({ s, names }: { s: SessionWithSets; names: Map<string, string> }) {
+function SessionCard({
+  s,
+  names,
+  adherentId,
+}: {
+  s: SessionWithSets;
+  names: Map<string, string>;
+  adherentId: string;
+}) {
   const { t } = useTranslation();
   const theme = useTheme();
+  const { toast, confirm } = useFeedback();
+  const remove = useDeleteSession(adherentId);
   const [open, setOpen] = useState(false);
+  const onDelete = async () => {
+    const name = s.workout?.name ?? '—';
+    const ok = await confirm({
+      title: t('adherent.deleteSession'),
+      message: `${t('adherent.deleteSessionConfirm', {
+        name,
+        date: formatLongDate(s.started_at.slice(0, 10)),
+      })}${s.status === 'in_progress' ? `\n\n${t('adherent.deleteSessionInProgress')}` : ''}`,
+      confirmLabel: t('common.delete'),
+      destructive: true,
+    });
+    if (!ok) return;
+    remove.mutate(s.id, {
+      onSuccess: () => toast(t('adherent.sessionDeleted')),
+      onError: (e) => toast(toUserMessage(e)),
+    });
+  };
   const byExercise = new Map<string, Tables<'set_logs'>[]>();
   for (const set of s.sets)
     byExercise.set(set.exercise_id, [...(byExercise.get(set.exercise_id) ?? []), set]);
   return (
     <Card>
-      <Pressable accessibilityRole="button" onPress={() => setOpen((v) => !v)}>
-        <HStack justify="space-between" wrap>
-          <VStack gap="xxs" flex={1}>
-            <Text weight="700">
-              {s.workout?.name ?? '—'} · {formatLongDate(s.started_at.slice(0, 10))}
-            </Text>
-            <Text variant="small" color="textMuted">
-              {formatTime(s.started_at)}
-              {s.duration_seconds ? ` · ${formatDuration(s.duration_seconds)}` : ''}
-              {` · ${s.sets.filter((x) => x.completed && x.set_type !== 'warmup').length} séries`}
-            </Text>
-          </VStack>
-          <HStack gap="xs">
-            {s.status !== 'completed' ? (
-              <Badge
-                label={
-                  s.status === 'in_progress' ? t('adherent.inProgress') : t('adherent.abandoned')
-                }
-                tone="warning"
-              />
-            ) : null}
-            {s.rating ? (
-              <Badge
-                label={t('adherent.sessionRating', { value: s.rating })}
-                tone={s.rating >= 9 ? 'warning' : 'neutral'}
-              />
-            ) : null}
-            <Icon name={open ? 'chevron-up' : 'chevron-down'} color="textMuted" />
+      <HStack gap="xs" align="flex-start">
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => setOpen((v) => !v)}
+          style={{ flex: 1 }}
+        >
+          <HStack justify="space-between" wrap>
+            <VStack gap="xxs" flex={1}>
+              <Text weight="700">
+                {s.workout?.name ?? '—'} · {formatLongDate(s.started_at.slice(0, 10))}
+              </Text>
+              <Text variant="small" color="textMuted">
+                {formatTime(s.started_at)}
+                {s.duration_seconds ? ` · ${formatDuration(s.duration_seconds)}` : ''}
+                {` · ${s.sets.filter((x) => x.completed && x.set_type !== 'warmup').length} séries`}
+              </Text>
+            </VStack>
+            <HStack gap="xs">
+              {s.status !== 'completed' ? (
+                <Badge
+                  label={
+                    s.status === 'in_progress' ? t('adherent.inProgress') : t('adherent.abandoned')
+                  }
+                  tone="warning"
+                />
+              ) : null}
+              {s.rating ? (
+                <Badge
+                  label={t('adherent.sessionRating', { value: s.rating })}
+                  tone={s.rating >= 9 ? 'warning' : 'neutral'}
+                />
+              ) : null}
+              <Icon name={open ? 'chevron-up' : 'chevron-down'} color="textMuted" />
+            </HStack>
           </HStack>
-        </HStack>
-      </Pressable>
+        </Pressable>
+        <IconButton
+          icon="trash-outline"
+          label={t('adherent.deleteSession')}
+          onPress={() => void onDelete()}
+        />
+      </HStack>
       {open ? (
         <VStack gap="md" style={{ marginTop: theme.spacing.md }}>
           {s.notes ? <Text color="textMuted">« {s.notes} »</Text> : null}
@@ -272,7 +313,7 @@ export function SessionsTab({ adherentId }: { adherentId: string }) {
   return (
     <VStack gap="sm">
       {(sessions.data ?? []).map((s) => (
-        <SessionCard key={s.id} s={s} names={names} />
+        <SessionCard key={s.id} s={s} names={names} adherentId={adherentId} />
       ))}
     </VStack>
   );
@@ -557,6 +598,7 @@ export function SettingsTab({ profile }: { profile: Profile }) {
   const { toast, confirm } = useFeedback();
   const refs = useReference1rm(profile.id);
   const { updateProfile, set1rm } = useAdherentActions(profile.id);
+  const deleteAdherent = useDeleteAdherent();
   const [picker, setPicker] = useState(false);
   const save = (patch: Parameters<typeof updateProfile.mutate>[0]) =>
     updateProfile.mutate(patch, {
@@ -653,6 +695,40 @@ export function SettingsTab({ profile }: { profile: Profile }) {
               style={{ alignSelf: 'flex-start' }}
             />
           )}
+          <Text variant="small" color="textMuted" style={{ marginTop: 8 }}>
+            {t('adherent.deleteAdherentHelp')}
+          </Text>
+          <Button
+            variant="danger"
+            icon="trash-outline"
+            label={t('adherent.deleteAdherent')}
+            loading={deleteAdherent.isPending}
+            onPress={async () => {
+              const name = fullName(profile);
+              const first = await confirm({
+                title: t('adherent.deleteAdherent'),
+                message: t('adherent.deleteAdherentConfirm', { name }),
+                destructive: true,
+                confirmLabel: t('adherent.deleteAdherent'),
+              });
+              if (!first) return;
+              const second = await confirm({
+                title: t('adherent.deleteAdherent'),
+                message: t('adherent.deleteAdherentConfirm2', { name }),
+                destructive: true,
+                confirmLabel: t('common.delete'),
+              });
+              if (!second) return;
+              deleteAdherent.mutate(profile.id, {
+                onSuccess: () => {
+                  toast(t('adherent.deleteAdherentDone'));
+                  router.replace('/coach/adherents');
+                },
+                onError: (e) => toast(toUserMessage(e)),
+              });
+            }}
+            style={{ alignSelf: 'flex-start' }}
+          />
         </VStack>
       </Card>
 

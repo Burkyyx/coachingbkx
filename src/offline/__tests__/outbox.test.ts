@@ -1,10 +1,12 @@
 import { createMemoryStore } from '../memoryStore';
 import {
+  dropSessionOps,
   enqueue,
   flushOutbox,
   MAX_ATTEMPTS,
   onOutboxChange,
   pendingCount,
+  sessionIdsInOutbox,
   type Remote,
 } from '../outbox';
 
@@ -165,5 +167,27 @@ describe('file d’attente hors-ligne', () => {
     off();
     await enqueue(store, { table: 'checkins', kind: 'upsert', payload: { id: 'c2' } }, makeId);
     expect(fn).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('séance supprimée par le coach', () => {
+  it('retire la séance, ses séries et ses records de la file, et rien d’autre', async () => {
+    const store = createMemoryStore();
+    const up = (
+      table: Parameters<typeof enqueue>[1]['table'],
+      payload: { id: string } & Record<string, unknown>,
+    ) => enqueue(store, { table, kind: 'upsert', payload }, makeId);
+    await up('session_logs', { id: 's1', status: 'in_progress' });
+    await up('set_logs', { id: 'x1', session_log_id: 's1', reps: 8 });
+    await up('personal_records', { id: 'r1', session_log_id: 's1' });
+    await up('session_logs', { id: 's2' });
+    await up('set_logs', { id: 'x2', session_log_id: 's2' });
+    await up('body_weights', { id: 'w1', weight_kg: 70 });
+
+    expect([...(await sessionIdsInOutbox(store))].sort()).toEqual(['s1', 's2']);
+    expect(await dropSessionOps(store, new Set(['s1']))).toBe(3);
+    const left = (await store.listOutbox()).map((o) => o.payload.id).sort();
+    expect(left).toEqual(['s2', 'w1', 'x2']);
+    expect(await dropSessionOps(store, new Set())).toBe(0);
   });
 });

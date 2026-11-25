@@ -323,6 +323,33 @@ export type Database = {
           },
         ];
       };
+      deleted_session_logs: {
+        Row: {
+          adherent_id: string;
+          deleted_at: string;
+          id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          adherent_id: string;
+          deleted_at?: string;
+          id: string;
+        };
+        Update: {
+          adherent_id?: string;
+          deleted_at?: string;
+          id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'deleted_session_logs_adherent_id_fkey';
+            columns: ['adherent_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       exercise_alternatives: {
         Row: {
           alternative_id: string;
@@ -1724,6 +1751,7 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      delete_session_log: { Args: { p_id: string }; Returns: undefined };
       display_name: { Args: { p_user: string }; Returns: string };
       duplicate_program: { Args: { p_as_template?: boolean; p_program: string }; Returns: string };
       duplicate_week: {

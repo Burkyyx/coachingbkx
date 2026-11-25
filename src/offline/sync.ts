@@ -8,10 +8,12 @@ import { supabase } from '@/lib/supabase';
 import { uuid } from '@/lib/uuid';
 
 import {
+  dropSessionOps,
   enqueue,
   flushOutbox,
   onOutboxChange,
   pendingCount,
+  sessionIdsInOutbox,
   type FlushResult,
   type Remote,
 } from './outbox';
@@ -59,6 +61,41 @@ export async function deleteOffline(table: SyncedTable, id: string) {
   await enqueue(localStore, { table, kind: 'delete', payload: { id } }, uuid);
 }
 
+/**
+ * Séances supprimées par le coach : l'espace adhérent indique la séance en cours et
+ * comment l'arrêter (le module hors-ligne ne dépend pas du mode séance).
+ */
+type SessionGuard = {
+  activeSessionId: () => string | null;
+  onDeleted: () => void | Promise<void>;
+};
+let guard: SessionGuard | null = null;
+export function registerSessionGuard(g: SessionGuard): () => void {
+  guard = g;
+  return () => {
+    if (guard === g) guard = null;
+  };
+}
+
+/**
+ * Avant chaque envoi : si le coach a supprimé une séance encore présente sur l'appareil
+ * (en cours ou en attente d'envoi), on retire ses écritures et on arrête la séance.
+ */
+async function purgeDeletedSessions() {
+  const ids = await sessionIdsInOutbox(localStore);
+  const active = guard?.activeSessionId() ?? null;
+  if (active) ids.add(active);
+  if (ids.size === 0) return;
+  const { data, error } = await supabase
+    .from('deleted_session_logs')
+    .select('id')
+    .in('id', [...ids]);
+  if (error || !data || data.length === 0) return;
+  const deleted = new Set(data.map((d) => d.id));
+  await dropSessionOps(localStore, deleted);
+  if (active && deleted.has(active)) await guard?.onDeleted();
+}
+
 let running: Promise<FlushResult> | null = null;
 const afterSync = new Set<(r: FlushResult) => void>();
 
@@ -75,6 +112,7 @@ export function syncNow(): Promise<FlushResult> {
   status.set({ syncing: true });
   running = (async () => {
     try {
+      await purgeDeletedSessions().catch(() => undefined);
       const result = await flushOutbox(localStore, remote, isNetworkError);
       status.set({
         pending: result.remaining,
@@ -125,8 +163,10 @@ export function useSyncManager() {
     if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
       window.addEventListener('online', onOnline);
     }
+    // Toutes les 20 s s'il reste des envois, ou pendant une séance (pour savoir vite
+    // si le coach l'a supprimée).
     const interval = setInterval(() => {
-      if (useSyncStatus.getState().pending > 0) void syncNow();
+      if (useSyncStatus.getState().pending > 0 || guard?.activeSessionId()) void syncNow();
     }, 20_000);
     return () => {
       offChange();

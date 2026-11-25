@@ -101,7 +101,9 @@ suggestions automatiques **validées par le coach**. Phases : 1 (entraînement, 
 - Échelle d'effort RIR/RPE réglée par adhérent. Vidéos messagerie : 60 s / 50 Mo.
 - Consentements demandés à l'arrivée de la fonctionnalité (CGU + entraînement à l'inscription,
   données corporelles au 1er bilan). Pas de mineurs < 15 ans (blocage).
-- Suppression de compte immédiate et définitive. Hébergement web : Cloudflare Pages. E-mails : Brevo.
+- Suppression de compte immédiate et définitive (par l'adhérent, ou par le coach : Edge Function `delete-account`
+  avec `adherent_id`). Le coach peut supprimer une séance même en cours (`delete_session_log`, trace dans
+  `deleted_session_logs` : la synchro ne la recrée pas et le téléphone de l'adhérent arrête la séance). Hébergement web : Cloudflare Pages. E-mails : Brevo.
 - En ligne : site https://divuscoaching.pages.dev (Cloudflare Pages, branche `claude/spec-md-instructions-14v2w9`),
   Supabase projet « ElanBKX » (ref `lzjcowifdikadgaiurfk`, Irlande). CLI : `db push --remote` pour la prod.
 - Retours de test (nov. 2026) : niveau d'activité au quotidien (5 niveaux, `profiles.activity_level`,

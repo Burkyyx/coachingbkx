@@ -213,3 +213,32 @@ export function useAdherentActions(id: string) {
     }),
   };
 }
+
+/** Suppression d'une séance de l'adhérent (même en cours) : séries et records compris. */
+export function useDeleteSession(adherentId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (sessionId: string) => {
+      const { error } = await supabase.rpc('delete_session_log', { p_id: sessionId });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['coach', 'adherent', adherentId] });
+      void qc.invalidateQueries({ queryKey: ['coach'] });
+    },
+  });
+}
+
+/** Suppression DÉFINITIVE d'un adhérent (compte, données et fichiers). */
+export function useDeleteAdherent() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (adherentId: string) => {
+      const { error } = await supabase.functions.invoke('delete-account', {
+        body: { adherent_id: adherentId },
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => void qc.invalidateQueries({ queryKey: ['coach'] }),
+  });
+}

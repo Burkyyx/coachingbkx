@@ -107,3 +107,37 @@ export async function flushOutbox(
 export async function pendingCount(store: LocalStore): Promise<number> {
   return (await store.listOutbox()).length;
 }
+
+/**
+ * Retire de la file les écritures liées à des séances supprimées par le coach :
+ * la séance elle-même, ses séries et ses records (sinon elles échoueraient sans fin).
+ * Renvoie le nombre d'opérations retirées.
+ */
+export async function dropSessionOps(
+  store: LocalStore,
+  sessionIds: ReadonlySet<string>,
+): Promise<number> {
+  if (sessionIds.size === 0) return 0;
+  let dropped = 0;
+  for (const op of await store.listOutbox()) {
+    const own = op.table === 'session_logs' && sessionIds.has(String(op.payload.id));
+    const child =
+      typeof op.payload.session_log_id === 'string' && sessionIds.has(op.payload.session_log_id);
+    if (own || child) {
+      await store.removeOutbox(op.opId);
+      dropped++;
+    }
+  }
+  if (dropped > 0) emit();
+  return dropped;
+}
+
+/** Identifiants des séances concernées par la file (séances, séries, records). */
+export async function sessionIdsInOutbox(store: LocalStore): Promise<Set<string>> {
+  const ids = new Set<string>();
+  for (const op of await store.listOutbox()) {
+    if (op.table === 'session_logs') ids.add(String(op.payload.id));
+    if (typeof op.payload.session_log_id === 'string') ids.add(op.payload.session_log_id);
+  }
+  return ids;
+}
