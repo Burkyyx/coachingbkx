@@ -36,7 +36,7 @@ Deno.serve(async (req) => {
     return json({ error: 'Le compte coach ne peut pas être supprimé ici.' }, 403);
 
   let removed = 0;
-  for (const bucket of ['avatars', 'checkin-photos', 'message-media']) {
+  for (const bucket of ['avatars', 'checkin-photos', 'message-media', 'meal-photos']) {
     removed += (await removeFolder(db, bucket, caller.userId)).length;
   }
   const { error } = await db.auth.admin.deleteUser(caller.userId);

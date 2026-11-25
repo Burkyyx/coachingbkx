@@ -3,6 +3,58 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export type Database = {
   public: {
     Tables: {
+      ai_usage: {
+        Row: {
+          adherent_id: string;
+          cost_usd: number;
+          created_at: string;
+          id: string;
+          input_tokens: number;
+          meal_id: string | null;
+          model: string;
+          output_tokens: number;
+          status: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          adherent_id: string;
+          cost_usd?: number;
+          created_at?: string;
+          id?: string;
+          input_tokens?: number;
+          meal_id?: string | null;
+          model: string;
+          output_tokens?: number;
+          status: string;
+        };
+        Update: {
+          adherent_id?: string;
+          cost_usd?: number;
+          created_at?: string;
+          id?: string;
+          input_tokens?: number;
+          meal_id?: string | null;
+          model?: string;
+          output_tokens?: number;
+          status?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'ai_usage_adherent_id_fkey';
+            columns: ['adherent_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'ai_usage_meal_id_fkey';
+            columns: ['meal_id'];
+            isOneToOne: false;
+            referencedRelation: 'meals';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       alerts: {
         Row: {
           adherent_id: string;
@@ -406,6 +458,145 @@ export type Database = {
           },
         ];
       };
+      meal_items: {
+        Row: {
+          adherent_id: string;
+          barcode: string | null;
+          carbs_g: number;
+          confidence: Database['public']['Enums']['ai_confidence'] | null;
+          created_at: string;
+          fat_g: number;
+          id: string;
+          kcal: number;
+          meal_id: string;
+          name: string;
+          position: number;
+          protein_g: number;
+          quantity_g: number | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          adherent_id: string;
+          barcode?: string | null;
+          carbs_g?: number;
+          confidence?: Database['public']['Enums']['ai_confidence'] | null;
+          created_at?: string;
+          fat_g?: number;
+          id: string;
+          kcal?: number;
+          meal_id: string;
+          name: string;
+          position?: number;
+          protein_g?: number;
+          quantity_g?: number | null;
+        };
+        Update: {
+          adherent_id?: string;
+          barcode?: string | null;
+          carbs_g?: number;
+          confidence?: Database['public']['Enums']['ai_confidence'] | null;
+          created_at?: string;
+          fat_g?: number;
+          id?: string;
+          kcal?: number;
+          meal_id?: string;
+          name?: string;
+          position?: number;
+          protein_g?: number;
+          quantity_g?: number | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'meal_items_adherent_id_fkey';
+            columns: ['adherent_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'meal_items_meal_id_fkey';
+            columns: ['meal_id'];
+            isOneToOne: false;
+            referencedRelation: 'meals';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      meals: {
+        Row: {
+          adherent_id: string;
+          analysis_note: string | null;
+          analysis_status: Database['public']['Enums']['meal_analysis_status'];
+          carbs_g: number;
+          coach_comment: string | null;
+          coach_commented_at: string | null;
+          created_at: string;
+          description: string | null;
+          eaten_at: string;
+          fat_g: number;
+          id: string;
+          is_favorite: boolean;
+          kcal: number;
+          meal_type: Database['public']['Enums']['meal_type'];
+          photo_path: string | null;
+          protein_g: number;
+          source: Database['public']['Enums']['meal_source'];
+          updated_at: string;
+          validated: boolean;
+        };
+        ComputedFields: never;
+        Insert: {
+          adherent_id: string;
+          analysis_note?: string | null;
+          analysis_status?: Database['public']['Enums']['meal_analysis_status'];
+          carbs_g?: number;
+          coach_comment?: string | null;
+          coach_commented_at?: string | null;
+          created_at?: string;
+          description?: string | null;
+          eaten_at: string;
+          fat_g?: number;
+          id: string;
+          is_favorite?: boolean;
+          kcal?: number;
+          meal_type: Database['public']['Enums']['meal_type'];
+          photo_path?: string | null;
+          protein_g?: number;
+          source?: Database['public']['Enums']['meal_source'];
+          updated_at?: string;
+          validated?: boolean;
+        };
+        Update: {
+          adherent_id?: string;
+          analysis_note?: string | null;
+          analysis_status?: Database['public']['Enums']['meal_analysis_status'];
+          carbs_g?: number;
+          coach_comment?: string | null;
+          coach_commented_at?: string | null;
+          created_at?: string;
+          description?: string | null;
+          eaten_at?: string;
+          fat_g?: number;
+          id?: string;
+          is_favorite?: boolean;
+          kcal?: number;
+          meal_type?: Database['public']['Enums']['meal_type'];
+          photo_path?: string | null;
+          protein_g?: number;
+          source?: Database['public']['Enums']['meal_source'];
+          updated_at?: string;
+          validated?: boolean;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'meals_adherent_id_fkey';
+            columns: ['adherent_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       messages: {
         Row: {
           body: string | null;
@@ -498,6 +689,60 @@ export type Database = {
             foreignKeyName: 'notifications_user_id_fkey';
             columns: ['user_id'];
             isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      nutrition_targets: {
+        Row: {
+          adherent_id: string;
+          ai_daily_limit: number;
+          calories_enabled: boolean;
+          carbs_g: number | null;
+          coach_note: string | null;
+          fat_g: number | null;
+          floor_kcal: number | null;
+          kcal: number | null;
+          nap_override: number | null;
+          protein_g: number | null;
+          updated_at: string;
+          weekly_rate_target: number | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          adherent_id: string;
+          ai_daily_limit?: number;
+          calories_enabled?: boolean;
+          carbs_g?: number | null;
+          coach_note?: string | null;
+          fat_g?: number | null;
+          floor_kcal?: number | null;
+          kcal?: number | null;
+          nap_override?: number | null;
+          protein_g?: number | null;
+          updated_at?: string;
+          weekly_rate_target?: number | null;
+        };
+        Update: {
+          adherent_id?: string;
+          ai_daily_limit?: number;
+          calories_enabled?: boolean;
+          carbs_g?: number | null;
+          coach_note?: string | null;
+          fat_g?: number | null;
+          floor_kcal?: number | null;
+          kcal?: number | null;
+          nap_override?: number | null;
+          protein_g?: number | null;
+          updated_at?: string;
+          weekly_rate_target?: number | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'nutrition_targets_adherent_id_fkey';
+            columns: ['adherent_id'];
+            isOneToOne: true;
             referencedRelation: 'profiles';
             referencedColumns: ['id'];
           },
@@ -1351,6 +1596,7 @@ export type Database = {
           workout_id: string;
         }[];
       };
+      ai_analyses_left: { Args: Record<PropertyKey, never>; Returns: number };
       apply_suggestion: {
         Args: { p_final?: Json; p_id: string };
         Returns: {
@@ -1567,6 +1813,7 @@ export type Database = {
     Enums: {
       activity_level:
         'sedentary' | 'lightly_active' | 'moderately_active' | 'very_active' | 'extremely_active';
+      ai_confidence: 'low' | 'medium' | 'high';
       alert_type:
         | 'missed_workout'
         | 'inactive'
@@ -1590,6 +1837,9 @@ export type Database = {
         | 'cardio_machine'
         | 'other';
       exercise_type: 'free_weight' | 'machine' | 'bodyweight' | 'cardio' | 'timed';
+      meal_analysis_status: 'none' | 'pending' | 'done' | 'failed';
+      meal_source: 'photo_ai' | 'barcode' | 'quick' | 'manual' | 'copy';
+      meal_type: 'breakfast' | 'lunch' | 'dinner' | 'snack';
       message_kind: 'text' | 'image' | 'video';
       muscle_group:
         | 'chest'
@@ -1742,6 +1992,7 @@ export const Constants = {
         'very_active',
         'extremely_active',
       ],
+      ai_confidence: ['low', 'medium', 'high'],
       alert_type: [
         'missed_workout',
         'inactive',
@@ -1767,6 +2018,9 @@ export const Constants = {
         'other',
       ],
       exercise_type: ['free_weight', 'machine', 'bodyweight', 'cardio', 'timed'],
+      meal_analysis_status: ['none', 'pending', 'done', 'failed'],
+      meal_source: ['photo_ai', 'barcode', 'quick', 'manual', 'copy'],
+      meal_type: ['breakfast', 'lunch', 'dinner', 'snack'],
       message_kind: ['text', 'image', 'video'],
       muscle_group: [
         'chest',
