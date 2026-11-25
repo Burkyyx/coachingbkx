@@ -30,8 +30,8 @@ export const LEGAL_DOCUMENTS: Record<LegalDocId, LegalDocument> = {
       {
         title: 'Hébergement',
         paragraphs: [
-          'Données et serveurs : Supabase Inc. — hébergement des données dans l’Union européenne (région [À COMPLÉTER : ex. Paris / Francfort]).',
-          'Site web : [À COMPLÉTER : ex. Cloudflare Inc., 101 Townsend St, San Francisco, CA 94107, USA].',
+          'Données et serveurs : Supabase Inc. — hébergement des données dans l’Union européenne (Irlande).',
+          'Site web : Cloudflare Inc., 101 Townsend St, San Francisco, CA 94107, États-Unis (Cloudflare Pages).',
         ],
       },
       {
@@ -92,7 +92,7 @@ export const LEGAL_DOCUMENTS: Record<LegalDocId, LegalDocument> = {
   },
   privacy: {
     title: 'Politique de confidentialité',
-    updatedAt: '[À COMPLÉTER : date]',
+    updatedAt: '25 novembre 2026',
     sections: [
       {
         title: 'Responsable du traitement',
@@ -106,19 +106,23 @@ export const LEGAL_DOCUMENTS: Record<LegalDocId, LegalDocument> = {
           'Données d’entraînement (séances, charges, répétitions, ressenti, temps de repos, records) : suivi et adaptation du programme par le coach.',
           'Bilans hebdomadaires, pesées et photos de progression (données potentiellement de santé) : suivi de l’évolution, uniquement avec le consentement explicite de l’utilisateur.',
           'Messages, photos et vidéos envoyés au coach : correction technique et échanges.',
+          'Alimentation (repas, quantités, valeurs nutritionnelles, photos de repas, objectifs nutritionnels fixés par le coach) : suivi nutritionnel, uniquement avec le consentement explicite de l’utilisateur (données potentiellement de santé).',
+          'Analyse des photos de repas par intelligence artificielle : estimation des aliments et de leurs valeurs, que l’utilisateur vérifie et corrige avant d’enregistrer ; uniquement avec un consentement spécifique, séparé et révocable. Le nombre d’analyses et leur coût sont enregistrés pour le suivi du service.',
         ],
       },
       {
         title: 'Base légale',
         paragraphs: [
-          'Exécution du contrat de coaching et consentement explicite, séparé et révocable pour les données d’entraînement et les données corporelles.',
+          'Exécution du contrat de coaching et consentement explicite, séparé et révocable pour les données d’entraînement, les données corporelles et nutritionnelles, et l’analyse des photos de repas par intelligence artificielle.',
         ],
       },
       {
         title: 'Destinataires',
         paragraphs: [
           'Seul le coach a accès aux données. Aucune donnée n’est vendue ni utilisée à des fins publicitaires.',
-          'Sous-traitants : Supabase (hébergement des données dans l’UE), [À COMPLÉTER : Expo pour les notifications push, fournisseur d’envoi d’e-mails].',
+          'Sous-traitants : Supabase (hébergement de la base de données et des fichiers, serveurs dans l’Union européenne, Irlande) ; Cloudflare (hébergement du site web) ; Brevo (envoi des e-mails de confirmation et de mot de passe, France) ; Expo (acheminement des notifications sur téléphone).',
+          'Analyse des photos de repas : Anthropic PBC (États-Unis), via son service Claude. Seule la photo du repas est transmise, accompagnée le cas échéant de la précision écrite par l’utilisateur ; aucun nom, adresse e-mail ni identifiant n’est envoyé. Anthropic agit comme sous-traitant : il s’engage contractuellement à n’utiliser ces données que pour fournir l’analyse, à ne pas s’en servir pour entraîner ses modèles et à ne les conserver que pour une durée limitée. Ce transfert hors de l’Union européenne est encadré par les clauses contractuelles types de la Commission européenne prévues par son contrat de traitement des données. Sans ce consentement, aucune photo n’est envoyée et la saisie reste manuelle.',
+          'Recherche par code-barres : seul le code-barres scanné est envoyé à la base publique Open Food Facts (association, France) pour obtenir les valeurs nutritionnelles du produit ; aucune donnée personnelle n’y est transmise.',
           'Vidéos de démonstration intégrées : lecteur YouTube (Google) en mode « confidentialité renforcée » (youtube-nocookie.com) ; aucune donnée de l’app n’est transmise, mais YouTube peut recevoir l’adresse IP de l’appareil au moment de la lecture.',
         ],
       },
