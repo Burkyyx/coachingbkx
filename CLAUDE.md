@@ -69,7 +69,11 @@ suggestions automatiques **validées par le coach**. Phases : 1 (entraînement, 
 
 ## État d'avancement
 
-- **Phase 1 livrée** (en attente de validation d'Enzo). Phases 2 (nutrition) et 3 (communauté) : NON commencées.
+- **Phase 1 validée par Enzo** (nov. 2026). **Phase 2 (nutrition) : validée, en cadrage.** Phase 3 (communauté) : NON commencée.
+- Phase 2 — décisions : analyse photo avec **Claude Haiku 5.5** (`claude-haiku-5-5`, modèle réglable par variable
+  d'environnement de l'Edge Function) ; code-barres **caméra + saisie manuelle** (Open Food Facts) ; compte
+  Anthropic créé plus tard par Enzo. Objectifs : calcul **DEJ = métabolisme de base × NAP** (sexe, taille, poids,
+  âge, activité), ajustable par le coach (détails de formule : voir décisions suivantes).
 - Nom de l'app : **« Divus »** (anciennement « Élan », renommée en nov. 2026), thème noir & blanc (`src/theme/tokens.ts`).
   Identifiants techniques gardés volontairement avec « elan » (renommer = perte de données) :
   `supabase/config.toml` project_id (base locale), préfixe `elan:` (stockage web) et `elan.db` (SQLite).
