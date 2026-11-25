@@ -155,3 +155,36 @@ export function useCoachConversations(coachId: string | null) {
     },
   });
 }
+
+/**
+ * Efface une conversation (coach) : supprime d'abord les photos / vidéos jointes,
+ * puis tous les messages. Le fil reste lié à l'adhérent, vide.
+ */
+export function useClearConversation() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (conversationId: string) => {
+      const { data: media, error } = await supabase
+        .from('messages')
+        .select('media_path')
+        .eq('conversation_id', conversationId)
+        .not('media_path', 'is', null);
+      if (error) throw error;
+      const paths = (media ?? []).map((m) => m.media_path).filter((p): p is string => !!p);
+      if (paths.length > 0) {
+        const { error: removeError } = await supabase.storage.from('message-media').remove(paths);
+        if (removeError) throw removeError;
+      }
+      const { data, error: clearError } = await supabase.rpc('clear_conversation', {
+        p_conversation: conversationId,
+      });
+      if (clearError) throw clearError;
+      return data;
+    },
+    onSuccess: (_count, conversationId) => {
+      void qc.invalidateQueries({ queryKey: keys.list });
+      void qc.invalidateQueries({ queryKey: keys.messages(conversationId) });
+      void qc.invalidateQueries({ queryKey: ['coach', 'badges'] });
+    },
+  });
+}

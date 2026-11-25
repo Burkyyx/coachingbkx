@@ -10,6 +10,7 @@ import {
   Card,
   EmptyState,
   HStack,
+  IconButton,
   LoadingState,
   Screen,
   Text,
@@ -32,7 +33,7 @@ function invitationLink(code: string): string {
 
 export default function InvitationsScreen() {
   const { t } = useTranslation();
-  const { toast } = useFeedback();
+  const { toast, confirm } = useFeedback();
   const qc = useQueryClient();
   const [label, setLabel] = useState('');
 
@@ -79,6 +80,28 @@ export default function InvitationsScreen() {
     onSuccess: () => void qc.invalidateQueries({ queryKey: ['coach', 'invitations'] }),
   });
 
+  // Suppression définitive (un ou plusieurs codes). Les comptes déjà créés ne sont pas touchés.
+  const remove = useMutation({
+    mutationFn: async (ids: string[]) => {
+      const { error } = await supabase.from('invitations').delete().in('id', ids);
+      if (error) throw error;
+      return ids.length;
+    },
+    onSuccess: () => void qc.invalidateQueries({ queryKey: ['coach', 'invitations'] }),
+    onError: (e) => toast(toUserMessage(e)),
+  });
+  const deleteOne = async (id: string, code: string) => {
+    const ok = await confirm({
+      title: t('invitations.delete'),
+      message: t('invitations.deleteConfirm', { code }),
+      confirmLabel: t('invitations.delete'),
+      destructive: true,
+    });
+    if (!ok) return;
+    await remove.mutateAsync([id]);
+    toast(t('invitations.deleted'));
+  };
+
   const copy = async (text: string) => {
     await Clipboard.setStringAsync(text);
     toast(t('invitations.copied'));
@@ -93,6 +116,25 @@ export default function InvitationsScreen() {
   };
 
   const now = new Date().toISOString();
+  const statusOf = (inv: {
+    used_at: string | null;
+    revoked_at: string | null;
+    expires_at: string;
+  }) =>
+    inv.used_at ? 'used' : inv.revoked_at ? 'revoked' : inv.expires_at < now ? 'expired' : 'valid';
+  const finished = (list.data ?? []).filter((inv) => statusOf(inv) !== 'valid');
+  const cleanup = async () => {
+    const ok = await confirm({
+      title: t('invitations.cleanup', { count: finished.length }),
+      message: t('invitations.cleanupConfirm', { count: finished.length }),
+      confirmLabel: t('invitations.delete'),
+      destructive: true,
+    });
+    if (!ok) return;
+    const count = await remove.mutateAsync(finished.map((inv) => inv.id));
+    toast(t('invitations.cleanedUp', { count }));
+  };
+
   return (
     <Screen maxWidth={900} onRefresh={() => void list.refetch()} refreshing={list.isRefetching}>
       <VStack gap="xxs">
@@ -121,18 +163,22 @@ export default function InvitationsScreen() {
         </VStack>
       </Card>
       {list.isLoading ? <LoadingState /> : null}
+      {finished.length > 0 ? (
+        <Button
+          variant="ghost"
+          icon="trash-outline"
+          label={t('invitations.cleanup', { count: finished.length })}
+          loading={remove.isPending}
+          onPress={() => void cleanup()}
+          style={{ alignSelf: 'flex-start' }}
+        />
+      ) : null}
       {list.data?.length === 0 ? (
         <EmptyState icon="mail-outline" title={t('invitations.empty')} />
       ) : null}
       {(list.data ?? []).map((inv) => {
         const user = inv.user as { first_name: string | null; last_name: string | null } | null;
-        const status = inv.used_at
-          ? 'used'
-          : inv.revoked_at
-            ? 'revoked'
-            : inv.expires_at < now
-              ? 'expired'
-              : 'valid';
+        const status = statusOf(inv);
         return (
           <Card key={inv.id}>
             <VStack gap="sm">
@@ -143,23 +189,30 @@ export default function InvitationsScreen() {
                   </Text>
                   {inv.label ? <Text color="textMuted">{inv.label}</Text> : null}
                 </HStack>
-                <Badge
-                  tone={status === 'valid' ? 'success' : status === 'used' ? 'info' : 'neutral'}
-                  label={
-                    status === 'used'
-                      ? t('invitations.used', {
-                          name: user ? fullName(user) : '—',
-                          date: formatFrenchDate((inv.used_at as string).slice(0, 10)),
-                        })
-                      : status === 'revoked'
-                        ? t('invitations.revoked')
-                        : status === 'expired'
-                          ? t('invitations.expired')
-                          : t('invitations.valid', {
-                              date: formatFrenchDate(inv.expires_at.slice(0, 10)),
-                            })
-                  }
-                />
+                <HStack gap="xs">
+                  <Badge
+                    tone={status === 'valid' ? 'success' : status === 'used' ? 'info' : 'neutral'}
+                    label={
+                      status === 'used'
+                        ? t('invitations.used', {
+                            name: user ? fullName(user) : '—',
+                            date: formatFrenchDate((inv.used_at as string).slice(0, 10)),
+                          })
+                        : status === 'revoked'
+                          ? t('invitations.revoked')
+                          : status === 'expired'
+                            ? t('invitations.expired')
+                            : t('invitations.valid', {
+                                date: formatFrenchDate(inv.expires_at.slice(0, 10)),
+                              })
+                    }
+                  />
+                  <IconButton
+                    icon="trash-outline"
+                    label={t('invitations.delete')}
+                    onPress={() => void deleteOne(inv.id, inv.code)}
+                  />
+                </HStack>
               </HStack>
               {status === 'valid' ? (
                 <HStack gap="xs" wrap>

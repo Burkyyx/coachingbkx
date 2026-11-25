@@ -1,7 +1,7 @@
 -- Messagerie, notifications, appareils push, stockage des fichiers.
 begin;
 \ir _helpers.sql
-select plan(24);
+select plan(28);
 
 select tests.create_user('coach@test.fr', 'coach') as coach \gset
 select tests.create_user('alice@test.fr') as alice \gset
@@ -72,6 +72,18 @@ select is_empty(format($$select * from storage.objects where bucket_id = 'messag
 
 select tests.login(:'coach');
 select is((select count(*)::int from storage.objects where bucket_id = 'checkin-photos'), 2, 'Le coach voit les photos de tous les adhérents');
+
+
+-- Effacer une conversation : coach uniquement
+select tests.login(:'alice');
+select throws_ok(format($$select public.clear_conversation(%L)$$, :'conv_alice'), '42501', null,
+  'Un adhérent ne peut pas effacer une conversation');
+select tests.login(:'coach');
+select ok(public.clear_conversation(:'conv_alice') >= 2, 'Le coach efface la conversation d''Alice');
+select is((select count(*)::int from public.messages where conversation_id = :'conv_alice'), 0,
+  '… plus aucun message');
+select is((select last_message_at from public.conversations where id = :'conv_alice'), null,
+  '… et le fil apparaît comme vide');
 
 select * from finish();
 rollback;

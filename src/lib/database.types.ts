@@ -1665,6 +1665,7 @@ export type Database = {
       can_access_conversation: { Args: { p_conversation: string }; Returns: boolean };
       can_read_program: { Args: { p_program: string }; Returns: boolean };
       check_invitation: { Args: { p_code: string }; Returns: boolean };
+      clear_conversation: { Args: { p_conversation: string }; Returns: number };
       coach_id: { Args: Record<PropertyKey, never>; Returns: string };
       coach_overview: {
         Args: Record<PropertyKey, never>;

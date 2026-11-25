@@ -803,6 +803,14 @@ export const fr = {
     weightTrend: 'Tendance du poids',
   },
   invitations: {
+    delete: 'Supprimer',
+    deleteConfirm: 'Supprimer le code {{code}} ? Il ne pourra plus être utilisé.',
+    deleted: 'Code supprimé.',
+    cleanup: 'Supprimer les codes utilisés, expirés et révoqués ({{count}})',
+    cleanupConfirm:
+      'Supprimer {{count}} code(s) qui ne servent plus ? Les comptes des adhérents déjà inscrits ne sont pas touchés.',
+    cleanedUp_one: '{{count}} code supprimé.',
+    cleanedUp_other: '{{count}} codes supprimés.',
     title: 'Invitations',
     subtitle: 'Chaque code ne sert qu’une fois et expire après {{days}} jours.',
     create: 'Créer une invitation',
@@ -949,6 +957,11 @@ export const fr = {
     withCoach: 'Ton coach',
     empty: 'Aucun message pour l’instant.',
     emptyCoach: 'Aucune conversation.',
+    emptyCoachHint: 'Pour écrire à un adhérent : sa fiche → « Envoyer un message ».',
+    clear: 'Supprimer la conversation',
+    clearConfirm:
+      'Supprimer tous les messages échangés avec {{name}} ? Les photos et vidéos envoyées seront aussi supprimées. C’est définitif.',
+    cleared: 'Conversation supprimée.',
     placeholder: 'Écris un message…',
     send: 'Envoyer',
     photo: 'Photo',
