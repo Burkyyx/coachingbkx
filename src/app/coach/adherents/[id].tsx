@@ -8,6 +8,7 @@ import {
   Button,
   ErrorState,
   HStack,
+  IconButton,
   LoadingState,
   Screen,
   Segmented,
@@ -26,6 +27,7 @@ import {
   SettingsTab,
 } from '@/features/coach/AdherentTabs';
 import { fullName } from '@/features/coach/api';
+import { useConfirmDeleteAdherent } from '@/features/coach/useConfirmDeleteAdherent';
 import { NutritionTargetsTab } from '@/features/nutrition/NutritionTargetsTab';
 
 type Tab =
@@ -45,6 +47,7 @@ const TABS: Tab[] = [
 export default function AdherentScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { t } = useTranslation();
+  const deleteAdherent = useConfirmDeleteAdherent();
   const profile = useAdherentProfile(id);
   const [tab, setTab] = useState<Tab>('profile');
 
@@ -83,12 +86,23 @@ export default function AdherentScreen() {
             </Text>
           </VStack>
         </HStack>
-        <Button
-          variant="secondary"
-          icon="chatbubble-outline"
-          label={t('adherent.sendMessage')}
-          onPress={() => router.push(`/coach/messages/${p.id}`)}
-        />
+        <HStack gap="xs">
+          <Button
+            variant="secondary"
+            icon="chatbubble-outline"
+            label={t('adherent.sendMessage')}
+            onPress={() => router.push(`/coach/messages/${p.id}`)}
+          />
+          <IconButton
+            icon="trash-outline"
+            label={t('adherent.deleteAdherent')}
+            color="danger"
+            disabled={deleteAdherent.pending}
+            onPress={() =>
+              void deleteAdherent.run(p.id, fullName(p), () => router.replace('/coach/adherents'))
+            }
+          />
+        </HStack>
       </HStack>
       <Segmented
         scrollable

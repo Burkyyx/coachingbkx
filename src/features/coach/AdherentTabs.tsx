@@ -54,12 +54,12 @@ import {
   useAdherentSessions,
   useAdherentWeights,
   useCoachNotes,
-  useDeleteAdherent,
   useDeleteSession,
   useReference1rm,
   type SessionWithSets,
 } from './adherent';
 import { fullName } from './api';
+import { useConfirmDeleteAdherent } from './useConfirmDeleteAdherent';
 
 type Profile = Tables<'profiles'>;
 
@@ -598,7 +598,7 @@ export function SettingsTab({ profile }: { profile: Profile }) {
   const { toast, confirm } = useFeedback();
   const refs = useReference1rm(profile.id);
   const { updateProfile, set1rm } = useAdherentActions(profile.id);
-  const deleteAdherent = useDeleteAdherent();
+  const deleteAdherent = useConfirmDeleteAdherent();
   const [picker, setPicker] = useState(false);
   const save = (patch: Parameters<typeof updateProfile.mutate>[0]) =>
     updateProfile.mutate(patch, {
@@ -702,31 +702,12 @@ export function SettingsTab({ profile }: { profile: Profile }) {
             variant="danger"
             icon="trash-outline"
             label={t('adherent.deleteAdherent')}
-            loading={deleteAdherent.isPending}
-            onPress={async () => {
-              const name = fullName(profile);
-              const first = await confirm({
-                title: t('adherent.deleteAdherent'),
-                message: t('adherent.deleteAdherentConfirm', { name }),
-                destructive: true,
-                confirmLabel: t('adherent.deleteAdherent'),
-              });
-              if (!first) return;
-              const second = await confirm({
-                title: t('adherent.deleteAdherent'),
-                message: t('adherent.deleteAdherentConfirm2', { name }),
-                destructive: true,
-                confirmLabel: t('common.delete'),
-              });
-              if (!second) return;
-              deleteAdherent.mutate(profile.id, {
-                onSuccess: () => {
-                  toast(t('adherent.deleteAdherentDone'));
-                  router.replace('/coach/adherents');
-                },
-                onError: (e) => toast(toUserMessage(e)),
-              });
-            }}
+            loading={deleteAdherent.pending}
+            onPress={() =>
+              void deleteAdherent.run(profile.id, fullName(profile), () =>
+                router.replace('/coach/adherents'),
+              )
+            }
             style={{ alignSelf: 'flex-start' }}
           />
         </VStack>
