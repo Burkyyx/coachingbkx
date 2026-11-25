@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type ComponentProps } from 'react';
 import { TextInput, View, type TextInputProps } from 'react-native';
 
 import { useTheme } from '@/theme/ThemeProvider';
@@ -7,6 +7,7 @@ import { MIN_TOUCH } from '@/theme/tokens';
 import { Text } from './Text';
 
 type Props = TextInputProps & {
+  ref?: ComponentProps<typeof TextInput>['ref'];
   label?: string;
   hint?: string;
   error?: string;

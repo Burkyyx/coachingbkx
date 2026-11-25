@@ -8,6 +8,7 @@ import { updatePassword } from '@/features/auth/api';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { AuthLayout, FormMessage } from '@/features/auth/components';
 import { makeNewPasswordSchema } from '@/features/auth/schemas';
+import { useAutofillSync } from '@/features/auth/autofill';
 import { toUserMessage } from '@/lib/errors';
 
 /** Choix d'un nouveau mot de passe (après le lien reçu par e-mail). */
@@ -17,10 +18,11 @@ export default function ResetPasswordScreen() {
   const schema = useMemo(() => makeNewPasswordSchema(t), [t]);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const { control, handleSubmit, formState } = useForm({
+  const { control, handleSubmit, formState, setValue } = useForm({
     resolver: zodResolver(schema),
     defaultValues: { password: '', confirm: '' },
   });
+  const autofill = useAutofillSync<'password' | 'confirm'>((name, value) => setValue(name, value));
 
   const onSubmit = handleSubmit(async ({ password }) => {
     setError(null);
@@ -34,6 +36,10 @@ export default function ResetPasswordScreen() {
       setBusy(false);
     }
   });
+  const submit = () => {
+    autofill.sync();
+    void onSubmit();
+  };
 
   return (
     <AuthLayout title={t('auth.newPasswordTitle')}>
@@ -43,6 +49,7 @@ export default function ResetPasswordScreen() {
           name="password"
           render={({ field }) => (
             <TextField
+              ref={autofill.bind('password')}
               label={t('auth.password')}
               value={field.value}
               onChangeText={field.onChange}
@@ -58,6 +65,7 @@ export default function ResetPasswordScreen() {
           name="confirm"
           render={({ field }) => (
             <TextField
+              ref={autofill.bind('confirm')}
               label={t('auth.passwordConfirm')}
               value={field.value}
               onChangeText={field.onChange}
@@ -68,13 +76,7 @@ export default function ResetPasswordScreen() {
           )}
         />
         {error ? <FormMessage tone="error">{error}</FormMessage> : null}
-        <Button
-          label={t('common.save')}
-          size="lg"
-          loading={busy}
-          onPress={() => void onSubmit()}
-          fullWidth
-        />
+        <Button label={t('common.save')} size="lg" loading={busy} onPress={submit} fullWidth />
       </VStack>
     </AuthLayout>
   );

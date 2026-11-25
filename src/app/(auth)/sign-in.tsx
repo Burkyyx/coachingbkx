@@ -8,6 +8,7 @@ import { Button, TextField, VStack } from '@/components/ui';
 import { signInWithApple, signInWithEmail, signInWithGoogle } from '@/features/auth/api';
 import { AuthLayout, FormMessage, SocialButtons } from '@/features/auth/components';
 import { makeSignInSchema } from '@/features/auth/schemas';
+import { useAutofillSync } from '@/features/auth/autofill';
 import { toUserMessage } from '@/lib/errors';
 
 export default function SignInScreen() {
@@ -15,10 +16,11 @@ export default function SignInScreen() {
   const schema = useMemo(() => makeSignInSchema(t), [t]);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const { control, handleSubmit, formState } = useForm({
+  const { control, handleSubmit, formState, setValue } = useForm({
     resolver: zodResolver(schema),
     defaultValues: { email: '', password: '' },
   });
+  const autofill = useAutofillSync<'email' | 'password'>((name, value) => setValue(name, value));
 
   const run = async (fn: () => Promise<void>) => {
     setError(null);
@@ -33,6 +35,10 @@ export default function SignInScreen() {
   };
 
   const onSubmit = handleSubmit((v) => run(() => signInWithEmail(v.email, v.password)));
+  const submit = () => {
+    autofill.sync();
+    void onSubmit();
+  };
 
   return (
     <AuthLayout title={t('auth.signInTitle')} subtitle={t('auth.signInSubtitle')}>
@@ -42,6 +48,7 @@ export default function SignInScreen() {
           name="email"
           render={({ field }) => (
             <TextField
+              ref={autofill.bind('email')}
               label={t('auth.email')}
               value={field.value}
               onChangeText={field.onChange}
@@ -59,6 +66,7 @@ export default function SignInScreen() {
           name="password"
           render={({ field }) => (
             <TextField
+              ref={autofill.bind('password')}
               label={t('auth.password')}
               value={field.value}
               onChangeText={field.onChange}
@@ -66,19 +74,13 @@ export default function SignInScreen() {
               secureTextEntry
               autoComplete="current-password"
               textContentType="password"
-              onSubmitEditing={() => void onSubmit()}
+              onSubmitEditing={submit}
               error={formState.errors.password?.message}
             />
           )}
         />
         {error ? <FormMessage tone="error">{error}</FormMessage> : null}
-        <Button
-          label={t('auth.signIn')}
-          size="lg"
-          loading={busy}
-          onPress={() => void onSubmit()}
-          fullWidth
-        />
+        <Button label={t('auth.signIn')} size="lg" loading={busy} onPress={submit} fullWidth />
         <Link href="/forgot-password" asChild>
           <Button variant="ghost" label={t('auth.forgotPassword')} />
         </Link>

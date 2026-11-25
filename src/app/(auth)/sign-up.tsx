@@ -9,6 +9,7 @@ import { signInWithApple, signInWithGoogle, signUpWithEmail } from '@/features/a
 import { AuthLayout, FormMessage, SocialButtons } from '@/features/auth/components';
 import { usePendingInvitation } from '@/features/auth/pendingInvitation';
 import { makeSignUpSchema } from '@/features/auth/schemas';
+import { useAutofillSync } from '@/features/auth/autofill';
 import { toUserMessage } from '@/lib/errors';
 
 /** Étape 2 de l'inscription : création du compte (le code est utilisé automatiquement). */
@@ -19,10 +20,13 @@ export default function SignUpScreen() {
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const { control, handleSubmit, formState } = useForm({
+  const { control, handleSubmit, formState, setValue } = useForm({
     resolver: zodResolver(schema),
     defaultValues: { email: '', password: '', confirm: '' },
   });
+  const autofill = useAutofillSync<'email' | 'password' | 'confirm'>((name, value) =>
+    setValue(name, value),
+  );
 
   if (!code) return <Redirect href="/invitation" />;
 
@@ -44,6 +48,10 @@ export default function SignUpScreen() {
       if (needsEmailConfirmation) setInfo(t('auth.checkEmail'));
     }),
   );
+  const submit = () => {
+    autofill.sync();
+    void onSubmit();
+  };
 
   return (
     <AuthLayout title={t('auth.signUp')} subtitle={t('auth.invitationValid')}>
@@ -53,6 +61,7 @@ export default function SignUpScreen() {
           name="email"
           render={({ field }) => (
             <TextField
+              ref={autofill.bind('email')}
               label={t('auth.email')}
               value={field.value}
               onChangeText={field.onChange}
@@ -70,6 +79,7 @@ export default function SignUpScreen() {
           name="password"
           render={({ field }) => (
             <TextField
+              ref={autofill.bind('password')}
               label={t('auth.password')}
               value={field.value}
               onChangeText={field.onChange}
@@ -87,26 +97,21 @@ export default function SignUpScreen() {
           name="confirm"
           render={({ field }) => (
             <TextField
+              ref={autofill.bind('confirm')}
               label={t('auth.passwordConfirm')}
               value={field.value}
               onChangeText={field.onChange}
               onBlur={field.onBlur}
               secureTextEntry
               autoComplete="new-password"
-              onSubmitEditing={() => void onSubmit()}
+              onSubmitEditing={submit}
               error={formState.errors.confirm?.message}
             />
           )}
         />
         {error ? <FormMessage tone="error">{error}</FormMessage> : null}
         {info ? <FormMessage tone="info">{info}</FormMessage> : null}
-        <Button
-          label={t('auth.signUp')}
-          size="lg"
-          loading={busy}
-          onPress={() => void onSubmit()}
-          fullWidth
-        />
+        <Button label={t('auth.signUp')} size="lg" loading={busy} onPress={submit} fullWidth />
         <SocialButtons
           loading={busy}
           onGoogle={() => void run(signInWithGoogle)}

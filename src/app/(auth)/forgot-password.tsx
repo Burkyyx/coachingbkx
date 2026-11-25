@@ -8,6 +8,7 @@ import { Button, TextField, VStack } from '@/components/ui';
 import { sendPasswordReset } from '@/features/auth/api';
 import { AuthLayout, FormMessage } from '@/features/auth/components';
 import { makeEmailSchema } from '@/features/auth/schemas';
+import { useAutofillSync } from '@/features/auth/autofill';
 import { toUserMessage } from '@/lib/errors';
 
 export default function ForgotPasswordScreen() {
@@ -16,10 +17,11 @@ export default function ForgotPasswordScreen() {
   const [error, setError] = useState<string | null>(null);
   const [sent, setSent] = useState(false);
   const [busy, setBusy] = useState(false);
-  const { control, handleSubmit, formState } = useForm({
+  const { control, handleSubmit, formState, setValue } = useForm({
     resolver: zodResolver(schema),
     defaultValues: { email: '' },
   });
+  const autofill = useAutofillSync<'email'>((name, value) => setValue(name, value));
 
   const onSubmit = handleSubmit(async ({ email }) => {
     setError(null);
@@ -33,6 +35,10 @@ export default function ForgotPasswordScreen() {
       setBusy(false);
     }
   });
+  const submit = () => {
+    autofill.sync();
+    void onSubmit();
+  };
 
   return (
     <AuthLayout title={t('auth.resetTitle')} subtitle={t('auth.resetSubtitle')}>
@@ -42,6 +48,7 @@ export default function ForgotPasswordScreen() {
           name="email"
           render={({ field }) => (
             <TextField
+              ref={autofill.bind('email')}
               label={t('auth.email')}
               value={field.value}
               onChangeText={field.onChange}
@@ -55,13 +62,7 @@ export default function ForgotPasswordScreen() {
         />
         {error ? <FormMessage tone="error">{error}</FormMessage> : null}
         {sent ? <FormMessage tone="info">{t('auth.resetSent')}</FormMessage> : null}
-        <Button
-          label={t('auth.resetSend')}
-          size="lg"
-          loading={busy}
-          onPress={() => void onSubmit()}
-          fullWidth
-        />
+        <Button label={t('auth.resetSend')} size="lg" loading={busy} onPress={submit} fullWidth />
         <Button
           variant="ghost"
           label={t('common.back')}
