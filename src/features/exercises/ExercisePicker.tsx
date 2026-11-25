@@ -48,6 +48,12 @@ export function ExercisePicker({
     [data, search, muscles, excludeIds],
   );
 
+  /** Choix d'un muscle (schéma ou pastille) : le schéma se replie pour montrer les exercices. */
+  const chooseMuscles = (m: MuscleGroup[]) => {
+    setMuscles(m);
+    if (m.length > 0) setBodyOpen(false);
+  };
+
   const muscleOptions = [
     { value: 'all' as const, label: t('exercises.allMuscles') },
     ...MUSCLES.map((m) => ({ value: m, label: t(`enums.muscle.${m}`) })),
@@ -102,22 +108,12 @@ export function ExercisePicker({
               label={bodyOpen ? t('exercises.hideBody') : t('exercises.showBody')}
               onPress={() => setBodyOpen((v) => !v)}
             />
-            {bodyOpen ? (
-              <BodyMap
-                selected={muscles}
-                onSelect={(m) => {
-                  setMuscles(m);
-                  // On replie le schéma pour montrer tout de suite les exercices du muscle choisi.
-                  if (m.length > 0) setBodyOpen(false);
-                }}
-                width={110}
-              />
-            ) : null}
+            {bodyOpen ? <BodyMap selected={muscles} onSelect={chooseMuscles} width={110} /> : null}
             <Segmented
               scrollable
               options={muscleOptions}
               value={muscles.length === 0 ? 'all' : muscles.length === 1 ? muscles[0] : null}
-              onChange={(v) => setMuscles(v === 'all' ? [] : [v])}
+              onChange={(v) => chooseMuscles(v === 'all' ? [] : [v])}
             />
           </VStack>
         }

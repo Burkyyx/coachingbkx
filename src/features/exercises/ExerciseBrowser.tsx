@@ -60,8 +60,19 @@ export function ExerciseBrowser({ onOpen, allowArchived, renderBadges, gender, h
   // Pastille active : « Tous », ou le muscle s'il n'y en a qu'un (sinon aucune).
   const chipValue = muscles.length === 0 ? 'all' : muscles.length === 1 ? muscles[0] : null;
 
+  /** Choix d'un muscle (schéma ou pastille) : sur téléphone, le schéma se replie. */
+  const chooseMuscles = (m: MuscleGroup[]) => {
+    setMuscles(m);
+    if (m.length > 0) setBodyOpen(false);
+  };
+
   const body = (
-    <BodyMap selected={muscles} onSelect={setMuscles} gender={gender} width={desktop ? 160 : 130} />
+    <BodyMap
+      selected={muscles}
+      onSelect={chooseMuscles}
+      gender={gender}
+      width={desktop ? 160 : 130}
+    />
   );
 
   const filters = (
@@ -88,7 +99,7 @@ export function ExerciseBrowser({ onOpen, allowArchived, renderBadges, gender, h
           ...MUSCLES.map((m) => ({ value: m, label: t(`enums.muscle.${m}`) })),
         ]}
         value={chipValue}
-        onChange={(v) => setMuscles(v === 'all' ? [] : [v])}
+        onChange={(v) => chooseMuscles(v === 'all' ? [] : [v])}
       />
       {allowArchived ? (
         <Checkbox
