@@ -73,7 +73,13 @@ suggestions automatiques **validées par le coach**. Phases : 1 (entraînement, 
 - Phase 2 — décisions : analyse photo avec **Claude Haiku 5.5** (`claude-haiku-5-5`, modèle réglable par variable
   d'environnement de l'Edge Function) ; code-barres **caméra + saisie manuelle** (Open Food Facts) ; compte
   Anthropic créé plus tard par Enzo. Objectifs : calcul **DEJ = métabolisme de base × NAP** (sexe, taille, poids,
-  âge, activité), ajustable par le coach (détails de formule : voir décisions suivantes).
+  âge, activité), ajustable par le coach :
+  - MB : **Mifflin-St Jeor** (H : 10P + 6,25T − 5A + 5 ; F : … − 161) ;
+  - NAP **hors sport** selon `activity_level` (1,4 · 1,5 · 1,6 · 1,75 · 1,9) **+ dépense nette des séances du
+    programme** (MET × poids × durée, lissée sur la semaine) ;
+  - plancher = **MB** (jamais < 1 200 kcal) ; perte limitée à 1 %/semaine ;
+  - objectif : sèche DEJ − 15 %, prise de masse + 10 %, sinon = DEJ ; protéines 1,8 g/kg (2 g/kg en sèche),
+    lipides 1 g/kg, glucides = le reste. Tout reste modifiable par adhérent.
 - Nom de l'app : **« Divus »** (anciennement « Élan », renommée en nov. 2026), thème noir & blanc (`src/theme/tokens.ts`).
   Identifiants techniques gardés volontairement avec « elan » (renommer = perte de données) :
   `supabase/config.toml` project_id (base locale), préfixe `elan:` (stockage web) et `elan.db` (SQLite).
