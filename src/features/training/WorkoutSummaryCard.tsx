@@ -1,7 +1,8 @@
 import { useTranslation } from 'react-i18next';
 
-import { Badge, Card, HStack, Text, VStack } from '@/components/ui';
+import { Badge, Card, HStack, IconBadge, Text, VStack } from '@/components/ui';
 import { formatKg, formatLongDate, formatRepRange } from '@/core';
+import { useTheme } from '@/theme/ThemeProvider';
 
 import type { AdherentBundle } from './bundle';
 import type { ScheduledWorkout } from './derive';
@@ -19,15 +20,19 @@ export function WorkoutSummaryCard({
   title?: string;
 }) {
   const { t } = useTranslation();
+  const theme = useTheme();
   const names = new Map(bundle.exercises.map((e) => [e.id, e.name]));
   const deload = bundle.adjustments.some((a) => a.week_index === workout.week_index);
   return (
-    <Card>
+    <Card accent={theme.accent.training}>
       <VStack gap="md">
         {title ? (
-          <Text variant="small" weight="700" color="textMuted">
-            {title.toUpperCase()}
-          </Text>
+          <HStack gap="sm">
+            <IconBadge icon="barbell" color={theme.accent.training} size={28} />
+            <Text variant="small" weight="700" style={{ color: theme.accent.training }}>
+              {title.toUpperCase()}
+            </Text>
+          </HStack>
         ) : null}
         <VStack gap="xxs">
           <Text variant="title">{workout.name}</Text>

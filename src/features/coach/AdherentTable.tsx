@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, View } from 'react-native';
 
 import { useIsDesktop } from '@/components/AppNav';
-import { Badge, Card, HStack, Icon, Text, VStack } from '@/components/ui';
+import { Avatar, Badge, Card, HStack, Icon, Text, VStack } from '@/components/ui';
 import {
   adherenceRate,
   formatFrenchDate,
@@ -68,7 +68,12 @@ export function AdherentTable({ rows }: { rows: Overview[] }) {
             >
               <VStack gap="xs">
                 <HStack justify="space-between">
-                  <Text weight="700">{fullName(r)}</Text>
+                  <HStack gap="sm" style={{ flex: 1 }}>
+                    <Avatar id={r.adherent_id} name={fullName(r)} size={32} />
+                    <Text weight="700" style={{ flexShrink: 1 }}>
+                      {fullName(r)}
+                    </Text>
+                  </HStack>
                   {!r.is_active ? <Badge label={t('coach.inactive')} /> : null}
                   {r.pending_suggestions > 0 ? (
                     <Badge tone="info" icon="sparkles" label={String(r.pending_suggestions)} />
@@ -130,21 +135,24 @@ export function AdherentTable({ rows }: { rows: Overview[] }) {
               opacity: r.is_active ? 1 : 0.55,
             })}
           >
-            <View style={{ flex: 2, gap: 2 }}>
-              <Text weight="700">{fullName(r)}</Text>
-              {!r.is_active ? (
-                <Text variant="caption" color="textSubtle">
-                  {t('coach.inactive')}
-                </Text>
-              ) : !r.onboarded ? (
-                <Text variant="caption" color="textSubtle">
-                  {t('coach.notOnboarded')}
-                </Text>
-              ) : r.goal ? (
-                <Text variant="caption" color="textSubtle">
-                  {t(`enums.goal.${r.goal}`)}
-                </Text>
-              ) : null}
+            <View style={{ flex: 2, flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+              <Avatar id={r.adherent_id} name={fullName(r)} />
+              <View style={{ flex: 1, gap: 2 }}>
+                <Text weight="700">{fullName(r)}</Text>
+                {!r.is_active ? (
+                  <Text variant="caption" color="textSubtle">
+                    {t('coach.inactive')}
+                  </Text>
+                ) : !r.onboarded ? (
+                  <Text variant="caption" color="textSubtle">
+                    {t('coach.notOnboarded')}
+                  </Text>
+                ) : r.goal ? (
+                  <Text variant="caption" color="textSubtle">
+                    {t(`enums.goal.${r.goal}`)}
+                  </Text>
+                ) : null}
+              </View>
             </View>
             <Text
               style={{ flex: 2 }}

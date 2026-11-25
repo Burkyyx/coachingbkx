@@ -25,23 +25,43 @@ export default function AdherentTabs() {
     >
       <Tabs.Screen
         name="today"
-        options={{ title: t('nav.today'), tabBarIcon: icon('flash-outline') }}
+        options={{
+          tabBarActiveTintColor: theme.accent.training,
+          title: t('nav.today'),
+          tabBarIcon: icon('flash-outline'),
+        }}
       />
       <Tabs.Screen
         name="program"
-        options={{ title: t('nav.program'), tabBarIcon: icon('calendar-outline') }}
+        options={{
+          tabBarActiveTintColor: theme.accent.program,
+          title: t('nav.program'),
+          tabBarIcon: icon('calendar-outline'),
+        }}
       />
       <Tabs.Screen
         name="nutrition"
-        options={{ title: t('nav.nutrition'), tabBarIcon: icon('restaurant-outline') }}
+        options={{
+          tabBarActiveTintColor: theme.accent.nutrition,
+          title: t('nav.nutrition'),
+          tabBarIcon: icon('restaurant-outline'),
+        }}
       />
       <Tabs.Screen
         name="community"
-        options={{ title: t('nav.community'), tabBarIcon: icon('people-outline') }}
+        options={{
+          tabBarActiveTintColor: theme.accent.community,
+          title: t('nav.community'),
+          tabBarIcon: icon('people-outline'),
+        }}
       />
       <Tabs.Screen
         name="profile"
-        options={{ title: t('nav.profile'), tabBarIcon: icon('person-circle-outline') }}
+        options={{
+          tabBarActiveTintColor: theme.accent.checkins,
+          title: t('nav.profile'),
+          tabBarIcon: icon('person-circle-outline'),
+        }}
       />
     </Tabs>
   );

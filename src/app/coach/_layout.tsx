@@ -25,6 +25,7 @@ export default function CoachLayout() {
       exact: true,
       label: t('nav.dashboard'),
       icon: 'grid-outline',
+      accent: theme.accent.program,
       primary: true,
     },
     {
@@ -32,6 +33,7 @@ export default function CoachLayout() {
       match: '/coach/adherents',
       label: t('nav.adherents'),
       icon: 'people-outline',
+      accent: theme.accent.people,
       primary: true,
     },
     {
@@ -39,6 +41,7 @@ export default function CoachLayout() {
       match: '/coach/suggestions',
       label: t('nav.suggestions'),
       icon: 'sparkles-outline',
+      accent: theme.accent.suggestions,
       badge: badges.pendingSuggestions,
       primary: true,
     },
@@ -47,6 +50,7 @@ export default function CoachLayout() {
       match: '/coach/programs',
       label: t('nav.programs'),
       icon: 'clipboard-outline',
+      accent: theme.accent.training,
       primary: true,
     },
     {
@@ -54,12 +58,14 @@ export default function CoachLayout() {
       match: '/coach/exercises',
       label: t('nav.exercises'),
       icon: 'barbell-outline',
+      accent: theme.accent.progress,
     },
     {
       href: '/coach/messages',
       match: '/coach/messages',
       label: t('nav.messages'),
       icon: 'chatbubbles-outline',
+      accent: theme.accent.messages,
       badge: badges.unreadMessages,
       primary: true,
     },
@@ -68,12 +74,14 @@ export default function CoachLayout() {
       match: '/coach/invitations',
       label: t('nav.invitations'),
       icon: 'person-add-outline',
+      accent: theme.accent.checkins,
     },
     {
       href: '/coach/settings',
       match: '/coach/settings',
       label: t('nav.settings'),
       icon: 'settings-outline',
+      accent: theme.accent.neutral,
     },
   ];
 
@@ -131,6 +139,7 @@ export default function CoachLayout() {
       match: '/coach/settings',
       label: 'Plus',
       icon: 'ellipsis-horizontal',
+      accent: theme.accent.neutral,
     },
   ];
   return (

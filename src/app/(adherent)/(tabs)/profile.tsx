@@ -41,6 +41,7 @@ import { supabase, type TablesUpdate } from '@/lib/supabase';
 import { localStore } from '@/offline/store';
 import { useSyncStatus } from '@/offline/sync';
 import { usePreferences } from '@/stores/preferences';
+import { useTheme } from '@/theme/ThemeProvider';
 
 const CONSENT_TYPES: ConsentType[] = [
   'terms',
@@ -59,6 +60,7 @@ export default function ProfileScreen() {
   const bundle = useAdherentBundle();
   const pending = useSyncStatus((s) => s.pending);
   const theme = usePreferences((s) => s.theme);
+  const { accent } = useTheme();
   const setTheme = usePreferences((s) => s.setTheme);
   const [weight, setWeight] = useState('');
   const [busy, setBusy] = useState<string | null>(null);
@@ -154,7 +156,7 @@ export default function ProfileScreen() {
         {t('profile.title')}
       </Text>
 
-      <SectionHeader title={t('profile.info')} />
+      <SectionHeader title={t('profile.info')} icon="person-outline" accent={accent.people} />
       <Card>
         <VStack gap="md">
           <CommitTextField
@@ -182,7 +184,11 @@ export default function ProfileScreen() {
         </VStack>
       </Card>
 
-      <SectionHeader title={t('onboarding.activityLabel')} />
+      <SectionHeader
+        title={t('onboarding.activityLabel')}
+        icon="walk-outline"
+        accent={accent.nutrition}
+      />
       <Card>
         <ActivityLevelPicker
           value={profile.activity_level}
@@ -191,7 +197,7 @@ export default function ProfileScreen() {
         />
       </Card>
 
-      <SectionHeader title={t('profile.weights')} />
+      <SectionHeader title={t('profile.weights')} icon="scale-outline" accent={accent.progress} />
       <Card>
         <HStack gap="sm" align="flex-end">
           <View style={{ flex: 1 }}>
@@ -230,7 +236,7 @@ export default function ProfileScreen() {
         emptyText={t('profile.noWeights')}
       />
 
-      <SectionHeader title={t('profile.records')} />
+      <SectionHeader title={t('profile.records')} icon="trophy-outline" accent={accent.records} />
       <Card>
         {(records.data ?? []).length === 0 ? (
           <Text color="textMuted">{t('adherent.noRecords')}</Text>
@@ -250,6 +256,8 @@ export default function ProfileScreen() {
 
       <SectionHeader
         title={t('profile.history')}
+        icon="time-outline"
+        accent={accent.training}
         right={
           <Text color="textMuted">{t('profile.sessionsCount', { count: sessions.length })}</Text>
         }
@@ -266,7 +274,11 @@ export default function ProfileScreen() {
         {sessions.length === 0 ? <Text color="textMuted">{t('adherent.noSessions')}</Text> : null}
       </Card>
 
-      <SectionHeader title={t('profile.notifications')} />
+      <SectionHeader
+        title={t('profile.notifications')}
+        icon="notifications-outline"
+        accent={accent.messages}
+      />
       <Card>
         <VStack gap="xs">
           <Text variant="small" color="textMuted">
@@ -287,7 +299,11 @@ export default function ProfileScreen() {
         </VStack>
       </Card>
 
-      <SectionHeader title={t('profile.consents')} />
+      <SectionHeader
+        title={t('profile.consents')}
+        icon="shield-checkmark-outline"
+        accent={accent.checkins}
+      />
       <Card>
         <VStack gap="sm">
           {CONSENT_TYPES.map((type) => {
@@ -313,7 +329,11 @@ export default function ProfileScreen() {
         </VStack>
       </Card>
 
-      <SectionHeader title={t('profile.appearance')} />
+      <SectionHeader
+        title={t('profile.appearance')}
+        icon="color-palette-outline"
+        accent={accent.suggestions}
+      />
       <Segmented
         options={[
           { value: 'dark' as const, label: t('settings.themeDark') },
@@ -324,7 +344,11 @@ export default function ProfileScreen() {
         onChange={setTheme}
       />
 
-      <SectionHeader title={t('profile.legal')} />
+      <SectionHeader
+        title={t('profile.legal')}
+        icon="document-text-outline"
+        accent={accent.neutral}
+      />
       <Card>
         <ListRow
           icon="document-text-outline"

@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
+  Avatar,
   Badge,
   Button,
   ErrorState,
@@ -67,18 +68,21 @@ export default function AdherentScreen() {
         style={{ alignSelf: 'flex-start' }}
       />
       <HStack justify="space-between" wrap>
-        <VStack gap="xxs">
-          <HStack gap="sm">
-            <Text variant="headline" accessibilityRole="header">
-              {fullName(p)}
+        <HStack gap="md">
+          <Avatar id={p.id} name={fullName(p)} size={52} />
+          <VStack gap="xxs">
+            <HStack gap="sm">
+              <Text variant="headline" accessibilityRole="header">
+                {fullName(p)}
+              </Text>
+              {!p.is_active ? <Badge label={t('coach.inactive')} tone="warning" /> : null}
+            </HStack>
+            <Text color="textMuted">
+              {p.nickname ? `@${p.nickname} · ` : ''}
+              {t('adherent.memberSince', { date: formatFrenchDate(p.created_at.slice(0, 10)) })}
             </Text>
-            {!p.is_active ? <Badge label={t('coach.inactive')} tone="warning" /> : null}
-          </HStack>
-          <Text color="textMuted">
-            {p.nickname ? `@${p.nickname} · ` : ''}
-            {t('adherent.memberSince', { date: formatFrenchDate(p.created_at.slice(0, 10)) })}
-          </Text>
-        </VStack>
+          </VStack>
+        </HStack>
         <Button
           variant="secondary"
           icon="chatbubble-outline"

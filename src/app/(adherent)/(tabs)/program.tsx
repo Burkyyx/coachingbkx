@@ -9,7 +9,7 @@ import {
   EmptyState,
   ErrorState,
   HStack,
-  Icon,
+  IconBadge,
   LoadingState,
   Screen,
   Segmented,
@@ -23,10 +23,12 @@ import { scheduledWorkouts, type ScheduledWorkout } from '@/features/training/de
 import { useActiveSession } from '@/features/training/session/store';
 import { WorkoutSummaryCard } from '@/features/training/WorkoutSummaryCard';
 import { SyncBadge } from '@/offline/SyncBadge';
+import { useTheme } from '@/theme/ThemeProvider';
 
 /** Onglet « Programme » : semaine par semaine, séances faites / à faire. */
 export default function ProgramScreen() {
   const { t } = useTranslation();
+  const theme = useTheme();
   const bundle = useAdherentBundle();
   const active = useActiveSession((s) => s.session);
   const today = todayLocal();
@@ -107,25 +109,24 @@ export default function ProgramScreen() {
       ) : null}
       {items.map((w) => {
         const status = w.done ? 'done' : w.date < today ? 'missed' : 'todo';
+        const color =
+          status === 'done'
+            ? theme.colors.success
+            : status === 'missed'
+              ? theme.colors.warning
+              : theme.accent.training;
         return (
           <Card
             key={w.id}
             onPress={() => setDetail(w)}
             accessibilityLabel={`${w.name}, ${formatLongDate(w.date)}`}
+            accent={w.date === today && status === 'todo' ? theme.accent.training : undefined}
           >
             <HStack gap="md">
-              <Icon
-                name={
-                  status === 'done'
-                    ? 'checkmark-circle'
-                    : status === 'missed'
-                      ? 'alert-circle-outline'
-                      : 'ellipse-outline'
-                }
-                color={
-                  status === 'done' ? 'success' : status === 'missed' ? 'warning' : 'textSubtle'
-                }
-                size={28}
+              <IconBadge
+                icon={status === 'done' ? 'checkmark' : status === 'missed' ? 'alert' : 'barbell'}
+                color={color}
+                size={40}
               />
               <VStack gap="xxs" flex={1}>
                 <Text weight="700">{w.name}</Text>

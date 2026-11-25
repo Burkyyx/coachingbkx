@@ -135,10 +135,14 @@ export default function CoachDashboard() {
         ) : null}
 
         {/* Suggestions */}
-        <Card style={{ flex: 1, minWidth: 240 }}>
+        <Card style={{ flex: 1, minWidth: 240 }} accent={theme.accent.suggestions}>
           <VStack gap="md">
-            <Text variant="subtitle">{t('nav.suggestions')}</Text>
-            <Text variant="headline" tabular>
+            <SectionHeader
+              title={t('nav.suggestions')}
+              icon="sparkles"
+              accent={theme.accent.suggestions}
+            />
+            <Text variant="display" tabular style={{ color: theme.accent.suggestions }}>
               {pending}
             </Text>
             <Text color="textMuted">{t('coach.pendingSuggestions', { count: pending })}</Text>
@@ -157,6 +161,8 @@ export default function CoachDashboard() {
         <VStack gap="sm">
           <SectionHeader
             title={`${t('coach.alerts')} (${allAlerts.length})`}
+            icon="warning"
+            accent={theme.accent.alerts}
             right={
               alertList.length > 0 ? (
                 <Button
@@ -228,7 +234,11 @@ export default function CoachDashboard() {
         </VStack>
       </Card>
 
-      <SectionHeader title={`${t('coach.adherents')} (${rows.length})`} />
+      <SectionHeader
+        title={`${t('coach.adherents')} (${rows.length})`}
+        icon="people"
+        accent={theme.accent.people}
+      />
       {rows.length === 0 ? (
         <EmptyState
           icon="people-outline"

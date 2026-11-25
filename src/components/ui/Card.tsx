@@ -7,10 +7,12 @@ type Props = ViewProps & {
   padded?: boolean;
   accessibilityLabel?: string;
   style?: StyleProp<ViewStyle>;
+  /** Couleur d'accent (liseré à gauche + fond légèrement teinté). */
+  accent?: string;
 };
 
 /** Carte : conteneur avec fond légèrement contrasté et coins arrondis. */
-export function Card({ onPress, padded = true, style, children, ...rest }: Props) {
+export function Card({ onPress, padded = true, style, accent, children, ...rest }: Props) {
   const theme = useTheme();
   const base: ViewStyle = {
     backgroundColor: theme.colors.surface,
@@ -18,6 +20,14 @@ export function Card({ onPress, padded = true, style, children, ...rest }: Props
     borderWidth: 1,
     borderColor: theme.colors.border,
     padding: padded ? theme.spacing.lg : 0,
+    ...(accent
+      ? {
+          borderLeftWidth: 4,
+          borderLeftColor: accent,
+          borderColor: `${accent}40`,
+          backgroundColor: theme.scheme === 'dark' ? `${accent}0F` : `${accent}0A`,
+        }
+      : null),
   };
   if (onPress) {
     return (

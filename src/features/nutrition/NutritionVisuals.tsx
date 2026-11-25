@@ -3,93 +3,11 @@ import type React from 'react';
 import { View } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 
-import { HStack, Icon, Text, VStack, type IconName } from '@/components/ui';
+import { HStack, IconBadge, Text, VStack, type IconName } from '@/components/ui';
 import { formatInt, formatNumber } from '@/core';
 import { useTheme } from '@/theme/ThemeProvider';
 
-/** Pastille ronde colorée avec une icône. */
-export function IconBadge({
-  icon,
-  color,
-  size = 36,
-}: {
-  icon: IconName;
-  color: string;
-  size?: number;
-}) {
-  return (
-    <View
-      style={{
-        width: size,
-        height: size,
-        borderRadius: size / 2,
-        backgroundColor: `${color}26`,
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      <Icon name={icon} size={size * 0.55} rawColor={color} />
-    </View>
-  );
-}
-
-/** Grand chiffre clé avec icône colorée. */
-export function StatTile({
-  icon,
-  color,
-  label,
-  value,
-  unit,
-  caption,
-  emphasis,
-}: {
-  icon: IconName;
-  color: string;
-  label: string;
-  value: string;
-  unit?: string;
-  caption?: string;
-  emphasis?: boolean;
-}) {
-  const theme = useTheme();
-  return (
-    <View
-      style={{
-        flexGrow: 1,
-        flexBasis: 170,
-        minWidth: 150,
-        padding: theme.spacing.md,
-        borderRadius: theme.radius.lg,
-        backgroundColor: emphasis ? `${color}1A` : theme.colors.surfaceAlt,
-        borderWidth: 1,
-        borderColor: emphasis ? color : theme.colors.border,
-        gap: theme.spacing.xs,
-      }}
-    >
-      <HStack gap="sm">
-        <IconBadge icon={icon} color={color} size={30} />
-        <Text variant="small" color="textMuted" style={{ flex: 1 }}>
-          {label}
-        </Text>
-      </HStack>
-      <HStack gap="xs" align="flex-end">
-        <Text variant="headline" tabular>
-          {value}
-        </Text>
-        {unit ? (
-          <Text variant="small" color="textMuted" style={{ marginBottom: 6 }}>
-            {unit}
-          </Text>
-        ) : null}
-      </HStack>
-      {caption ? (
-        <Text variant="caption" color="textSubtle">
-          {caption}
-        </Text>
-      ) : null}
-    </View>
-  );
-}
+export { IconBadge, StatTile } from '@/components/ui';
 
 type Segment = {
   key: string;

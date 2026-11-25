@@ -5,6 +5,8 @@ import { LineChart } from 'react-native-gifted-charts';
 import { useTheme } from '@/theme/ThemeProvider';
 
 import { Card } from './ui/Card';
+import type { IconName } from './ui/Icon';
+import { IconBadge } from './ui/Visuals';
 import { Text } from './ui/Text';
 import { formatNumber } from '@/core';
 
@@ -18,6 +20,9 @@ type Props = {
   unit?: string;
   height?: number;
   emptyText: string;
+  /** Couleur de la courbe principale (accent du domaine). */
+  color?: string;
+  icon?: IconName;
 };
 
 /**
@@ -31,8 +36,11 @@ export function LineChartCard({
   unit = '',
   height = 180,
   emptyText,
+  color,
+  icon,
 }: Props) {
   const theme = useTheme();
+  const main = color ?? theme.colors.chart[0];
   const [width, setWidth] = useState(0);
   const values = [...points, ...(points2 ?? [])].map((p) => p.value);
   const min = values.length ? Math.min(...values) : 0;
@@ -52,9 +60,12 @@ export function LineChartCard({
         onLayout={(e: LayoutChangeEvent) => setWidth(e.nativeEvent.layout.width)}
       >
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-          <Text weight="700">{title}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: theme.spacing.sm }}>
+            {icon && color ? <IconBadge icon={icon} color={color} size={28} /> : null}
+            <Text weight="700">{title}</Text>
+          </View>
           {last ? (
-            <Text weight="700" tabular>
+            <Text weight="700" tabular style={color ? { color } : undefined}>
               {formatNumber(last.value, 1)} {unit}
             </Text>
           ) : null}
@@ -74,9 +85,9 @@ export function LineChartCard({
             spacing={step}
             initialSpacing={6}
             endSpacing={6}
-            color1={theme.colors.chart[0]}
+            color1={main}
             color2={theme.colors.chart[1]}
-            dataPointsColor1={theme.colors.chart[0]}
+            dataPointsColor1={main}
             hideDataPoints2
             thickness={2}
             noOfSections={SECTIONS}

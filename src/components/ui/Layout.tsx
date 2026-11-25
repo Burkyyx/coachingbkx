@@ -13,6 +13,7 @@ import { SafeAreaView, type Edge } from 'react-native-safe-area-context';
 import { useTheme } from '@/theme/ThemeProvider';
 import type { spacing as spacingTokens } from '@/theme/tokens';
 
+import { Icon, type IconName } from './Icon';
 import { Text } from './Text';
 
 type Gap = keyof typeof spacingTokens;
@@ -145,14 +146,45 @@ export function Screen({
 }
 
 /** Titre de section avec action optionnelle à droite. */
-export function SectionHeader({ title, right }: { title: string; right?: ReactNode }) {
+export function SectionHeader({
+  title,
+  right,
+  icon,
+  accent,
+}: {
+  title: string;
+  right?: ReactNode;
+  /** Pastille d'icône colorée devant le titre (avec `accent`). */
+  icon?: IconName;
+  accent?: string;
+}) {
   return (
     <HStack justify="space-between">
-      <Text variant="subtitle" accessibilityRole="header">
-        {title}
-      </Text>
+      <HStack gap="sm" style={{ flex: 1 }}>
+        {icon && accent ? <SectionIcon icon={icon} color={accent} /> : null}
+        <Text variant="subtitle" accessibilityRole="header" style={{ flexShrink: 1 }}>
+          {title}
+        </Text>
+      </HStack>
       {right}
     </HStack>
+  );
+}
+
+function SectionIcon({ icon, color }: { icon: IconName; color: string }) {
+  return (
+    <View
+      style={{
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+        backgroundColor: `${color}26`,
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <Icon name={icon} size={16} rawColor={color} />
+    </View>
   );
 }
 

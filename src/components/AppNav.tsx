@@ -14,6 +14,8 @@ export type NavItem = {
   match: string;
   label: string;
   icon: IconName;
+  /** Couleur d'accent de l'entrée (icône, fond de l'entrée active). */
+  accent?: string;
   badge?: number;
   /** Affiché dans la barre du bas sur mobile (sinon seulement dans le menu « Plus »). */
   primary?: boolean;
@@ -94,10 +96,18 @@ export function Sidebar({
                 minHeight: MIN_TOUCH,
                 paddingHorizontal: theme.spacing.md,
                 borderRadius: theme.radius.md,
-                backgroundColor: active || pressed ? theme.colors.surfaceAlt : 'transparent',
+                backgroundColor: active
+                  ? `${item.accent ?? theme.colors.text}1F`
+                  : pressed
+                    ? theme.colors.surfaceAlt
+                    : 'transparent',
               })}
             >
-              <Icon name={item.icon} color={active ? 'text' : 'textMuted'} size={20} />
+              <Icon
+                name={item.icon}
+                rawColor={item.accent ?? (active ? theme.colors.text : theme.colors.textMuted)}
+                size={20}
+              />
               <Text
                 weight={active ? '700' : '500'}
                 color={active ? 'text' : 'textMuted'}
@@ -149,7 +159,11 @@ export function BottomBar({ items }: { items: NavItem[] }) {
             }}
           >
             <View>
-              <Icon name={item.icon} color={active ? 'text' : 'textSubtle'} size={24} />
+              <Icon
+                name={item.icon}
+                rawColor={active ? (item.accent ?? theme.colors.text) : theme.colors.textSubtle}
+                size={24}
+              />
               {item.badge ? (
                 <View style={{ position: 'absolute', top: -6, right: -12 }}>
                   <BadgeDot count={item.badge} />
@@ -160,6 +174,7 @@ export function BottomBar({ items }: { items: NavItem[] }) {
               variant="caption"
               weight={active ? '700' : '500'}
               color={active ? 'text' : 'textSubtle'}
+              style={active && item.accent ? { color: item.accent } : undefined}
               numberOfLines={1}
             >
               {item.label}

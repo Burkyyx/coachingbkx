@@ -6,6 +6,7 @@ import {
   Badge,
   Button,
   Card,
+  Avatar,
   Checkbox,
   EmptyState,
   ErrorState,
@@ -233,6 +234,11 @@ export default function SuggestionsScreen() {
             <Card key={s.id}>
               <VStack gap="sm">
                 <HStack gap="sm" wrap>
+                  <Avatar
+                    id={s.adherent_id}
+                    name={s.adherent ? fullName(s.adherent) : '?'}
+                    size={30}
+                  />
                   {tab === 'pending' ? (
                     <Checkbox
                       label={s.adherent ? fullName(s.adherent) : '—'}

@@ -2,6 +2,7 @@
  * THÈME CENTRALISÉ
  * ----------------
  * Toutes les couleurs, tailles et espacements de l'app sont définis ici.
+ * Base noir & blanc + une couleur d'accent par domaine (`accentColors`).
  * Pour changer l'identité visuelle (ex. passer d'un noir & blanc à une couleur
  * principale orange), il suffit de modifier `palette` et `brand` ci-dessous.
  */
@@ -100,6 +101,56 @@ export const nutritionColors: Record<ColorScheme, NutritionColors> = {
   },
 };
 
+/**
+ * Couleurs d'accent par domaine de l'app (icônes, pastilles, tuiles, onglet actif).
+ * Le fond reste noir / blanc et les boutons principaux gardent la couleur de la marque.
+ */
+export type AccentColors = {
+  training: string;
+  program: string;
+  nutrition: string;
+  progress: string;
+  records: string;
+  checkins: string;
+  messages: string;
+  suggestions: string;
+  community: string;
+  people: string;
+  alerts: string;
+  neutral: string;
+};
+
+export const accentColors: Record<ColorScheme, AccentColors> = {
+  dark: {
+    training: '#FB923C',
+    program: '#38BDF8',
+    nutrition: '#34D399',
+    progress: '#2DD4BF',
+    records: '#FACC15',
+    checkins: '#A78BFA',
+    messages: '#60A5FA',
+    suggestions: '#F472B6',
+    community: '#22D3EE',
+    people: '#818CF8',
+    alerts: '#F87171',
+    neutral: '#A3A3A3',
+  },
+  light: {
+    training: '#EA580C',
+    program: '#0284C7',
+    nutrition: '#059669',
+    progress: '#0D9488',
+    records: '#CA8A04',
+    checkins: '#7C3AED',
+    messages: '#2563EB',
+    suggestions: '#DB2777',
+    community: '#0891B2',
+    people: '#4F46E5',
+    alerts: '#DC2626',
+    neutral: '#525252',
+  },
+};
+
 /** Espacements (multiples de 4). */
 export const spacing = {
   xxs: 2,
@@ -142,6 +193,7 @@ export type Theme = {
   scheme: ColorScheme;
   colors: ThemeColors;
   nutrition: NutritionColors;
+  accent: AccentColors;
   spacing: typeof spacing;
   radius: typeof radius;
   typography: typeof typography;
@@ -152,6 +204,7 @@ export function buildTheme(scheme: ColorScheme): Theme {
     scheme,
     colors: colors[scheme],
     nutrition: nutritionColors[scheme],
+    accent: accentColors[scheme],
     spacing,
     radius,
     typography,

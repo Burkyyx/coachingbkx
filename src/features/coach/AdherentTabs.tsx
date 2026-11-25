@@ -21,6 +21,7 @@ import {
   TextField,
   VStack,
   useFeedback,
+  SectionHeader,
 } from '@/components/ui';
 import {
   exerciseProgress,
@@ -73,6 +74,7 @@ function Info({ label, value }: { label: string; value: string }) {
 // ---------------------------------------------------------------------------
 export function ProfileTab({ profile }: { profile: Profile }) {
   const { t } = useTranslation();
+  const theme = useTheme();
   const programs = useActiveProgram(profile.id);
   const weights = useAdherentWeights(profile.id);
   const points = (weights.data ?? []).map((w) => ({
@@ -120,9 +122,13 @@ export function ProfileTab({ profile }: { profile: Profile }) {
           </Text>
         </VStack>
       </Card>
-      <Card>
+      <Card accent={theme.accent.program}>
         <VStack gap="sm">
-          <Text weight="700">{t('adherent.currentProgram')}</Text>
+          <SectionHeader
+            title={t('adherent.currentProgram')}
+            icon="clipboard"
+            accent={theme.accent.program}
+          />
           {(programs.data ?? []).length === 0 ? (
             <Text color="textMuted">{t('adherent.noProgram')}</Text>
           ) : null}
@@ -160,6 +166,8 @@ export function ProfileTab({ profile }: { profile: Profile }) {
       </Card>
       <LineChartCard
         title={t('adherent.weightTrend')}
+        icon="scale"
+        color={theme.accent.progress}
         unit="kg"
         points={trend.map((p) => ({ label: formatShortDate(p.date), value: p.kg }))}
         points2={trend.map((p) => ({ label: formatShortDate(p.date), value: p.trend }))}
@@ -273,6 +281,7 @@ export function SessionsTab({ adherentId }: { adherentId: string }) {
 // ---------------------------------------------------------------------------
 export function ProgressTab({ adherentId }: { adherentId: string }) {
   const { t } = useTranslation();
+  const theme = useTheme();
   const sessions = useAdherentSessions(adherentId);
   const { data: exercises = [] } = useExercises();
   const names = useMemo(() => new Map(exercises.map((e) => [e.id, e.name])), [exercises]);
@@ -317,18 +326,24 @@ export function ProgressTab({ adherentId }: { adherentId: string }) {
       />
       <LineChartCard
         title={t('adherent.maxLoad')}
+        icon="barbell"
+        color={theme.accent.training}
         unit="kg"
         points={series('maxLoad')}
         emptyText={t('adherent.noData')}
       />
       <LineChartCard
         title={t('adherent.e1rm')}
+        icon="flash"
+        color={theme.accent.records}
         unit="kg"
         points={series('estimated1RM')}
         emptyText={t('adherent.noData')}
       />
       <LineChartCard
         title={t('adherent.volume')}
+        icon="layers"
+        color={theme.accent.program}
         unit="kg"
         points={series('volume')}
         emptyText={t('adherent.noData')}

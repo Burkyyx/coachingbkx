@@ -8,6 +8,7 @@ import {
   EmptyState,
   ErrorState,
   HStack,
+  IconBadge,
   LoadingState,
   Screen,
   Text,
@@ -23,10 +24,12 @@ import { WorkoutSummaryCard } from '@/features/training/WorkoutSummaryCard';
 import { supabase } from '@/lib/supabase';
 import { NotificationBell } from '@/features/notifications/NotificationBell';
 import { SyncBadge } from '@/offline/SyncBadge';
+import { useTheme } from '@/theme/ThemeProvider';
 
 /** Onglet « Aujourd'hui » : séance du jour, dernier message du coach, rappel du bilan. */
 export default function TodayScreen() {
   const { t } = useTranslation();
+  const theme = useTheme();
   const { confirm } = useFeedback();
   const { profile, userId } = useAuth();
   const bundle = useAdherentBundle();
@@ -97,9 +100,14 @@ export default function TodayScreen() {
       </HStack>
 
       {active ? (
-        <Card>
+        <Card accent={theme.accent.training}>
           <VStack gap="sm">
-            <Text weight="700">{t('training.resumeBanner', { name: active.workoutName })}</Text>
+            <HStack gap="sm">
+              <IconBadge icon="play" color={theme.accent.training} size={30} />
+              <Text weight="700" style={{ flex: 1 }}>
+                {t('training.resumeBanner', { name: active.workoutName })}
+              </Text>
+            </HStack>
             <Button
               size="xl"
               icon="play"
@@ -164,9 +172,14 @@ export default function TodayScreen() {
       )}
 
       {showCheckin ? (
-        <Card>
+        <Card accent={theme.accent.checkins}>
           <VStack gap="sm">
-            <Text weight="700">{t('training.checkinReminder')}</Text>
+            <HStack gap="sm">
+              <IconBadge icon="clipboard-outline" color={theme.accent.checkins} size={30} />
+              <Text weight="700" style={{ flex: 1 }}>
+                {t('training.checkinReminder')}
+              </Text>
+            </HStack>
             <Text color="textMuted">{t('training.checkinReminderBody')}</Text>
             <Button
               variant="secondary"
@@ -182,11 +195,15 @@ export default function TodayScreen() {
         <Card
           onPress={() => router.push('/messages')}
           accessibilityLabel={t('training.openMessages')}
+          accent={theme.accent.messages}
         >
           <VStack gap="xs">
-            <Text variant="small" weight="700" color="textMuted">
-              {t('training.lastCoachMessage').toUpperCase()}
-            </Text>
+            <HStack gap="sm">
+              <IconBadge icon="chatbubble-ellipses" color={theme.accent.messages} size={28} />
+              <Text variant="small" weight="700" style={{ color: theme.accent.messages }}>
+                {t('training.lastCoachMessage').toUpperCase()}
+              </Text>
+            </HStack>
             <Text numberOfLines={3}>
               {extras.data.lastMessage.kind === 'text'
                 ? extras.data.lastMessage.body

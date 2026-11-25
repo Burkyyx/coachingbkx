@@ -80,7 +80,9 @@ suggestions automatiques **validées par le coach**. Phases : 1 (entraînement, 
   - plancher = **MB** (jamais < 1 200 kcal) ; perte limitée à 1 %/semaine ;
   - objectif : sèche DEJ − 15 %, prise de masse + 10 %, sinon = DEJ ; protéines 1,8 g/kg (2 g/kg en sèche),
     lipides 1 g/kg, glucides = le reste. Tout reste modifiable par adhérent.
-- Nom de l'app : **« Divus »** (anciennement « Élan », renommée en nov. 2026), thème noir & blanc (`src/theme/tokens.ts`).
+- Nom de l'app : **« Divus »** (anciennement « Élan », renommée en nov. 2026). Thème (`src/theme/tokens.ts`) : base noir & blanc
+  + **une couleur d'accent par domaine** (`theme.accent` : entraînement orange, programme bleu ciel, nutrition vert, records or,
+  bilans violet, messages bleu, suggestions rose…), via `IconBadge`, `StatTile`, `Avatar`, `SectionHeader icon/accent`, `Card accent`.
   Identifiants techniques gardés volontairement avec « elan » (renommer = perte de données) :
   `supabase/config.toml` project_id (base locale), préfixe `elan:` (stockage web) et `elan.db` (SQLite).
 
