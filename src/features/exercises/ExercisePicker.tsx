@@ -107,8 +107,8 @@ export function ExercisePicker({
                 selected={muscles}
                 onSelect={(m) => {
                   setMuscles(m);
-                  // Sur téléphone, on replie le schéma pour montrer tout de suite les exercices.
-                  if (!desktop && m.length > 0) setBodyOpen(false);
+                  // On replie le schéma pour montrer tout de suite les exercices du muscle choisi.
+                  if (m.length > 0) setBodyOpen(false);
                 }}
                 width={110}
               />
