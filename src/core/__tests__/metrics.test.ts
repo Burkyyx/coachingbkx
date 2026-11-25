@@ -1,6 +1,7 @@
 import {
   formatDuration,
   formatKg,
+  formatInt,
   formatNumber,
   formatRepRange,
   formatSigned,
@@ -34,6 +35,10 @@ import { session, set } from '../testing/factories';
 describe('format', () => {
   it('formate les nombres à la française', () => {
     expect(formatNumber(62.5)).toBe('62,5');
+    expect(formatInt(1349.4)).toBe('1\u202F349');
+    expect(formatInt(12500)).toBe('12\u202F500');
+    expect(formatInt(950)).toBe('950');
+    expect(formatInt(-2500)).toBe('−2\u202F500');
     expect(formatNumber(60)).toBe('60');
     expect(formatNumber(2.256)).toBe('2,26');
     expect(formatKg(62.5)).toBe('62,5 kg');

@@ -10,6 +10,13 @@ export function formatNumber(value: number, maxDecimals = 2): string {
   return String(rounded).replace('.', ',');
 }
 
+/** Entier avec espace (fine insécable) des milliers : 1349.4 → "1 349" ; −2500 → "−2 500". */
+export function formatInt(value: number): string {
+  const n = Math.round(value);
+  const digits = String(Math.abs(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F');
+  return n < 0 ? `−${digits}` : digits;
+}
+
 /** 62.5 → "62,5 kg". */
 export function formatKg(value: number): string {
   return `${formatNumber(value)} kg`;

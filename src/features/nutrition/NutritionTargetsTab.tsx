@@ -1,11 +1,14 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { View } from 'react-native';
+
 import {
   Button,
   Card,
   Checkbox,
   HStack,
+  Icon,
   LoadingState,
   NumberCell,
   Text,
@@ -16,6 +19,7 @@ import {
 import {
   ageOn,
   computeNutritionTargets,
+  formatInt,
   formatNumber,
   kcalFromMacros,
   NAP_BY_ACTIVITY,
@@ -26,6 +30,7 @@ import {
 import { useAdherentWeights } from '@/features/coach/adherent';
 import { toUserMessage } from '@/lib/errors';
 import type { Tables } from '@/lib/supabase';
+import { useTheme } from '@/theme/ThemeProvider';
 
 import {
   useNutritionTargets,
@@ -33,6 +38,7 @@ import {
   useSaveNutritionTargets,
   type NutritionTargetsRow,
 } from './api';
+import { IconBadge, MacroBreakdown, StackedBar, StatTile } from './NutritionVisuals';
 
 type Profile = Tables<'profiles'>;
 
@@ -93,6 +99,7 @@ function TargetsEditor({
 }) {
   const { t } = useTranslation();
   const { toast } = useFeedback();
+  const theme = useTheme();
   const week = usePlannedWeek(profile.id);
   const save = useSaveNutritionTargets(profile.id);
 
@@ -173,87 +180,170 @@ function TargetsEditor({
   const pct = (f: number) =>
     `${f > 0 ? '+' : f < 0 ? '−' : ''}${formatNumber(Math.abs(f) * 100, 0)} %`;
 
+  const nc = theme.nutrition;
+  const activityKcal = calc ? calc.bmr * (calc.nap - 1) : 0;
+  const macroField = (
+    key: 'protein_g' | 'carbs_g' | 'fat_g',
+    label: string,
+    color: string,
+    max: number,
+  ) => (
+    <VStack gap="xxs">
+      <HStack gap="xs">
+        <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: color }} />
+        <Text variant="small" color="textMuted">
+          {label}
+        </Text>
+      </HStack>
+      <NumberCell
+        label={label}
+        value={form[key]}
+        decimals={0}
+        max={max}
+        width={110}
+        onCommit={(v) => set(key, v)}
+      />
+    </VStack>
+  );
+  const macroGap = macroKcal !== null && form.kcal !== null ? macroKcal - form.kcal : null;
+
   return (
     <VStack gap="lg">
       {/* Calcul proposé */}
       <Card>
-        <VStack gap="sm">
-          <Text weight="700">{t('nutrition.calcTitle')}</Text>
-          <Text variant="small" color="textMuted">
-            {t('nutrition.calcHelp')}
-          </Text>
-          <HStack gap="sm" wrap align="flex-end">
-            <NumberCell
-              label={t('nutrition.weightUsed')}
-              showLabel
-              value={weight}
-              decimals={1}
-              min={25}
-              max={350}
-              width={110}
-              onCommit={setWeight}
-            />
-            <NumberCell
-              label={t('nutrition.napUsed')}
-              showLabel
-              value={
-                nap ?? (profile.activity_level ? NAP_BY_ACTIVITY[profile.activity_level] : null)
-              }
-              decimals={2}
-              min={1.1}
-              max={2.5}
-              width={90}
-              onCommit={(v) => setNap(v)}
-            />
-          </HStack>
-          {missing.length > 0 ? (
-            <Text color="warning">{t('nutrition.missing', { list: missing.join(', ') })}</Text>
-          ) : calc ? (
-            <VStack gap="xxs">
-              <Row label={t('nutrition.stepBmr')} value={`${calc.bmr} kcal`} />
-              <Row
-                label={t('nutrition.stepNap', {
-                  nap: formatNumber(calc.nap, 2),
-                  activity: profile.activity_level
-                    ? t(`enums.activity.${profile.activity_level}`)
-                    : '—',
-                })}
-                value={`${Math.round(calc.bmr * calc.nap)} kcal`}
-              />
-              <Row
-                label={
-                  sessions.length
-                    ? t('nutrition.stepTraining', { count: sessions.length, minutes: avgMinutes })
-                    : t('nutrition.stepTrainingNone')
-                }
-                value={`+${calc.trainingKcalPerDay} kcal/j`}
-              />
-              <Row label={t('nutrition.stepTdee')} value={`${calc.tdee} kcal`} strong />
-              {profile.goal ? (
-                <Row
-                  label={t('nutrition.stepGoal', {
-                    goal: t(`enums.goal.${profile.goal}`),
-                    percent: pct(calc.goalFactor),
-                  })}
-                  value={`${calc.kcal} kcal`}
-                  strong
-                />
-              ) : null}
-              <Row label={t('nutrition.stepFloor')} value={`${calc.floor} kcal`} />
+        <VStack gap="md">
+          <HStack justify="space-between" align="flex-start" wrap gap="md">
+            <VStack gap="xxs" flex={1}>
+              <HStack gap="sm">
+                <IconBadge icon="calculator-outline" color={nc.bmr} size={32} />
+                <Text variant="subtitle">{t('nutrition.calcTitle')}</Text>
+              </HStack>
               <Text variant="small" color="textMuted">
-                {`${t('nutrition.protein')} ${calc.proteinG} · ${t('nutrition.carbs')} ${calc.carbsG} · ${t('nutrition.fat')} ${calc.fatG}`}
+                {t('nutrition.calcHelp')}
               </Text>
-              <HStack>
-                <Button
-                  variant="secondary"
-                  icon="arrow-down"
-                  label={t('nutrition.useCalc')}
-                  onPress={applyCalc}
+            </VStack>
+            <HStack gap="sm" align="flex-end">
+              <NumberCell
+                label={t('nutrition.weightUsed')}
+                showLabel
+                value={weight}
+                decimals={1}
+                min={25}
+                max={350}
+                width={110}
+                onCommit={setWeight}
+              />
+              <NumberCell
+                label={t('nutrition.napUsed')}
+                showLabel
+                value={
+                  nap ?? (profile.activity_level ? NAP_BY_ACTIVITY[profile.activity_level] : null)
+                }
+                decimals={2}
+                min={1.1}
+                max={2.5}
+                width={90}
+                onCommit={(v) => setNap(v)}
+              />
+            </HStack>
+          </HStack>
+
+          {missing.length > 0 ? (
+            <HStack gap="sm" align="flex-start">
+              <Icon name="alert-circle-outline" color="warning" />
+              <Text color="warning" style={{ flex: 1 }}>
+                {t('nutrition.missing', { list: missing.join(', ') })}
+              </Text>
+            </HStack>
+          ) : !calc ? (
+            <LoadingState />
+          ) : (
+            <VStack gap="lg">
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: theme.spacing.sm }}>
+                <StatTile
+                  icon="flame-outline"
+                  color={nc.bmr}
+                  label={t('nutrition.statBmr')}
+                  value={formatInt(calc.bmr)}
+                  unit="kcal"
+                  caption={t('nutrition.statBmrCaption')}
                 />
+                <StatTile
+                  icon="flash-outline"
+                  color={nc.activity}
+                  label={t('nutrition.statTdee')}
+                  value={formatInt(calc.tdee)}
+                  unit="kcal"
+                  caption={t('nutrition.statTdeeCaption')}
+                />
+                <StatTile
+                  icon="flag-outline"
+                  color={nc.training}
+                  emphasis
+                  label={t('nutrition.statTarget')}
+                  value={formatInt(calc.kcal)}
+                  unit="kcal"
+                  caption={`${profile.goal ? `${t(`enums.goal.${profile.goal}`)} · ${pct(calc.goalFactor)}` : t('nutrition.noGoal')} · ${t('nutrition.floorShort', { kcal: formatInt(calc.floor) })}`}
+                />
+              </View>
+
+              <VStack gap="sm">
+                <Text weight="700">{t('nutrition.breakdownTitle')}</Text>
+                <StackedBar
+                  unit="kcal"
+                  segments={[
+                    {
+                      key: 'bmr',
+                      icon: 'flame-outline',
+                      color: nc.bmr,
+                      label: t('nutrition.segBmr'),
+                      detail: t('nutrition.segBmrDetail'),
+                      value: calc.bmr,
+                    },
+                    {
+                      key: 'activity',
+                      icon: 'walk-outline',
+                      color: nc.activity,
+                      label: t('nutrition.segActivity'),
+                      detail: t('nutrition.segActivityDetail', {
+                        nap: formatNumber(calc.nap, 2),
+                        activity: profile.activity_level
+                          ? t(`enums.activity.${profile.activity_level}`)
+                          : '—',
+                      }),
+                      value: activityKcal,
+                    },
+                    {
+                      key: 'training',
+                      icon: 'barbell-outline',
+                      color: nc.training,
+                      label: t('nutrition.segTraining'),
+                      detail: sessions.length
+                        ? t('nutrition.segTrainingDetail', {
+                            count: sessions.length,
+                            minutes: avgMinutes,
+                          })
+                        : t('nutrition.segTrainingNone'),
+                      value: calc.trainingKcalPerDay,
+                    },
+                  ]}
+                />
+              </VStack>
+
+              <VStack gap="sm">
+                <Text weight="700">{t('nutrition.macrosTitle')}</Text>
+                <MacroBreakdown
+                  proteinG={calc.proteinG}
+                  carbsG={calc.carbsG}
+                  fatG={calc.fatG}
+                  weightKg={weight}
+                />
+              </VStack>
+
+              <HStack>
+                <Button icon="arrow-down" label={t('nutrition.useCalc')} onPress={applyCalc} />
               </HStack>
             </VStack>
-          ) : (
-            <LoadingState />
           )}
         </VStack>
       </Card>
@@ -261,10 +351,18 @@ function TargetsEditor({
       {/* Objectifs enregistrés */}
       <Card>
         <VStack gap="md">
-          <Text weight="700">{t('nutrition.targetsTitle')}</Text>
+          <HStack gap="sm">
+            <IconBadge icon="flag-outline" color={nc.training} size={32} />
+            <Text variant="subtitle" style={{ flex: 1 }}>
+              {t('nutrition.targetsTitle')}
+            </Text>
+          </HStack>
           {!row ? <Text color="textMuted">{t('nutrition.targetsNone')}</Text> : null}
           {age !== null && age < 18 ? (
-            <Text color="warning">{t('nutrition.minorWarning')}</Text>
+            <HStack gap="sm">
+              <Icon name="information-circle-outline" color="warning" />
+              <Text color="warning">{t('nutrition.minorWarning')}</Text>
+            </HStack>
           ) : null}
           <Checkbox
             checked={form.calories_enabled}
@@ -272,53 +370,55 @@ function TargetsEditor({
             label={t('nutrition.caloriesEnabled')}
             description={t('nutrition.caloriesEnabledHint')}
           />
-          <HStack gap="sm" wrap align="flex-end">
-            <NumberCell
-              label={t('nutrition.kcal')}
-              showLabel
-              value={form.kcal}
-              decimals={0}
-              min={800}
-              max={8000}
-              width={120}
-              onCommit={(v) => set('kcal', v)}
-            />
-            <NumberCell
-              label={t('nutrition.protein')}
-              showLabel
-              value={form.protein_g}
-              decimals={0}
-              max={600}
-              width={110}
-              onCommit={(v) => set('protein_g', v)}
-            />
-            <NumberCell
-              label={t('nutrition.carbs')}
-              showLabel
-              value={form.carbs_g}
-              decimals={0}
-              max={1500}
-              width={110}
-              onCommit={(v) => set('carbs_g', v)}
-            />
-            <NumberCell
-              label={t('nutrition.fat')}
-              showLabel
-              value={form.fat_g}
-              decimals={0}
-              max={500}
-              width={110}
-              onCommit={(v) => set('fat_g', v)}
-            />
+          <HStack gap="md" wrap align="flex-end">
+            <VStack gap="xxs">
+              <HStack gap="xs">
+                <Icon name="flame" size={14} rawColor={nc.training} />
+                <Text variant="small" color="textMuted">
+                  {t('nutrition.kcal')}
+                </Text>
+              </HStack>
+              <NumberCell
+                label={t('nutrition.kcal')}
+                value={form.kcal}
+                decimals={0}
+                min={800}
+                max={8000}
+                width={130}
+                onCommit={(v) => set('kcal', v)}
+              />
+            </VStack>
+            {macroField('protein_g', t('nutrition.protein'), nc.protein, 600)}
+            {macroField('carbs_g', t('nutrition.carbs'), nc.carbs, 1500)}
+            {macroField('fat_g', t('nutrition.fat'), nc.fat, 500)}
           </HStack>
-          {macroKcal !== null ? (
-            <Text
-              variant="small"
-              color={form.kcal && Math.abs(macroKcal - form.kcal) > 100 ? 'warning' : 'textMuted'}
-            >
-              {t('nutrition.macrosKcal', { kcal: macroKcal })}
-            </Text>
+          {form.protein_g !== null && form.carbs_g !== null && form.fat_g !== null ? (
+            <MacroBreakdown
+              compact
+              proteinG={form.protein_g}
+              carbsG={form.carbs_g}
+              fatG={form.fat_g}
+              weightKg={weight}
+            />
           ) : null}
+          {macroGap !== null ? (
+            <HStack gap="xs">
+              <Icon
+                name={Math.abs(macroGap) <= 100 ? 'checkmark-circle' : 'alert-circle'}
+                size={18}
+                color={Math.abs(macroGap) <= 100 ? 'success' : 'warning'}
+              />
+              <Text variant="small" color={Math.abs(macroGap) <= 100 ? 'success' : 'warning'}>
+                {t('nutrition.macrosKcal', { kcal: formatInt(macroKcal ?? 0) })}
+              </Text>
+            </HStack>
+          ) : null}
+
+          <View style={{ height: 1, backgroundColor: theme.colors.border }} />
+          <HStack gap="sm">
+            <Icon name="options-outline" color="textMuted" size={18} />
+            <Text weight="700">{t('nutrition.settingsTitle')}</Text>
+          </HStack>
           <HStack gap="sm" wrap align="flex-end">
             <NumberCell
               label={t('nutrition.floor')}
@@ -327,7 +427,7 @@ function TargetsEditor({
               decimals={0}
               min={800}
               max={4000}
-              width={120}
+              width={130}
               onCommit={(v) => set('floor_kcal', v)}
             />
             <NumberCell
@@ -374,23 +474,5 @@ function TargetsEditor({
         </VStack>
       </Card>
     </VStack>
-  );
-}
-
-function Row({ label, value, strong }: { label: string; value: string; strong?: boolean }) {
-  return (
-    <HStack justify="space-between" gap="md">
-      <Text
-        variant="small"
-        color={strong ? 'text' : 'textMuted'}
-        weight={strong ? '700' : '400'}
-        style={{ flex: 1 }}
-      >
-        {label}
-      </Text>
-      <Text variant="small" weight={strong ? '700' : '400'} tabular>
-        {value}
-      </Text>
-    </HStack>
   );
 }

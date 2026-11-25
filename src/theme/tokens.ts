@@ -71,6 +71,35 @@ export const colors: Record<ColorScheme, ThemeColors> = {
   },
 };
 
+/** Nutrition : une couleur par macro et par composante de la dépense énergétique. */
+export type NutritionColors = {
+  protein: string;
+  carbs: string;
+  fat: string;
+  bmr: string;
+  activity: string;
+  training: string;
+};
+
+export const nutritionColors: Record<ColorScheme, NutritionColors> = {
+  dark: {
+    protein: '#F87171',
+    carbs: '#FBBF24',
+    fat: '#60A5FA',
+    bmr: '#A78BFA',
+    activity: '#34D399',
+    training: '#FB923C',
+  },
+  light: {
+    protein: '#DC2626',
+    carbs: '#D97706',
+    fat: '#2563EB',
+    bmr: '#7C3AED',
+    activity: '#059669',
+    training: '#EA580C',
+  },
+};
+
 /** Espacements (multiples de 4). */
 export const spacing = {
   xxs: 2,
@@ -112,11 +141,19 @@ export const DESKTOP_BREAKPOINT = 900;
 export type Theme = {
   scheme: ColorScheme;
   colors: ThemeColors;
+  nutrition: NutritionColors;
   spacing: typeof spacing;
   radius: typeof radius;
   typography: typeof typography;
 };
 
 export function buildTheme(scheme: ColorScheme): Theme {
-  return { scheme, colors: colors[scheme], spacing, radius, typography };
+  return {
+    scheme,
+    colors: colors[scheme],
+    nutrition: nutritionColors[scheme],
+    spacing,
+    radius,
+    typography,
+  };
 }
