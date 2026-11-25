@@ -70,6 +70,14 @@ export default function CoachLayout() {
       primary: true,
     },
     {
+      href: '/coach/community',
+      match: '/coach/community',
+      label: t('nav.community'),
+      icon: 'people-circle-outline',
+      accent: theme.accent.community,
+      badge: badges.pendingReports,
+    },
+    {
       href: '/coach/invitations',
       match: '/coach/invitations',
       label: t('nav.invitations'),

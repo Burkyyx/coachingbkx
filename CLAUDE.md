@@ -70,7 +70,7 @@ suggestions automatiques **validées par le coach**. Phases : 1 (entraînement, 
 ## État d'avancement
 
 - **Phase 1 validée par Enzo** (nov. 2026). **Phase 2 (nutrition) : validée et livrée** (objectifs, journal, code-barres, photo IA,
-  suggestions caloriques + alerte déficit/force, journal côté coach). **Phase 3 (communauté) : validée par Enzo (nov. 2026), en cours.**
+  suggestions caloriques + alerte déficit/force, journal côté coach). **Phase 3 (communauté) : validée par Enzo (nov. 2026), livrée** (fil, XP/niveaux/badges, challenges, modération).
 - Phase 3 — décisions : 8 niveaux (Recrue, Initié, Régulier, Confirmé, Athlète, Élite, Champion, Légende) ;
   XP par défaut (réglables, plafonnés) : séance 20 · bilan 15 · semaine complète 30 · record 10 (max 3/séance) ·
   challenge réussi 50 · journal alimentaire tenu (≥ 2 repas notés dans la journée) 10 — **jamais d'XP ni de
@@ -78,6 +78,10 @@ suggestions automatiques **validées par le coach**. Phases : 1 (entraînement, 
   Posts automatiques désactivés par défaut (l'adhérent les active) ; posts manuels publiés tout de suite,
   modération a posteriori. Consentement « communauté » demandé à l'inscription (facultatif) et par une fenêtre
   aux adhérents déjà inscrits. Pas de messages privés entre adhérents. Identité : pseudo (sinon prénom + initiale).
+  Technique : migration `…000020_community.sql` (XP/badges/progression des challenges attribués par
+  déclencheurs SQL ; lecture publique via `community_people()` / `challenge_board()` uniquement) ;
+  `src/core/community/progression.ts` (niveaux, badges, barème) ; écrans `src/features/community/`,
+  onglet adhérent `(tabs)/community.tsx`, espace coach `coach/community.tsx`.
 - Phase 2 — décisions : analyse photo avec **Claude Haiku 5.5** (`claude-haiku-5-5`, modèle réglable par variable
   d'environnement de l'Edge Function) ; code-barres **caméra + saisie manuelle** (Open Food Facts) ; compte
   Anthropic créé plus tard par Enzo. Objectifs : calcul **DEJ = métabolisme de base × NAP** (sexe, taille, poids,

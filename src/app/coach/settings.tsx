@@ -92,6 +92,11 @@ export default function SettingsScreen() {
           onPress={() => router.push('/coach/exercises')}
         />
         <ListRow
+          icon="people-circle-outline"
+          title={t('nav.community')}
+          onPress={() => router.push('/coach/community')}
+        />
+        <ListRow
           icon="person-add-outline"
           title={t('nav.invitations')}
           onPress={() => router.push('/coach/invitations')}
