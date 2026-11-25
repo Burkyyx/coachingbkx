@@ -218,7 +218,20 @@ d'un exercice.
    npx supabase functions deploy compute-suggestions
    npx supabase functions deploy send-push
    npx supabase functions deploy delete-account
+   npx supabase functions deploy analyze-meal
    ```
+   **Analyse des photos de repas (Phase 2)** : tant qu'aucune clé n'est enregistrée, l'app propose
+   la saisie manuelle à la place. Pour l'activer, crée une clé sur https://console.anthropic.com
+   (_API Keys_), puis :
+   ```bash
+   npx supabase secrets set ANTHROPIC_API_KEY="sk-ant-..."
+   # facultatif : autre modèle que Claude Haiku 5.5
+   npx supabase secrets set ANTHROPIC_MODEL="claude-haiku-5-5"
+   ```
+   La clé reste sur le serveur Supabase : elle n'est jamais dans l'app. Coût indicatif : moins
+   d'un dixième de centime par photo ; le nombre d'analyses par jour et par adhérent se règle
+   dans l'onglet Nutrition de chaque adhérent (10 par défaut), et chaque analyse est notée dans
+   la table `ai_usage`.
 4. **Tâches planifiées** :
    - dans Supabase, _Database → Extensions_ : active **pg_cron** et **pg_net** (sinon erreur
      « schema "cron" does not exist ») ;

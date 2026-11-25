@@ -824,6 +824,33 @@ export const fr = {
       cameraDenied:
         'L’accès à la caméra est refusé : autorise-le dans les réglages, ou tape le code à la main.',
       cameraUnavailable: 'Caméra indisponible ici : tape le code à la main.',
+      modePhoto: 'Photo',
+      takePhoto: 'Prendre une photo',
+      choosePhoto: 'Choisir une photo',
+      changePhoto: 'Changer de photo',
+      photoHelp: 'Prends ton assiette en photo, de face ou légèrement au-dessus, avec la lumière.',
+      photoNoNumbers: 'La photo et ta description suffisent : ton coach les verra.',
+      hintLabel: 'Précision (facultatif)',
+      hintPlaceholder: 'Ex. : pâtes carbonara, 1 cuillère d’huile',
+      analyze: 'Analyser avec l’IA',
+      analyzing: 'Analyse en cours…',
+      analysesLeft: '{{count}} analyse(s) restante(s) aujourd’hui',
+      manualEntry: 'Saisir les aliments moi-même',
+      aiConsentTitle: 'Analyse des photos par IA',
+      aiConsentBody:
+        'L’IA estime les aliments et les quantités de ta photo. Seule la photo est envoyée au service d’analyse (Anthropic), sans ton nom ni ton identifiant. Tu vérifies toujours le résultat avant d’enregistrer.',
+      aiResult: 'Estimation de l’IA : vérifie et corrige si besoin avant d’enregistrer.',
+      aiNote: 'Remarque : {{note}}',
+      lowConfidence: 'Estimation incertaine : vérifie cet aliment.',
+      notFood:
+        'Aucun aliment reconnu sur cette photo. Essaie une autre photo ou saisis les aliments.',
+      aiNotConfigured:
+        'L’analyse photo n’est pas encore activée par ton coach : saisis les aliments ci-dessous.',
+      aiLimit: 'Tu as utilisé toutes tes analyses photo du jour : saisis les aliments ci-dessous.',
+      aiBusy: 'Le service d’analyse est très sollicité : réessaie dans un instant.',
+      aiFailed: 'L’analyse n’a pas abouti. Réessaie, ou saisis les aliments ci-dessous.',
+      photoUploadFailed: 'Envoi de la photo impossible. Vérifie ta connexion.',
+      photoMissing: 'Ajoute une photo.',
     },
   },
   adherent: {

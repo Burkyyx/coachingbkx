@@ -449,3 +449,6 @@ verify_jwt = false
 
 [functions.delete-account]
 verify_jwt = false
+
+[functions.analyze-meal]
+verify_jwt = false

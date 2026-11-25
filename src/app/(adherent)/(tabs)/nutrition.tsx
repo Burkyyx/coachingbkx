@@ -1,3 +1,4 @@
+import { Image } from 'expo-image';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, View } from 'react-native';
@@ -42,6 +43,7 @@ import {
 } from '@/features/nutrition/journal';
 import { MacroProgress, ProgressRing } from '@/features/nutrition/NutritionVisuals';
 import { toUserMessage } from '@/lib/errors';
+import { useSignedUrl } from '@/lib/storage';
 import { useTheme } from '@/theme/ThemeProvider';
 
 const MEAL_ICONS: Record<MealType, IconName> = {
@@ -363,6 +365,8 @@ function MealCard({
   const { toast, confirm } = useFeedback();
   const { remove, setFavorite } = useMealActions(adherentId);
   const totals = mealTotals(meal);
+  const photo = useSignedUrl('meal-photos', meal.photo_path);
+  const label = mealLabel(meal);
 
   const onDelete = async () => {
     const ok = await confirm({
@@ -384,8 +388,23 @@ function MealCard({
     <Card>
       <VStack gap="sm">
         <HStack gap="sm" align="flex-start">
+          {meal.photo_path ? (
+            <Image
+              source={photo.data ? { uri: photo.data } : undefined}
+              style={{
+                width: 56,
+                height: 56,
+                borderRadius: theme.radius.md,
+                backgroundColor: theme.colors.surfaceAlt,
+              }}
+              contentFit="cover"
+              accessibilityLabel={t('nutrition.journal.modePhoto')}
+            />
+          ) : null}
           <VStack gap="xxs" flex={1}>
-            <Text weight="600">{mealLabel(meal)}</Text>
+            <Text weight="600">
+              {label === '—' && meal.photo_path ? t('nutrition.journal.modePhoto') : label}
+            </Text>
             <Text variant="caption" color="textSubtle" tabular>
               {formatTime(meal.eaten_at)}
               {numbers
